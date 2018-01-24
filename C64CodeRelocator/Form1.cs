@@ -24,9 +24,41 @@ namespace C64CodeRelocator
 
         public Form1()
         {
-            ReadFile();
             InitializeComponent();
+            PopulateOpCodeList.Init();
+            ReadBin();
+            ReadFile();
         }
+
+        private void ReadBin()
+        {
+            List<string> code = new List<string>();
+            var fileStuff = File.ReadAllBytes("BIG-T");
+            int filePosition = 0;
+            int startAddress = 2304;
+            int lineNumber = 0;
+            int pc = 0;
+            var m_OpCodes = PopulateOpCodeList.GetOpCodes;
+            while (filePosition < fileStuff.Length)
+            {
+                int opCode = fileStuff[filePosition];
+                lineNumber = startAddress + filePosition;
+                string line = (startAddress + filePosition).ToString("X4");
+                line += "  " + opCode.ToString("X2");
+                pc = startAddress + filePosition;
+                foreach (OpCode oc in m_OpCodes)
+                {
+
+                    if (oc.m_code == opCode.ToString("X2"))
+                    {
+                        oc.GetCode(ref line, ref filePosition, fileStuff, lineNumber, pc);
+                    }
+                }
+                code.Add(line);
+            }
+            textBox1.Lines = code.ToArray();
+        }
+
 
         private void ReadFile()
         {
