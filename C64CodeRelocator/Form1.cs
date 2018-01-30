@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -12,32 +13,30 @@ namespace C64CodeRelocator
         private string branch = "branch";
         private int labelCount = 0;
         private int branchCount = 0;
+        private int startAddress = 0;
 
+        private List<string> code = new List<string>();
         private List<string> passOne = new List<string>();
         private List<string> passTwo = new List<string>();
         private List<string> passThree = new List<string>();
         private List<string> found = new List<string>();
         private Dictionary<string, string> labelLoc = new Dictionary<string, string>();
         private Dictionary<string, string> branchLoc = new Dictionary<string, string>();
-        private string memStartLocation = "0900";
-        private string memEndLocation = "0ad1";
 
         public Form1()
         {
             InitializeComponent();
+            generate.Enabled = false;
             PopulateOpCodeList.Init();
-            ReadBin();
-            ReadFile();
         }
 
-        private void ReadBin()
+        private void ReadBin(string fileName)
         {
-            List<string> code = new List<string>();
-            var fileStuff = File.ReadAllBytes("BIG-T");
+            var fileStuff = File.ReadAllBytes(fileName);
             int filePosition = 0;
-            int startAddress = 2304;
             int lineNumber = 0;
             int pc = 0;
+
             var m_OpCodes = PopulateOpCodeList.GetOpCodes;
             while (filePosition < fileStuff.Length)
             {
@@ -54,15 +53,20 @@ namespace C64CodeRelocator
                         oc.GetCode(ref line, ref filePosition, fileStuff, lineNumber, pc);
                     }
                 }
+
                 code.Add(line);
             }
+            // Use a monospaced font
+            textBox1.Font = new Font(FontFamily.GenericMonospace, textBox1.Font.Size);
             textBox1.Lines = code.ToArray();
+            generate.Enabled = true;
         }
 
 
-        private void ReadFile()
+        private void AddLabels(string start, string end)
         {
-            var originalContent = File.ReadAllLines("Thun.s");
+            passThree.Add("                *=$" + start);
+            var originalContent = code;
             bool firstPass = true;
             int count = 0;
 
@@ -88,11 +92,11 @@ namespace C64CodeRelocator
                         case "D0": // BNE
                         case "F0": // BEQ
                         case "10": // BPL
+                            string test = dets[4] + dets[3];
                             if (!branchLoc.Keys.Contains(dets[4] + dets[3]))
                             {
                                 branchLoc.Add(dets[11].Replace("$", ""), branch + branchCount++.ToString());
                             }
-                            int i = 0;
                             passOne.Add(dets[10] + " " + dets[11]);
                             break;
                         default:
@@ -112,7 +116,7 @@ namespace C64CodeRelocator
                             break;
                     }
                 }
-                if (dets[0].Contains("0ad1"))
+                if (dets[0].ToLower().Contains(end.ToLower()))//"0ad1"))
                 {
                     firstPass = false;
                 }
@@ -149,11 +153,9 @@ namespace C64CodeRelocator
                 passTwo.Add(label + assembly);
             }
 
-
-
             // Add the labels to the front of the code
             counter = 0;
-            for (int i = 0; i < passOne.Count; i++)// String str in originalContent)
+            for (int i = 0; i < passOne.Count; i++)
             {
                 var dets = originalContent[counter++].Split(' ');
                 string label = "                ";
@@ -161,8 +163,8 @@ namespace C64CodeRelocator
                 {
                     if (dets[0].ToUpper().Contains(memLocation.Key))
                     {
-                        label = memLocation.Value + "      ";
-                        // The moemory address has been found add it another list
+                        label = memLocation.Value + "          ";
+                        // The memory address has been found add it list of addresses found
                         found.Add(memLocation.Key);
                     }
                 }
@@ -171,12 +173,11 @@ namespace C64CodeRelocator
                 {
                     if (dets[0].ToUpper().Contains(memLocation.Key))
                     {
-                        label = memLocation.Value + "      ";
+                        label = memLocation.Value + "         ";
                     }
                 }
                 passThree.Add(label + passTwo[i]);
             }
-
 
             // Finally iterate through the found list & add references to the address not found
             foreach (KeyValuePair<String, String> memLocation in labelLoc)
@@ -187,8 +188,71 @@ namespace C64CodeRelocator
                 }
             }
 
-            File.WriteAllLines("new_assembly.s", passThree);
+            textBox2.Font = new Font(FontFamily.GenericMonospace, textBox2.Font.Size);
+            textBox2.Lines = passThree.ToArray();
+        }
 
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Open File";
+            openFileDialog.InitialDirectory = @"*.*";
+            openFileDialog.Filter = "All files (*.prg)|*.PRG|All files (*.*)|*.*";
+            openFileDialog.FilterIndex = 2;
+            openFileDialog.RestoreDirectory = true;
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                ClearCollections();
+                textBox1.Clear();
+                MemoryLocation ml = new MemoryLocation();
+                if (ml.ShowDialog() == DialogResult.OK)
+                {
+                    int.TryParse(ml.GetMemStartLocation, out startAddress);
+                    ReadBin(openFileDialog.FileName);
+                }
+            }
+        }
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save File";
+            saveFileDialog.InitialDirectory = @"*.*";
+            saveFileDialog.Filter = "All files (*.*)|*.*|All files (*.a)|*.a";
+            saveFileDialog.FilterIndex = 2;
+            saveFileDialog.RestoreDirectory = true;
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllLines(saveFileDialog.FileName, passThree);
+            }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void generate_Click(object sender, EventArgs e)
+        {
+            MemorySelector ms = new MemorySelector();
+            if (ms.ShowDialog() == DialogResult.OK)
+            {
+                var o = ms.GetSelectedMemStartLocation;
+                var p = ms.GetSelectedMemEndLocation;
+                AddLabels(o, p);
+            }
+        }
+
+        private void ClearCollections()
+        {
+            passOne.Clear();
+            passTwo.Clear();
+            passThree.Clear();
+            found.Clear();
+            labelLoc.Clear();
+            branchLoc.Clear();
         }
     }
 }

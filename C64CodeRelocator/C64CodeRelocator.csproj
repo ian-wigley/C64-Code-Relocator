@@ -51,9 +51,30 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="MemoryLocation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MemoryLocation.Designer.cs">
+      <DependentUpon>MemoryLocation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MemorySelector.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MemorySelector.Designer.cs">
+      <DependentUpon>MemorySelector.cs</DependentUpon>
+    </Compile>
     <Compile Include="OpCode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MemoryLocation.resx">
+      <DependentUpon>MemoryLocation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MemorySelector.resx">
+      <DependentUpon>MemorySelector.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

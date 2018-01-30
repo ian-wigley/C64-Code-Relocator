@@ -24,7 +24,7 @@ namespace C64CodeRelocator
 
             if (m_numberOfBytes == 1)
             {
-                line += "\t\t\t" + m_name;
+                line += "          " + m_name;
                 filePosition += 1;
             }
             if (m_numberOfBytes == 2)
@@ -38,11 +38,11 @@ namespace C64CodeRelocator
                 {
                     sbyte s = unchecked((sbyte)fileStuff[filePosition + 1]);
                     s += 2;
-                    line += "\t\t" + m_name + m_prefix + (pc + s).ToString("X4");
+                    line += "       " + m_name + " " + m_prefix + (pc + s).ToString("X4");
                 }
                 else
                 {
-                    line += "\t\t" + m_name + m_prefix + fileStuff[filePosition + 1].ToString("X2") + m_suffix;
+                    line += "       " + m_name + " " + m_prefix + fileStuff[filePosition + 1].ToString("X2") + m_suffix;
                 }
 
                 filePosition += 2;
@@ -50,7 +50,7 @@ namespace C64CodeRelocator
             else if (m_numberOfBytes == 3)
             {
                 line += " " + fileStuff[filePosition + 1].ToString("X2") + " " + fileStuff[filePosition + 2].ToString("X2");
-                line += "\t\t" + m_name + m_prefix + fileStuff[filePosition + 2].ToString("X2") + fileStuff[filePosition + 1].ToString("X2") + m_suffix;
+                line += "    " + m_name + " " + m_prefix + fileStuff[filePosition + 2].ToString("X2") + fileStuff[filePosition + 1].ToString("X2") + m_suffix;
                 filePosition += 3;
             }
         }
