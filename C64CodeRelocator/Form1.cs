@@ -20,6 +20,7 @@ namespace C64CodeRelocator
         private List<string> passTwo = new List<string>();
         private List<string> passThree = new List<string>();
         private List<string> found = new List<string>();
+        private List<string> lineNumbers = new List<string>();
         private Dictionary<string, string> labelLoc = new Dictionary<string, string>();
         private Dictionary<string, string> branchLoc = new Dictionary<string, string>();
 
@@ -28,6 +29,8 @@ namespace C64CodeRelocator
             InitializeComponent();
             generate.Enabled = false;
             PopulateOpCodeList.Init();
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
         }
 
         private void ReadBin(string fileName)
@@ -42,6 +45,7 @@ namespace C64CodeRelocator
             {
                 int opCode = fileStuff[filePosition];
                 lineNumber = startAddress + filePosition;
+                lineNumbers.Add(lineNumber.ToString("X4"));
                 string line = (startAddress + filePosition).ToString("X4");
                 line += "  " + opCode.ToString("X2");
                 pc = startAddress + filePosition;
@@ -236,7 +240,13 @@ namespace C64CodeRelocator
 
         private void generate_Click(object sender, EventArgs e)
         {
-            MemorySelector ms = new MemorySelector();
+            char[] sa = new char[lineNumbers[0].Length];
+            int count = 0;
+            foreach (char chr in lineNumbers[0])
+            {
+                sa[count++] = chr;
+            }
+            MemorySelector ms = new MemorySelector(sa);
             if (ms.ShowDialog() == DialogResult.OK)
             {
                 var o = ms.GetSelectedMemStartLocation;

@@ -10,7 +10,7 @@ namespace C64CodeRelocator
         public string GetSelectedMemStartLocation { get { return comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text; } }
         public string GetSelectedMemEndLocation { get { return comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text; } }
 
-        public MemorySelector()
+        public MemorySelector(char[] sa)
         {
             InitializeComponent();
 
@@ -53,6 +53,10 @@ namespace C64CodeRelocator
             comboBox7.DataSource = memValues;
             comboBox8.DataSource = memValues;
 
+            comboBox1.Text = sa[0].ToString();
+            comboBox2.Text = sa[1].ToString();
+            comboBox3.Text = sa[2].ToString();
+            comboBox4.Text = sa[3].ToString();
         }
 
         private void button1_Click(object sender, System.EventArgs e)
