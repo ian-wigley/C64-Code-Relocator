@@ -93,11 +93,15 @@ namespace C64CodeRelocator
                             }
                             passOne.Add(dets[8] + " " + dets[9]);
                             break;
-                        case "D0": // BNE
+                        case "90": // BCC
+                        case "B0": // BCS 
                         case "F0": // BEQ
-                        case "10": // BPL
-                            string test = dets[4] + dets[3];
-                            if (!branchLoc.Keys.Contains(dets[4] + dets[3]))
+                        case "30": // BMI 
+                        case "D0": // BNE
+                        case "10": // BPL 
+                        case "50": // BVC
+                        case "70": // BVS
+                            if (!branchLoc.Keys.Contains(dets[11].Replace("$", "")))
                             {
                                 branchLoc.Add(dets[11].Replace("$", ""), branch + branchCount++.ToString());
                             }
@@ -120,7 +124,7 @@ namespace C64CodeRelocator
                             break;
                     }
                 }
-                if (dets[0].ToLower().Contains(end.ToLower()))//"0ad1"))
+                if (count >= int.Parse(end, System.Globalization.NumberStyles.HexNumber) || count >= originalContent.Count || dets[0].ToLower().Contains(end.ToLower()))
                 {
                     firstPass = false;
                 }
@@ -240,18 +244,34 @@ namespace C64CodeRelocator
 
         private void generate_Click(object sender, EventArgs e)
         {
-            char[] sa = new char[lineNumbers[0].Length];
+            char[] startAdress = new char[lineNumbers[0].Length];
+            char[] endAdress = new char[lineNumbers[lineNumbers.Count - 1].Length];
+
             int count = 0;
             foreach (char chr in lineNumbers[0])
             {
-                sa[count++] = chr;
+                startAdress[count++] = chr;
             }
-            MemorySelector ms = new MemorySelector(sa);
+            count = 0;
+            foreach (char chr in lineNumbers[lineNumbers.Count - 1])
+            {
+                endAdress[count++] = chr;
+            }
+            MemorySelector ms = new MemorySelector(startAdress, endAdress);
             if (ms.ShowDialog() == DialogResult.OK)
             {
-                var o = ms.GetSelectedMemStartLocation;
-                var p = ms.GetSelectedMemEndLocation;
-                AddLabels(o, p);
+                int end1 = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
+                int end2 = int.Parse(lineNumbers[lineNumbers.Count - 1], System.Globalization.NumberStyles.HexNumber);
+
+                if (end1 <= end2)
+                {
+
+                    AddLabels(ms.GetSelectedMemStartLocation, ms.GetSelectedMemEndLocation);
+                }
+                else
+                {
+                    MessageBox.Show("The selected end address exceeds the length of the bytes $" + lineNumbers[lineNumbers.Count - 1]);
+                }
             }
         }
 

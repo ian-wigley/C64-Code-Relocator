@@ -6,58 +6,48 @@ namespace C64CodeRelocator
     public partial class MemorySelector : Form
     {
         private IList<object> memValues = new List<object>();
+        private char[] m_startAdress;
+        private char[] m_endAdress;
 
         public string GetSelectedMemStartLocation { get { return comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text; } }
         public string GetSelectedMemEndLocation { get { return comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text; } }
 
-        public MemorySelector(char[] sa)
+        public MemorySelector(char[] startAdress, char[] endAdress)
         {
             InitializeComponent();
 
-            comboBox1.BindingContext = new BindingContext();
-            comboBox1.DisplayMember = "Text";
-            comboBox1.ValueMember = "Value";
-            comboBox2.BindingContext = new BindingContext();
-            comboBox2.DisplayMember = "Text";
-            comboBox2.ValueMember = "Value";
-            comboBox3.BindingContext = new BindingContext();
-            comboBox3.DisplayMember = "Text";
-            comboBox3.ValueMember = "Value";
-            comboBox4.BindingContext = new BindingContext();
-            comboBox4.DisplayMember = "Text";
-            comboBox4.ValueMember = "Value";
-            comboBox5.BindingContext = new BindingContext();
-            comboBox5.DisplayMember = "Text";
-            comboBox5.ValueMember = "Value";
-            comboBox6.BindingContext = new BindingContext();
-            comboBox6.DisplayMember = "Text";
-            comboBox6.ValueMember = "Value";
-            comboBox7.BindingContext = new BindingContext();
-            comboBox7.DisplayMember = "Text";
-            comboBox7.ValueMember = "Value";
-            comboBox8.BindingContext = new BindingContext();
-            comboBox8.DisplayMember = "Text";
-            comboBox8.ValueMember = "Value";
+            m_startAdress = startAdress;
+            m_endAdress = endAdress;
 
             for (int i = 0; i < 16; i++)
             {
                 memValues.Add(new { Text = i.ToString("X1"), Value = i });
             }
 
-            comboBox1.DataSource = memValues;
-            comboBox2.DataSource = memValues;
-            comboBox3.DataSource = memValues;
-            comboBox4.DataSource = memValues;
-            comboBox5.DataSource = memValues;
-            comboBox6.DataSource = memValues;
-            comboBox7.DataSource = memValues;
-            comboBox8.DataSource = memValues;
 
-            comboBox1.Text = sa[0].ToString();
-            comboBox2.Text = sa[1].ToString();
-            comboBox3.Text = sa[2].ToString();
-            comboBox4.Text = sa[3].ToString();
+            InitialiseComboBoxes(comboBox1);
+            InitialiseComboBoxes(comboBox2);
+            InitialiseComboBoxes(comboBox3);
+            InitialiseComboBoxes(comboBox4);
+            InitialiseComboBoxes(comboBox5);
+            InitialiseComboBoxes(comboBox6);
+            InitialiseComboBoxes(comboBox7);
+            InitialiseComboBoxes(comboBox8);
+
+            comboBox1.Text = startAdress[0].ToString();
+            comboBox2.Text = startAdress[1].ToString();
+            comboBox3.Text = startAdress[2].ToString();
+            comboBox4.Text = startAdress[3].ToString();
         }
+
+        private void InitialiseComboBoxes(ComboBox comboBox)
+        {
+            comboBox.BindingContext = new BindingContext();
+            comboBox.DisplayMember = "Text";
+            comboBox.ValueMember = "Value";
+            comboBox.DataSource = memValues;
+        }
+
 
         private void button1_Click(object sender, System.EventArgs e)
         {
