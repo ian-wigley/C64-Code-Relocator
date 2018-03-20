@@ -31,10 +31,13 @@ namespace C64CodeRelocator
             PopulateOpCodeList.Init();
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            leftWindowToolStripMenuItem.Enabled = false;
+            rightWindowToolStripMenuItem.Enabled = false;
         }
 
         private void ReadBin(string fileName)
         {
+            textBox1.Clear();
             var fileStuff = File.ReadAllBytes(fileName);
             int filePosition = 0;
             int lineNumber = 0;
@@ -44,6 +47,7 @@ namespace C64CodeRelocator
             while (filePosition < fileStuff.Length)
             {
                 int opCode = fileStuff[filePosition];
+
                 lineNumber = startAddress + filePosition;
                 lineNumbers.Add(lineNumber.ToString("X4"));
                 string line = (startAddress + filePosition).ToString("X4");
@@ -64,11 +68,14 @@ namespace C64CodeRelocator
             textBox1.Font = new Font(FontFamily.GenericMonospace, textBox1.Font.Size);
             textBox1.Lines = code.ToArray();
             generate.Enabled = true;
+            leftWindowToolStripMenuItem.Enabled = true;
         }
 
 
         private void AddLabels(string start, string end)
         {
+            textBox2.Clear();
+            ClearRightWindow();
             passThree.Add("                *=$" + start);
             var originalContent = code;
             bool firstPass = true;
@@ -198,6 +205,7 @@ namespace C64CodeRelocator
 
             textBox2.Font = new Font(FontFamily.GenericMonospace, textBox2.Font.Size);
             textBox2.Lines = passThree.ToArray();
+            rightWindowToolStripMenuItem.Enabled = true;
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -219,21 +227,6 @@ namespace C64CodeRelocator
                     int.TryParse(ml.GetMemStartLocation, out startAddress);
                     ReadBin(openFileDialog.FileName);
                 }
-            }
-        }
-
-        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Title = "Save File";
-            saveFileDialog.InitialDirectory = @"*.*";
-            saveFileDialog.Filter = "All files (*.*)|*.*|All files (*.a)|*.a";
-            saveFileDialog.FilterIndex = 2;
-            saveFileDialog.RestoreDirectory = true;
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                File.WriteAllLines(saveFileDialog.FileName, passThree);
             }
         }
 
@@ -277,12 +270,48 @@ namespace C64CodeRelocator
 
         private void ClearCollections()
         {
+            ClearLeftWindow();
+            ClearRightWindow();
+        }
+
+        private void ClearLeftWindow()
+        {
+            code.Clear();
+        }
+
+        private void ClearRightWindow()
+        {
             passOne.Clear();
             passTwo.Clear();
             passThree.Clear();
             found.Clear();
             labelLoc.Clear();
             branchLoc.Clear();
+        }
+
+        private void leftWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Save(code);
+        }
+
+        private void rightWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Save(passThree);
+        }
+
+        private void Save(List<string> collection)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save File";
+            saveFileDialog.InitialDirectory = @"*.*";
+            saveFileDialog.Filter = "All files (*.*)|*.*|All files (*.a)|*.a";
+            saveFileDialog.FilterIndex = 2;
+            saveFileDialog.RestoreDirectory = true;
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllLines(saveFileDialog.FileName, collection);
+            }
         }
     }
 }

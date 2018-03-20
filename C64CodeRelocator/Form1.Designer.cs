@@ -36,6 +36,8 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generate = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
+            this.leftWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rightWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -74,21 +76,24 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
+            this.saveAsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.leftWindowToolStripMenuItem,
+            this.rightWindowToolStripMenuItem});
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save As";
-            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            //this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -110,6 +115,20 @@
             this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox2.Size = new System.Drawing.Size(390, 529);
             this.textBox2.TabIndex = 3;
+            // 
+            // leftWindowToolStripMenuItem
+            // 
+            this.leftWindowToolStripMenuItem.Name = "leftWindowToolStripMenuItem";
+            this.leftWindowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.leftWindowToolStripMenuItem.Text = "Left Window";
+            this.leftWindowToolStripMenuItem.Click += new System.EventHandler(this.leftWindowToolStripMenuItem_Click);
+            // 
+            // rightWindowToolStripMenuItem
+            // 
+            this.rightWindowToolStripMenuItem.Name = "rightWindowToolStripMenuItem";
+            this.rightWindowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.rightWindowToolStripMenuItem.Text = "Right Window";
+            this.rightWindowToolStripMenuItem.Click += new System.EventHandler(this.rightWindowToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -141,5 +160,7 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.Button generate;
         private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.ToolStripMenuItem leftWindowToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rightWindowToolStripMenuItem;
     }
 }
