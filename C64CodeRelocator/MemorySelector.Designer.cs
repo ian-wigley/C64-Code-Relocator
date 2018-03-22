@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.comboBox4 = new System.Windows.Forms.ComboBox();
             this.comboBox3 = new System.Windows.Forms.ComboBox();
@@ -39,6 +40,8 @@
             this.comboBox6 = new System.Windows.Forms.ComboBox();
             this.comboBox5 = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -49,12 +52,12 @@
             this.groupBox1.Controls.Add(this.comboBox3);
             this.groupBox1.Controls.Add(this.comboBox2);
             this.groupBox1.Controls.Add(this.comboBox1);
-            this.groupBox1.Location = new System.Drawing.Point(36, 19);
+            this.groupBox1.Location = new System.Drawing.Point(32, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(215, 62);
+            this.groupBox1.Size = new System.Drawing.Size(208, 62);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Memory Start Address";
+            this.groupBox1.Text = "Select Memory Start Address";
             // 
             // comboBox4
             // 
@@ -98,12 +101,12 @@
             this.groupBox2.Controls.Add(this.comboBox7);
             this.groupBox2.Controls.Add(this.comboBox6);
             this.groupBox2.Controls.Add(this.comboBox5);
-            this.groupBox2.Location = new System.Drawing.Point(36, 98);
+            this.groupBox2.Location = new System.Drawing.Point(32, 91);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(215, 72);
+            this.groupBox2.Size = new System.Drawing.Size(208, 72);
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Memory End Address";
+            this.groupBox2.Text = "Select Memory End Address";
             // 
             // comboBox8
             // 
@@ -115,7 +118,6 @@
             // 
             // comboBox7
             // 
-            this.comboBox7.DropDownWidth = 30;
             this.comboBox7.FormattingEnabled = true;
             this.comboBox7.Location = new System.Drawing.Point(108, 29);
             this.comboBox7.Name = "comboBox7";
@@ -124,7 +126,6 @@
             // 
             // comboBox6
             // 
-            this.comboBox6.DropDownWidth = 30;
             this.comboBox6.FormattingEnabled = true;
             this.comboBox6.Location = new System.Drawing.Point(62, 29);
             this.comboBox6.Name = "comboBox6";
@@ -133,7 +134,6 @@
             // 
             // comboBox5
             // 
-            this.comboBox5.DropDownWidth = 30;
             this.comboBox5.FormattingEnabled = true;
             this.comboBox5.Location = new System.Drawing.Point(16, 29);
             this.comboBox5.Name = "comboBox5";
@@ -142,7 +142,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(106, 199);
+            this.button1.Location = new System.Drawing.Point(94, 204);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 6;
@@ -150,11 +150,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(48, 170);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(173, 17);
+            this.checkBox1.TabIndex = 7;
+            this.checkBox1.Text = "Convert Illegal opcodes to data";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // MemorySelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
+            this.ClientSize = new System.Drawing.Size(275, 245);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -163,6 +174,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -179,5 +191,7 @@
         private System.Windows.Forms.ComboBox comboBox5;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ComboBox comboBox4;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

@@ -11,11 +11,14 @@ namespace C64CodeRelocator
 
         public string GetSelectedMemStartLocation { get { return comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text; } }
         public string GetSelectedMemEndLocation { get { return comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text; } }
+        public bool GetDataOption { get { return checkBox1.Checked; } }
+
 
         public MemorySelector(char[] startAdress, char[] endAdress)
         {
             InitializeComponent();
-
+            checkBox1.Checked = true;
+            toolTip1.SetToolTip(checkBox1, "This option will automatically convert illegal Opcodes into data statements");
             m_startAdress = startAdress;
             m_endAdress = endAdress;
 
@@ -47,7 +50,6 @@ namespace C64CodeRelocator
             comboBox.ValueMember = "Value";
             comboBox.DataSource = memValues;
         }
-
 
         private void button1_Click(object sender, System.EventArgs e)
         {
