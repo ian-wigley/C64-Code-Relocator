@@ -9,6 +9,11 @@ namespace C64CodeRelocator
         public MemoryLocation()
         {
             InitializeComponent();
+
+            MaximizeBox = false;
+            MinimizeBox = false;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+
             comboBox1.DisplayMember = "Text";
             comboBox1.ValueMember = "Value";
 
@@ -41,10 +46,9 @@ namespace C64CodeRelocator
             comboBox1.DataSource = items;
         }
 
-
         private void button1_Click(object sender, System.EventArgs e)
         {
-            this.DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK;
             Close();
         }
     }

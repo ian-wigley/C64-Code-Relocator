@@ -22,16 +22,33 @@ namespace C64CodeRelocator
             m_illegal = illegal;
         }
 
-        public void GetCode(ref string line, ref int filePosition, byte[] fileStuff, int lineNumber, int pc)
+        public void GetCode(ref string line, ref int filePosition, byte[] fileStuff, int lineNumber, int pc, ref Dictionary<string, string[]> dataStatements, ref List<string> illegalOpCodes)
         {
-
+            string[] temp;
             if (m_numberOfBytes == 1)
             {
+                if (m_illegal)
+                {
+                    //Add the programme counter location to the list of illegal opcodes found
+                    illegalOpCodes.Add(pc.ToString("X4"));
+                }
+
+                temp = new string[1];
+                temp[0] = "!byte $" + m_code;
+                dataStatements.Add(pc.ToString("X4"), temp);
                 line += "          " + m_name;
                 filePosition += 1;
             }
             if (m_numberOfBytes == 2)
             {
+                if (m_illegal)
+                {
+                    illegalOpCodes.Add(pc.ToString("X4"));
+                }
+                temp = new string[2];
+                temp[0] = "!byte $" + m_code;
+                temp[1] = "!byte $" + fileStuff[filePosition + 1].ToString("X2");
+                dataStatements.Add(pc.ToString("X4"), temp);
                 line += " " + fileStuff[filePosition + 1].ToString("X2");
 
                 if (m_name.Contains("BCC") || m_name.Contains("BCS") ||
@@ -47,11 +64,21 @@ namespace C64CodeRelocator
                 {
                     line += "       " + m_name + " " + m_prefix + fileStuff[filePosition + 1].ToString("X2") + m_suffix;
                 }
-
                 filePosition += 2;
             }
             else if (m_numberOfBytes == 3)
             {
+                if (m_illegal)
+                {
+                    illegalOpCodes.Add(pc.ToString("X4"));
+                }
+
+                temp = new string[3];
+                temp[0] = "!byte $" + m_code;
+                temp[1] = "!byte $" + fileStuff[filePosition + 1].ToString("X2");
+                temp[2] = "!byte $" + fileStuff[filePosition + 2].ToString("X2");
+                dataStatements.Add(pc.ToString("X4"), temp);
+
                 line += " " + fileStuff[filePosition + 1].ToString("X2") + " " + fileStuff[filePosition + 2].ToString("X2");
                 line += "    " + m_name + " " + m_prefix + fileStuff[filePosition + 2].ToString("X2") + fileStuff[filePosition + 1].ToString("X2") + m_suffix;
                 filePosition += 3;
@@ -83,7 +110,7 @@ namespace C64CodeRelocator
             m_OpCodes.Add(new OpCode("0E", "ASL", 3, "$", "", false));
             m_OpCodes.Add(new OpCode("0F", "SLO", 3, "$", "", true));
             m_OpCodes.Add(new OpCode("10", "BPL", 2, "$", "", false));
-            m_OpCodes.Add(new OpCode("11", "ORA", 2, "($", ",Y)", false));
+            m_OpCodes.Add(new OpCode("11", "ORA", 2, "($", "),Y", false));
             m_OpCodes.Add(new OpCode("12", "JAM", 1, "", "", true));
             m_OpCodes.Add(new OpCode("13", "SLO", 2, "($", "),Y", true));
             m_OpCodes.Add(new OpCode("14", "NOP", 2, "$", ",X", true));
@@ -322,7 +349,6 @@ namespace C64CodeRelocator
             m_OpCodes.Add(new OpCode("FD", "SBC", 3, "$", ",X", false));
             m_OpCodes.Add(new OpCode("FE", "INC", 3, "$", ",X", false));
             m_OpCodes.Add(new OpCode("FF", "ISB", 3, "$", ",X", true));
-
         }
     }
 }
