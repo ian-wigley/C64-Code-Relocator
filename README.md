@@ -3,13 +3,22 @@ This is a small tool to load, parse and display C64 assembly code, add lables & 
 
 Fire up your favourite C64 emulator & write out some bytes of interest !
 
+![](C64CodeRelocator/C64_6502_Dissasembly.jpg)
+
 Open this tool & load the bytes you have just saved.
-Once loaded you can select the chunk of memory to automatically add labels to, for both branches and jumps.
+Once loaded you can select the chunk of memory to automatically add labels to branches (BNE) and jumps (JMP).
+I plan to extend this functionality to include Loads(LDA) and Stores(STA) in the near future.
+
+Either windows output can be saved, as long as it's populated.
+
 The resulting code can then be saved to disk & loaded into C64 Studio.
 
 ![](C64CodeRelocator/Application.jpg)
 
-The reason for creating this tool... some 30 something years after writing some C64 demo's i wanted to reminisce.
+If Illegal opcodes are found during the add labels processing, you will be prompted if you would like them automatically converting to data statements an appending into the code.
+
+
+The reason for creating this tool... some 30 something years after learning to write 6502 & a few C64 demo's i wanted to view the code.
 
 After trying to save Commodore 64 dis-assembled code & manually adding labels by hand, i quickly became bored !
 So this seemed like a much better idea than adding labels by hand !!
