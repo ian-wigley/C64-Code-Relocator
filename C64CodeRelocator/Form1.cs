@@ -182,21 +182,21 @@ namespace C64CodeRelocator
             counter = 0;
             for (int i = 0; i < passOne.Count; i++)
             {
-                var dets = originalFileContent[counter++].Split(' ');
+                var detail = originalFileContent[counter++].Split(' ');
                 string label = "                ";
                 foreach (KeyValuePair<String, String> memLocation in labelLoc)
                 {
-                    if (dets[0].ToUpper().Contains(memLocation.Key))
+                    if (detail[0].ToUpper().Contains(memLocation.Key))
                     {
                         label = memLocation.Value + "          ";
-                        // The moemory address has been found add it another list
+                        // The memory address has been found add it another list
                         found.Add(memLocation.Key);
                     }
                 }
 
                 foreach (KeyValuePair<String, String> memLocation in branchLoc)
                 {
-                    if (dets[0].ToUpper().Contains(memLocation.Key))
+                    if (detail[0].ToUpper().Contains(memLocation.Key))
                     {
                         label = memLocation.Value + "         ";
                     }
