@@ -1,5 +1,7 @@
-# C64-Code-Relocator
-This is a small tool to load, parse and display C64 assembly code, add lables & write it to disk.
+# C64 Binary to Assembly convertor
+This is a small tool to reverse engineer a `Commodore 64` binary file & convert it back into assembly code.
+
+The tool will load the selected file, reverse engineer the binary and display C64 assembly code, it can also add labels for branches, jumps and loops which allows the code to be relocateable.
 
 Fire up your favourite C64 emulator & write out some bytes of interest !
 
