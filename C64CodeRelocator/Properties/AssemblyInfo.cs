@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("6502LabelCreator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("OSYS")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("6502LabelCreator")]
-[assembly: AssemblyCopyright("Copyright © OSYS 2018")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
