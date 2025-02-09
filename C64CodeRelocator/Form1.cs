@@ -70,7 +70,11 @@ namespace C64CodeRelocator
             leftWindowToolStripMenuItem.Enabled = true;
         }
 
-        private void AddLabels(string start, string end, bool replaceIllegalOpcodes, Dictionary<string, string[]> bucket, int firstOccurance, int lastOccurrance)
+        private void AddLabels(
+            string start, 
+            string end, 
+            bool replaceIllegalOpcodes, 
+            Dictionary<string, string[]> bucket)
         {
             textBox2.Clear();
             ClearRightWindow();
@@ -326,7 +330,7 @@ namespace C64CodeRelocator
                     {
                         convertToBytes = true;
                     }
-                    AddLabels(ms.GetSelectedMemStartLocation, ms.GetSelectedMemEndLocation, convertToBytes, replacedWithDataCollection, firstOccurance, lastOccurrance);
+                    AddLabels(ms.GetSelectedMemStartLocation, ms.GetSelectedMemEndLocation, convertToBytes, replacedWithDataCollection);
                 }
                 else
                 {
