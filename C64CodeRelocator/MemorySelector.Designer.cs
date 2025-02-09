@@ -45,9 +45,9 @@
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // groupBox1
-            // 
+            //
             this.groupBox1.Controls.Add(this.comboBox4);
             this.groupBox1.Controls.Add(this.comboBox3);
             this.groupBox1.Controls.Add(this.comboBox2);
@@ -58,45 +58,45 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Select Memory Start Address";
-            // 
+            //
             // comboBox4
-            // 
+            //
             this.comboBox4.DropDownWidth = 30;
             this.comboBox4.FormattingEnabled = true;
             this.comboBox4.Location = new System.Drawing.Point(154, 30);
             this.comboBox4.Name = "comboBox4";
             this.comboBox4.Size = new System.Drawing.Size(40, 21);
             this.comboBox4.TabIndex = 4;
-            // 
+            //
             // comboBox3
-            // 
+            //
             this.comboBox3.DropDownWidth = 30;
             this.comboBox3.FormattingEnabled = true;
             this.comboBox3.Location = new System.Drawing.Point(108, 30);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(40, 21);
             this.comboBox3.TabIndex = 3;
-            // 
+            //
             // comboBox2
-            // 
+            //
             this.comboBox2.DropDownWidth = 30;
             this.comboBox2.FormattingEnabled = true;
             this.comboBox2.Location = new System.Drawing.Point(62, 30);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(40, 21);
             this.comboBox2.TabIndex = 2;
-            // 
+            //
             // comboBox1
-            // 
+            //
             this.comboBox1.DropDownWidth = 30;
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Location = new System.Drawing.Point(16, 30);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(40, 21);
             this.comboBox1.TabIndex = 1;
-            // 
+            //
             // groupBox2
-            // 
+            //
             this.groupBox2.Controls.Add(this.comboBox8);
             this.groupBox2.Controls.Add(this.comboBox7);
             this.groupBox2.Controls.Add(this.comboBox6);
@@ -107,41 +107,41 @@
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Select Memory End Address";
-            // 
+            //
             // comboBox8
-            // 
+            //
             this.comboBox8.FormattingEnabled = true;
             this.comboBox8.Location = new System.Drawing.Point(154, 29);
             this.comboBox8.Name = "comboBox8";
             this.comboBox8.Size = new System.Drawing.Size(40, 21);
             this.comboBox8.TabIndex = 8;
-            // 
+            //
             // comboBox7
-            // 
+            //
             this.comboBox7.FormattingEnabled = true;
             this.comboBox7.Location = new System.Drawing.Point(108, 29);
             this.comboBox7.Name = "comboBox7";
             this.comboBox7.Size = new System.Drawing.Size(40, 21);
             this.comboBox7.TabIndex = 7;
-            // 
+            //
             // comboBox6
-            // 
+            //
             this.comboBox6.FormattingEnabled = true;
             this.comboBox6.Location = new System.Drawing.Point(62, 29);
             this.comboBox6.Name = "comboBox6";
             this.comboBox6.Size = new System.Drawing.Size(40, 21);
             this.comboBox6.TabIndex = 6;
-            // 
+            //
             // comboBox5
-            // 
+            //
             this.comboBox5.FormattingEnabled = true;
             this.comboBox5.Location = new System.Drawing.Point(16, 29);
             this.comboBox5.Name = "comboBox5";
             this.comboBox5.Size = new System.Drawing.Size(40, 21);
             this.comboBox5.TabIndex = 5;
-            // 
+            //
             // button1
-            // 
+            //
             this.button1.Location = new System.Drawing.Point(94, 204);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
@@ -149,9 +149,9 @@
             this.button1.Text = "OK";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
+            //
             // checkBox1
-            // 
+            //
             this.checkBox1.AutoSize = true;
             this.checkBox1.Location = new System.Drawing.Point(48, 170);
             this.checkBox1.Name = "checkBox1";
@@ -159,9 +159,9 @@
             this.checkBox1.TabIndex = 7;
             this.checkBox1.Text = "Convert Illegal opcodes to data";
             this.checkBox1.UseVisualStyleBackColor = true;
-            // 
+            //
             // MemorySelector
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(275, 245);
