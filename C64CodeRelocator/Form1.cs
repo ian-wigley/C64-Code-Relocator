@@ -7,27 +7,27 @@ using System.Windows.Forms;
 
 namespace C64CodeRelocator
 {
-    public partial class Form1 : Form
+    public partial class C64BinaryToAssemblyConverter : Form
     {
-        private string label = "label";
-        private string branch = "branch";
+        private readonly string label = "label";
+        private readonly string branch = "branch";
         private int labelCount = 0;
         private int branchCount = 0;
         private int startAddress = 0;
 
-        private List<string> code = new List<string>();
-        private List<string> passOne = new List<string>();
-        private List<string> passTwo = new List<string>();
-        private List<string> passThree = new List<string>();
-        private List<string> found = new List<string>();
-        private List<string> lineNumbers = new List<string>();
+        private readonly List<string> code = new List<string>();
+        private readonly List<string> passOne = new List<string>();
+        private readonly List<string> passTwo = new List<string>();
+        private readonly List<string> passThree = new List<string>();
+        private readonly List<string> found = new List<string>();
+        private readonly List<string> lineNumbers = new List<string>();
         private List<string> illegalOpcodes = new List<string>();
 
         private Dictionary<string, string[]> dataStatements = new Dictionary<string, string[]>();
-        private Dictionary<string, string> labelLoc = new Dictionary<string, string>();
-        private Dictionary<string, string> branchLoc = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> labelLoc = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> branchLoc = new Dictionary<string, string>();
 
-        public Form1()
+        public C64BinaryToAssemblyConverter()
         {
             InitializeComponent();
             MaximizeBox = false;
@@ -43,17 +43,15 @@ namespace C64CodeRelocator
             textBox1.Clear();
             var fileContent = File.ReadAllBytes(fileName);
             int filePosition = 0;
-            int lineNumber = 0;
-            int pc = 0;
             var m_OpCodes = PopulateOpCodeList.GetOpCodes;
             while (filePosition < fileContent.Length)
             {
                 int opCode = fileContent[filePosition];
-                lineNumber = startAddress + filePosition;
+                int lineNumber = startAddress + filePosition;
                 lineNumbers.Add(lineNumber.ToString("X4"));
                 string line = (startAddress + filePosition).ToString("X4");
                 line += "  " + opCode.ToString("X2");
-                pc = startAddress + filePosition;
+                int pc = startAddress + filePosition;
                 foreach (OpCode oc in m_OpCodes)
                 {
                     if (oc.m_code == opCode.ToString("X2"))
@@ -153,8 +151,6 @@ namespace C64CodeRelocator
             int counter = 0;
             for (int i = 0; i < passOne.Count; i++)
             {
-
-                string label = "";
                 string assembly = passOne[counter++];
                 foreach (KeyValuePair<String, String> memLocation in labelLoc)
                 {
@@ -179,7 +175,7 @@ namespace C64CodeRelocator
                         }
                     }
                 }
-                passTwo.Add(label + assembly);
+                passTwo.Add(assembly);
             }
 
             // Add the labels to the front of the code
@@ -284,7 +280,7 @@ namespace C64CodeRelocator
                     {
                         if (illegalOpcodes.Contains(i.ToString("X4")))
                         {
-                            if (i > firstOccurance & !firstIllegalOpcodeFound)
+                            if (i > firstOccurance && !firstIllegalOpcodeFound)
                             {
                                 firstOccurance = i;
                                 firstIllegalOpcodeFound = true;
