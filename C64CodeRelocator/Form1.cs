@@ -109,11 +109,11 @@ namespace C64CodeRelocator
                                 passOne.Add(lineDetails[8] + " " + lineDetails[9]);
                                 break;
                             case "90": // BCC
-                            case "B0": // BCS 
+                            case "B0": // BCS
                             case "F0": // BEQ
-                            case "30": // BMI 
+                            case "30": // BMI
                             case "D0": // BNE
-                            case "10": // BPL 
+                            case "10": // BPL
                             case "50": // BVC
                             case "70": // BVS
                                 if (!branchLoc.Keys.Contains(lineDetails[11].Replace("$", "")))
