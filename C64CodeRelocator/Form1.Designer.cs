@@ -1,6 +1,6 @@
 ﻿namespace C64CodeRelocator
 {
-    partial class Form1
+    partial class C64BinaryToAssemblyConverter
     {
         /// <summary>
         /// Required designer variable.
@@ -33,11 +33,11 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.leftWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rightWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generate = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
-            this.leftWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rightWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -76,7 +76,7 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -86,14 +86,27 @@
             this.leftWindowToolStripMenuItem,
             this.rightWindowToolStripMenuItem});
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.saveAsToolStripMenuItem.Text = "Save As";
-            //this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            // 
+            // leftWindowToolStripMenuItem
+            // 
+            this.leftWindowToolStripMenuItem.Name = "leftWindowToolStripMenuItem";
+            this.leftWindowToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.leftWindowToolStripMenuItem.Text = "Left Window";
+            this.leftWindowToolStripMenuItem.Click += new System.EventHandler(this.leftWindowToolStripMenuItem_Click);
+            // 
+            // rightWindowToolStripMenuItem
+            // 
+            this.rightWindowToolStripMenuItem.Name = "rightWindowToolStripMenuItem";
+            this.rightWindowToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.rightWindowToolStripMenuItem.Text = "Right Window";
+            this.rightWindowToolStripMenuItem.Click += new System.EventHandler(this.rightWindowToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -116,21 +129,7 @@
             this.textBox2.Size = new System.Drawing.Size(390, 529);
             this.textBox2.TabIndex = 3;
             // 
-            // leftWindowToolStripMenuItem
-            // 
-            this.leftWindowToolStripMenuItem.Name = "leftWindowToolStripMenuItem";
-            this.leftWindowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.leftWindowToolStripMenuItem.Text = "Left Window";
-            this.leftWindowToolStripMenuItem.Click += new System.EventHandler(this.leftWindowToolStripMenuItem_Click);
-            // 
-            // rightWindowToolStripMenuItem
-            // 
-            this.rightWindowToolStripMenuItem.Name = "rightWindowToolStripMenuItem";
-            this.rightWindowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.rightWindowToolStripMenuItem.Text = "Right Window";
-            this.rightWindowToolStripMenuItem.Click += new System.EventHandler(this.rightWindowToolStripMenuItem_Click);
-            // 
-            // Form1
+            // C64BinaryToAssemblyConverter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -141,8 +140,8 @@
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "C64BinaryToAssemblyConverter";
+            this.Text = "C64 Binary To Assembly Converter";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
