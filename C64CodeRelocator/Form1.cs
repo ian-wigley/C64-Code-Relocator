@@ -81,6 +81,17 @@ namespace C64CodeRelocator
             bool firstPass = true;
             int count = 0;
 
+            InitialPass(end, replaceIllegalOpcodes, bucket, originalFileContent, ref firstPass, ref count);
+            int counter = SecondPass(originalFileContent);
+            counter = FinalPass(originalFileContent);
+
+            textBox2.Font = new Font(FontFamily.GenericMonospace, textBox2.Font.Size);
+            textBox2.Lines = passThree.ToArray();
+            rightWindowToolStripMenuItem.Enabled = true;
+        }
+
+        private void InitialPass(string end, bool replaceIllegalOpcodes, Dictionary<string, string[]> bucket, List<string> originalFileContent, ref bool firstPass, ref int count)
+        {
             // First pass parses the content looking for branch & jump conditions
             while (firstPass)
             {
@@ -89,9 +100,8 @@ namespace C64CodeRelocator
 
                 if (lineDetails.Length > 1)
                 {
-                    string[] dataValue;
                     // Replace the Illegal Opcodes with data statement
-                    if (replaceIllegalOpcodes && bucket.TryGetValue(lineDetails[0], out dataValue))
+                    if (replaceIllegalOpcodes && bucket.TryGetValue(lineDetails[0], out string[] dataValue))
                     {
                         foreach (string str in dataValue)
                         {
@@ -146,7 +156,10 @@ namespace C64CodeRelocator
                     firstPass = false;
                 }
             }
+        }
 
+        private int SecondPass(List<string> originalFileContent)
+        {
             // Second pass iterates through first pass collection adding labels and branches into the code
             int counter = 0;
             for (int i = 0; i < passOne.Count; i++)
@@ -178,8 +191,13 @@ namespace C64CodeRelocator
                 passTwo.Add(assembly);
             }
 
+            return counter;
+        }
+
+        private int FinalPass(List<string> originalFileContent)
+        {
             // Add the labels to the front of the code
-            counter = 0;
+            int counter = 0;
             for (int i = 0; i < passOne.Count; i++)
             {
                 var detail = originalFileContent[counter++].Split(' ');
@@ -212,10 +230,7 @@ namespace C64CodeRelocator
                     passThree.Add(memLocation.Value + " = $" + memLocation.Key);
                 }
             }
-
-            textBox2.Font = new Font(FontFamily.GenericMonospace, textBox2.Font.Size);
-            textBox2.Lines = passThree.ToArray();
-            rightWindowToolStripMenuItem.Enabled = true;
+            return counter;
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
