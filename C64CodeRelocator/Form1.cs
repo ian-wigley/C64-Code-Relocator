@@ -78,20 +78,22 @@ namespace C64CodeRelocator
             ClearRightWindow();
             passThree.Add("                *=$" + start);
             var originalFileContent = code;
-            bool firstPass = true;
-            int count = 0;
-
-            InitialPass(end, replaceIllegalOpcodes, bucket, originalFileContent, ref firstPass, ref count);
-            int counter = SecondPass(originalFileContent);
-            counter = FinalPass(originalFileContent);
+            InitialPass(end, replaceIllegalOpcodes, bucket, originalFileContent);
+            SecondPass(originalFileContent);
+            FinalPass(originalFileContent);
 
             textBox2.Font = new Font(FontFamily.GenericMonospace, textBox2.Font.Size);
             textBox2.Lines = passThree.ToArray();
             rightWindowToolStripMenuItem.Enabled = true;
         }
 
-        private void InitialPass(string end, bool replaceIllegalOpcodes, Dictionary<string, string[]> bucket, List<string> originalFileContent, ref bool firstPass, ref int count)
+        private void InitialPass(string end, bool replaceIllegalOpcodes, Dictionary<string, string[]> bucket, List<string> originalFileContent)
         {
+            int count = 0;
+            bool firstPass = true;
+            int userSelectedFileEnd = int.Parse(end, System.Globalization.NumberStyles.HexNumber);
+            int originalFileLength = code.Count;
+
             // First pass parses the content looking for branch & jump conditions
             while (firstPass)
             {
@@ -151,14 +153,14 @@ namespace C64CodeRelocator
                         }
                     }
                 }
-                if (count >= int.Parse(end, System.Globalization.NumberStyles.HexNumber) || count >= originalFileContent.Count || lineDetails[0].ToLower().Contains(end.ToLower()))
+                if (count >= userSelectedFileEnd || count >= originalFileLength || lineDetails[0].ToLower().Contains(end.ToLower()))
                 {
                     firstPass = false;
                 }
             }
         }
 
-        private int SecondPass(List<string> originalFileContent)
+        private void SecondPass(List<string> originalFileContent)
         {
             // Second pass iterates through first pass collection adding labels and branches into the code
             int counter = 0;
@@ -190,11 +192,9 @@ namespace C64CodeRelocator
                 }
                 passTwo.Add(assembly);
             }
-
-            return counter;
         }
 
-        private int FinalPass(List<string> originalFileContent)
+        private void FinalPass(List<string> originalFileContent)
         {
             // Add the labels to the front of the code
             int counter = 0;
@@ -230,7 +230,6 @@ namespace C64CodeRelocator
                     passThree.Add(memLocation.Value + " = $" + memLocation.Key);
                 }
             }
-            return counter;
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
