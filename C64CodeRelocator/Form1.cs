@@ -320,15 +320,14 @@ namespace C64CodeRelocator
 
                     for (int i = firstOccurance; i < lastOccurrance; i++)
                     {
-                        string[] dataValue;
                         // Replace the Illegal Opcodes with data statement
-                        if (dataStatements.TryGetValue(i.ToString("X4"), out dataValue))
+                        if (dataStatements.TryGetValue(i.ToString("X4"), out string[] dataValue))
                         {
                             replacedWithDataCollection.Add(i.ToString("X4"), dataValue);
                         }
                     }
 
-                    DialogResult result = DialogResult.Yes;
+                    DialogResult result = DialogResult.No;
                     if (firstIllegalOpcodeFound)
                     {
                         result = MessageBox.Show("Illegal Opcodes found within the selection from : " + firstOccurance.ToString("X4") + " to " + lastOccurrance.ToString("X4") + "\n"
