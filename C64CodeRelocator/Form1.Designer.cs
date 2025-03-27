@@ -78,7 +78,7 @@
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.openToolStripMenuItem.Text = "Open";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
@@ -94,14 +94,14 @@
             this.leftWindowToolStripMenuItem.Name = "leftWindowToolStripMenuItem";
             this.leftWindowToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.leftWindowToolStripMenuItem.Text = "Left Window";
-            this.leftWindowToolStripMenuItem.Click += new System.EventHandler(this.leftWindowToolStripMenuItem_Click);
+            this.leftWindowToolStripMenuItem.Click += new System.EventHandler(this.LeftWindowToolStripMenuItem_Click);
             // 
             // rightWindowToolStripMenuItem
             // 
             this.rightWindowToolStripMenuItem.Name = "rightWindowToolStripMenuItem";
             this.rightWindowToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.rightWindowToolStripMenuItem.Text = "Right Window";
-            this.rightWindowToolStripMenuItem.Click += new System.EventHandler(this.rightWindowToolStripMenuItem_Click);
+            this.rightWindowToolStripMenuItem.Click += new System.EventHandler(this.RightWindowToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
@@ -118,7 +118,7 @@
             this.generate.TabIndex = 2;
             this.generate.Text = "Generate Labels";
             this.generate.UseVisualStyleBackColor = true;
-            this.generate.Click += new System.EventHandler(this.generate_Click);
+            this.generate.Click += new System.EventHandler(this.Generate_Click);
             // 
             // textBox2
             // 
