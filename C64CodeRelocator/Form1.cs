@@ -54,7 +54,7 @@ namespace C64CodeRelocator
                 int pc = startAddress + filePosition;
                 foreach (OpCode oc in m_OpCodes)
                 {
-                    if (oc.m_code == opCode.ToString("X2"))
+                    if (oc.Code == opCode.ToString("X2"))
                     {
                         oc.GetCode(ref line, ref filePosition, fileContent, lineNumber, pc, ref dataStatements, ref illegalOpcodes);
                     }
@@ -69,6 +69,7 @@ namespace C64CodeRelocator
         }
 
         private void AddLabels(
+            int delta,
             string start, 
             string end, 
             bool replaceIllegalOpcodes, 
@@ -78,7 +79,7 @@ namespace C64CodeRelocator
             ClearRightWindow();
             passThree.Add("                *=$" + start);
             var originalFileContent = code;
-            InitialPass(end, replaceIllegalOpcodes, bucket, originalFileContent);
+            InitialPass(delta, end, replaceIllegalOpcodes, bucket, originalFileContent);
             SecondPass(originalFileContent);
             FinalPass(originalFileContent);
 
@@ -87,11 +88,10 @@ namespace C64CodeRelocator
             rightWindowToolStripMenuItem.Enabled = true;
         }
 
-        private void InitialPass(string end, bool replaceIllegalOpcodes, Dictionary<string, string[]> bucket, List<string> originalFileContent)
+        private void InitialPass(int delta, string end, bool replaceIllegalOpcodes, Dictionary<string, string[]> bucket, List<string> originalFileContent)
         {
             int count = 0;
             bool firstPass = true;
-            int userSelectedFileEnd = int.Parse(end, System.Globalization.NumberStyles.HexNumber);
             int originalFileLength = code.Count;
 
             // First pass parses the content looking for branch & jump conditions
@@ -153,7 +153,7 @@ namespace C64CodeRelocator
                         }
                     }
                 }
-                if (count >= userSelectedFileEnd || count >= originalFileLength || lineDetails[0].ToLower().Contains(end.ToLower()))
+                if (count >= delta || count >= originalFileLength || lineDetails[0].ToLower().Contains(end.ToLower()))
                 {
                     firstPass = false;
                 }
@@ -232,7 +232,7 @@ namespace C64CodeRelocator
             }
         }
 
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -261,7 +261,7 @@ namespace C64CodeRelocator
             Application.Exit();
         }
 
-        private void generate_Click(object sender, EventArgs e)
+        private void Generate_Click(object sender, EventArgs e)
         {
             char[] startAdress = new char[lineNumbers[0].Length];
             char[] endAdress = new char[lineNumbers[lineNumbers.Count - 1].Length];
@@ -284,6 +284,7 @@ namespace C64CodeRelocator
             {
                 int start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
                 int end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
+                int delta = end - start;
                 bool firstIllegalOpcodeFound = false;
                 Dictionary<string, string[]> replacedWithDataCollection = new Dictionary<string, string[]>();
 
@@ -339,7 +340,7 @@ namespace C64CodeRelocator
                     {
                         convertToBytes = true;
                     }
-                    AddLabels(ms.GetSelectedMemStartLocation, ms.GetSelectedMemEndLocation, convertToBytes, replacedWithDataCollection);
+                    AddLabels(delta, ms.GetSelectedMemStartLocation, ms.GetSelectedMemEndLocation, convertToBytes, replacedWithDataCollection);
                 }
                 else
                 {
@@ -369,12 +370,12 @@ namespace C64CodeRelocator
             branchLoc.Clear();
         }
 
-        private void leftWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LeftWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Save(code);
         }
 
-        private void rightWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        private void RightWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Save(passThree);
         }
