@@ -202,14 +202,13 @@ namespace C64CodeRelocator
             {
                 var detail = originalFileContent[counter++].Split(' ');
                 string label = "                ";
-                foreach (KeyValuePair<String, String> memLocation in labelLoc)
+                foreach (var memLocation in from KeyValuePair<String, String> memLocation in labelLoc
+                                            where detail[0].ToUpper().Contains(memLocation.Key)
+                                            select memLocation)
                 {
-                    if (detail[0].ToUpper().Contains(memLocation.Key))
-                    {
-                        label = memLocation.Value + "          ";
-                        // The memory address has been found add it another list
-                        found.Add(memLocation.Key);
-                    }
+                    label = memLocation.Value + "          ";
+                    // The memory address has been found add it another list
+                    found.Add(memLocation.Key);
                 }
 
                 foreach (KeyValuePair<String, String> memLocation in branchLoc)
