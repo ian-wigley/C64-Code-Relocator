@@ -5,7 +5,7 @@ namespace C64CodeRelocator
 {
     public partial class MemorySelector : Form
     {
-        private IList<object> memValues = new List<object>();
+        private readonly IList<object> memValues = new List<object>();
         public string GetSelectedMemStartLocation { get { return comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text; } }
         public string GetSelectedMemEndLocation { get { return comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text; } }
 
