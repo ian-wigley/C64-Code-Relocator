@@ -36,7 +36,7 @@
             this.leftWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rightWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.generate = new System.Windows.Forms.Button();
+            this.GenerateLabels = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -108,17 +108,17 @@
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.exitToolStripMenuItem.Text = "Exit";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
-            // generate
+            // GenerateLabels
             // 
-            this.generate.Location = new System.Drawing.Point(319, 584);
-            this.generate.Name = "generate";
-            this.generate.Size = new System.Drawing.Size(145, 23);
-            this.generate.TabIndex = 2;
-            this.generate.Text = "Generate Labels";
-            this.generate.UseVisualStyleBackColor = true;
-            this.generate.Click += new System.EventHandler(this.Generate_Click);
+            this.GenerateLabels.Location = new System.Drawing.Point(319, 584);
+            this.GenerateLabels.Name = "GenerateLabels";
+            this.GenerateLabels.Size = new System.Drawing.Size(145, 23);
+            this.GenerateLabels.TabIndex = 2;
+            this.GenerateLabels.Text = "Generate Labels";
+            this.GenerateLabels.UseVisualStyleBackColor = true;
+            this.GenerateLabels.Click += new System.EventHandler(this.GenerateLabelsClickEvent);
             // 
             // textBox2
             // 
@@ -135,7 +135,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 613);
             this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.generate);
+            this.Controls.Add(this.GenerateLabels);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
@@ -157,7 +157,7 @@
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.Button generate;
+        private System.Windows.Forms.Button GenerateLabels;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.ToolStripMenuItem leftWindowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rightWindowToolStripMenuItem;
