@@ -22,13 +22,16 @@ namespace C64CodeRelocator
             InitializeComponent();
             MaximizeBox = false;
             MinimizeBox = false;
-            generate.Enabled = false;
+            GenerateLabels.Enabled = false;
             leftWindowToolStripMenuItem.Enabled = false;
             rightWindowToolStripMenuItem.Enabled = false;
             PopulateOpCodeList.Init();
             assemblyCreator = new AssemblyCreator();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void AddLabels(
             int delta,
             string start, 
@@ -45,6 +48,9 @@ namespace C64CodeRelocator
             rightWindowToolStripMenuItem.Enabled = true;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -67,18 +73,24 @@ namespace C64CodeRelocator
                     Parser parser = new Parser();
                     data = parser.LoadBinaryData(openFileDialog.FileName);
                     parser.ParseFileContent(data, textBox1, startAddress, ref lineNumbers, ref code);
-                    generate.Enabled = true;
+                    GenerateLabels.Enabled = true;
                     leftWindowToolStripMenuItem.Enabled = true;
                 }
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
-        private void Generate_Click(object sender, EventArgs e)
+        /// <summary>
+        ///
+        /// </summary>
+        private void GenerateLabelsClickEvent(object sender, EventArgs e)
         {
             char[] startAdress = new char[lineNumbers[0].Length];
             char[] endAdress = new char[lineNumbers[lineNumbers.Count - 1].Length];
@@ -166,17 +178,26 @@ namespace C64CodeRelocator
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void ClearCollections()
         {
             ClearLeftWindow();
             ClearRightWindow();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void ClearLeftWindow()
         {
             code.Clear();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void ClearRightWindow()
         {
             assemblyCreator.passOne.Clear();
@@ -187,16 +208,25 @@ namespace C64CodeRelocator
             assemblyCreator.branchLoc.Clear();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void LeftWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Save(code);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void RightWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Save(assemblyCreator.passThree);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void Save(List<string> collection)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
