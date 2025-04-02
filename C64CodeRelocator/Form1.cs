@@ -11,8 +11,7 @@ namespace C64CodeRelocator
     {
         private byte[] data;
         private readonly AssemblyCreator assemblyCreator;
-
-        private List<string> code = new List<string>();
+        private readonly Parser parser = new Parser();
         private List<string> lineNumbers = new List<string>();
         private List<string> illegalOpcodes = new List<string>();
         private Dictionary<string, string[]> dataStatements = new Dictionary<string, string[]>();
@@ -42,9 +41,9 @@ namespace C64CodeRelocator
             textBox2.Clear();
             ClearRightWindow();
             textBox2.Font = new Font(FontFamily.GenericMonospace, textBox2.Font.Size);
-            assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, bucket, code);
-            assemblyCreator.SecondPass(code);
-            textBox2.Lines = assemblyCreator.FinalPass(code, start).ToArray();
+            assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, bucket, parser.Code);
+            assemblyCreator.SecondPass(parser.Code);
+            textBox2.Lines = assemblyCreator.FinalPass(parser.Code, start).ToArray();
             rightWindowToolStripMenuItem.Enabled = true;
         }
 
@@ -69,10 +68,11 @@ namespace C64CodeRelocator
                 MemoryLocation ml = new MemoryLocation();
                 if (ml.ShowDialog() == DialogResult.OK)
                 {
+                    // Use a monospaced font
+                    textBox1.Font = new Font(FontFamily.GenericMonospace, textBox1.Font.Size);
                     _ = int.TryParse(ml.GetMemStartLocation, out int startAddress);
-                    Parser parser = new Parser();
                     data = parser.LoadBinaryData(openFileDialog.FileName);
-                    parser.ParseFileContent(data, textBox1, startAddress, ref lineNumbers, ref code);
+                    textBox1.Lines = parser.ParseFileContent(data, textBox1, startAddress, ref lineNumbers); //, ref code);
                     GenerateLabels.Enabled = true;
                     leftWindowToolStripMenuItem.Enabled = true;
                 }
@@ -138,7 +138,7 @@ namespace C64CodeRelocator
 
                     var temp = lastOccurrance.ToString("X4");
                     int index = 0;
-                    foreach (string str in code)
+                    foreach (string str in parser.Code)
                     {
                         if (str.Contains(temp))
                         {
@@ -192,7 +192,8 @@ namespace C64CodeRelocator
         /// </summary>
         private void ClearLeftWindow()
         {
-            code.Clear();
+            parser.Code.Clear();
+            parser.DataStatements.Clear();
         }
 
         /// <summary>
@@ -213,7 +214,7 @@ namespace C64CodeRelocator
         /// </summary>
         private void LeftWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save(code);
+            Save(parser.Code);
         }
 
         /// <summary>
