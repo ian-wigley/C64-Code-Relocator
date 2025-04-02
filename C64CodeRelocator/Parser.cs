@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
 namespace C64CodeRelocator
 {
-    class Parser
+    public class Parser
     {
+        public List<string> Code { get; set; } = new List<string>();
         private List<string> illegalOpcodes = new List<string>();
         private Dictionary<string, string[]> dataStatements = new Dictionary<string, string[]>();
+        public Dictionary<string, string[]> DataStatements { get { return dataStatements; } }
 
         /// <summary>
         /// Load Binary ata
@@ -30,17 +31,19 @@ namespace C64CodeRelocator
         /// <summary>
         /// Parse File Content
         /// </summary>
-        public void ParseFileContent(
+        public string[] ParseFileContent(
             byte[] data,
             TextBox textBox,
             int startAddress,
-            ref List<string> lineNumbers,
-            ref List<string> code
+            ref List<string> lineNumbers
             )
         {
             textBox.Clear();
             int filePosition = 0;
             var m_OpCodes = PopulateOpCodeList.GetOpCodes;
+            
+            List<OpCode> codeList = new List<OpCode>();
+
             while (filePosition < data.Length)
             {
                 int opCode = data[filePosition];
@@ -54,13 +57,14 @@ namespace C64CodeRelocator
                     if (oc.Code == opCode.ToString("X2"))
                     {
                         oc.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref dataStatements, ref illegalOpcodes);
+                        codeList.Add(oc);
+                        break;
                     }
                 }
-                code.Add(line);
+                Code.Add(line);
             }
-            // Use a monospaced font
-            textBox.Font = new Font(FontFamily.GenericMonospace, textBox.Font.Size);
-            textBox.Lines = code.ToArray();
+
+            return Code.ToArray();
         }
     }
 }
