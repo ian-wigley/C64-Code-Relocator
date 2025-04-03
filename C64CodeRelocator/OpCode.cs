@@ -6,6 +6,7 @@ namespace C64CodeRelocator
     {
         public string Code { get; private set; }
         public bool Illegal { get; private set; }
+        public string LineNumber { get; private set; }
 
         private readonly int m_numberOfBytes = 0;
         private readonly string m_name;
@@ -22,8 +23,20 @@ namespace C64CodeRelocator
             Illegal = illegal;
         }
 
-        public void GetCode(ref string line, ref int filePosition, byte[] fileStuff, int lineNumber, int pc, ref Dictionary<string, string[]> dataStatements, ref List<string> illegalOpCodes)
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GetCode(
+            ref string line, 
+            ref int filePosition, 
+            byte[] fileStuff, 
+            int lineNumber, 
+            int pc, 
+            ref Dictionary<string, string[]> dataStatements, 
+            ref List<string> illegalOpCodes
+            )
         {
+            LineNumber = lineNumber.ToString("X2");
             string[] temp;
             if (m_numberOfBytes == 1)
             {
