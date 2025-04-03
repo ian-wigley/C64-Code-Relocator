@@ -8,12 +8,13 @@ namespace C64CodeRelocator
     public class Parser
     {
         public List<string> Code { get; set; } = new List<string>();
+        public List<OpCode> CodeList { get; set; } = new List<OpCode>();
         private List<string> illegalOpcodes = new List<string>();
         private Dictionary<string, string[]> dataStatements = new Dictionary<string, string[]>();
         public Dictionary<string, string[]> DataStatements { get { return dataStatements; } }
 
         /// <summary>
-        /// Load Binary ata
+        /// Load Binary Data
         /// </summary>
         public byte[] LoadBinaryData(string fileName)
         {
@@ -41,8 +42,6 @@ namespace C64CodeRelocator
             textBox.Clear();
             int filePosition = 0;
             var m_OpCodes = PopulateOpCodeList.GetOpCodes;
-            
-            List<OpCode> codeList = new List<OpCode>();
 
             while (filePosition < data.Length)
             {
@@ -57,7 +56,7 @@ namespace C64CodeRelocator
                     if (oc.Code == opCode.ToString("X2"))
                     {
                         oc.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref dataStatements, ref illegalOpcodes);
-                        codeList.Add(oc);
+                        CodeList.Add(oc);
                         break;
                     }
                 }
