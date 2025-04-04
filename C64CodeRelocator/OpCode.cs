@@ -13,7 +13,13 @@ namespace C64CodeRelocator
         private readonly string m_prefix;
         private readonly string m_suffix;
 
-        public OpCode(string code, string name, int numberOfBytes, string prefix, string suffix, bool illegal)
+        public OpCode(
+            string code, 
+            string name, 
+            int numberOfBytes, 
+            string prefix, 
+            string suffix, 
+            bool illegal)
         {
             Code = code;
             m_name = name;
@@ -29,7 +35,7 @@ namespace C64CodeRelocator
         public void GetCode(
             ref string line, 
             ref int filePosition, 
-            byte[] fileStuff, 
+            byte[] bytes, 
             int lineNumber, 
             int pc, 
             ref Dictionary<string, string[]> dataStatements, 
@@ -60,22 +66,22 @@ namespace C64CodeRelocator
                 }
                 temp = new string[2];
                 temp[0] = "!byte $" + Code;
-                temp[1] = "!byte $" + fileStuff[filePosition + 1].ToString("X2");
+                temp[1] = "!byte $" + bytes[filePosition + 1].ToString("X2");
                 dataStatements.Add(pc.ToString("X4"), temp);
-                line += " " + fileStuff[filePosition + 1].ToString("X2");
+                line += " " + bytes[filePosition + 1].ToString("X2");
 
                 if (m_name.Contains("BCC") || m_name.Contains("BCS") ||
                     m_name.Contains("BEQ") || m_name.Contains("BMI") ||
                     m_name.Contains("BNE") || m_name.Contains("BPL") ||
                     m_name.Contains("BVC") || m_name.Contains("BVS"))
                 {
-                    sbyte s = unchecked((sbyte)fileStuff[filePosition + 1]);
+                    sbyte s = unchecked((sbyte)bytes[filePosition + 1]);
                     s += 2;
                     line += "       " + m_name + " " + m_prefix + (pc + s).ToString("X4");
                 }
                 else
                 {
-                    line += "       " + m_name + " " + m_prefix + fileStuff[filePosition + 1].ToString("X2") + m_suffix;
+                    line += "       " + m_name + " " + m_prefix + bytes[filePosition + 1].ToString("X2") + m_suffix;
                 }
                 filePosition += 2;
             }
@@ -88,17 +94,20 @@ namespace C64CodeRelocator
 
                 temp = new string[3];
                 temp[0] = "!byte $" + Code;
-                temp[1] = "!byte $" + fileStuff[filePosition + 1].ToString("X2");
-                temp[2] = "!byte $" + fileStuff[filePosition + 2].ToString("X2");
+                temp[1] = "!byte $" + bytes[filePosition + 1].ToString("X2");
+                temp[2] = "!byte $" + bytes[filePosition + 2].ToString("X2");
                 dataStatements.Add(pc.ToString("X4"), temp);
 
-                line += " " + fileStuff[filePosition + 1].ToString("X2") + " " + fileStuff[filePosition + 2].ToString("X2");
-                line += "    " + m_name + " " + m_prefix + fileStuff[filePosition + 2].ToString("X2") + fileStuff[filePosition + 1].ToString("X2") + m_suffix;
+                line += " " + bytes[filePosition + 1].ToString("X2") + " " + bytes[filePosition + 2].ToString("X2");
+                line += "    " + m_name + " " + m_prefix + bytes[filePosition + 2].ToString("X2") + bytes[filePosition + 1].ToString("X2") + m_suffix;
                 filePosition += 3;
             }
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class PopulateOpCodeList
     {
         public static List<OpCode> GetOpCodes { get; } = new List<OpCode>();
