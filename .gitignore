@@ -52,3 +52,4 @@ C64CodeRelocator/bin/
 .vs/
 /packages
 C64CodeRelocatorTests/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs
+C64CodeRelocatorTests/obj/Debug/C64CodeRelocatorTests.csproj.FileListAbsolute.txt
