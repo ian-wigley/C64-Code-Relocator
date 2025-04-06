@@ -43,6 +43,9 @@ namespace C64CodeRelocator
             comboBox8.Text = endAdress[3].ToString();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void InitialiseComboBoxes(ComboBox comboBox)
         {
             comboBox.BindingContext = new BindingContext();
@@ -51,6 +54,9 @@ namespace C64CodeRelocator
             comboBox.DataSource = memValues;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void Button1_Click(object sender, System.EventArgs e)
         {
             DialogResult = DialogResult.OK;
