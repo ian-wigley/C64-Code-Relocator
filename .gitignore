@@ -53,3 +53,6 @@ C64CodeRelocator/bin/
 /packages
 C64CodeRelocatorTests/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs
 C64CodeRelocatorTests/obj/Debug/C64CodeRelocatorTests.csproj.FileListAbsolute.txt
+/C64BinaryToAssemblyConverter/bin/Debug
+/C64BinaryToAssemblyConverter/obj
+/C64BinaryToAssemblyConverterTests/obj
