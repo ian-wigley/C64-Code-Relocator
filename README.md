@@ -5,7 +5,7 @@ The tool will load the selected file, reverse engineer the binary and display C6
 
 Fire up your favourite C64 emulator & write out some bytes of interest !
 
-![](C64CodeRelocator/C64_6502_Dissasembly.jpg)
+![](C64_6502_Dissasembly.jpg)
 
 Open this tool & load the bytes you have just saved.
 Once loaded you can select the chunk of memory to automatically add labels to branches (BNE) and jumps (JMP).
@@ -15,7 +15,7 @@ Either windows output can be saved, as long as it's populated.
 
 The resulting code can then be saved to disk & loaded into C64 Studio.
 
-![](C64CodeRelocator/Application.jpg)
+![](Application.jpg)
 
 If Illegal opcodes are found during the add labels processing, you will be prompted if you would like them automatically converting to data statements an appending into the code.
 
