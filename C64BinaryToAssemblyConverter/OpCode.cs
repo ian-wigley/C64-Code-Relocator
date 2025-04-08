@@ -14,11 +14,11 @@ namespace C64CodeRelocator
         private readonly string m_suffix;
 
         public OpCode(
-            string code, 
-            string name, 
-            int numberOfBytes, 
-            string prefix, 
-            string suffix, 
+            string code,
+            string name,
+            int numberOfBytes,
+            string prefix,
+            string suffix,
             bool illegal)
         {
             Code = code;
@@ -30,15 +30,15 @@ namespace C64CodeRelocator
         }
 
         /// <summary>
-        /// 
+        /// Get Code
         /// </summary>
         public void GetCode(
-            ref string line, 
-            ref int filePosition, 
-            byte[] bytes, 
-            int lineNumber, 
-            int pc, 
-            ref Dictionary<string, string[]> dataStatements, 
+            ref string line,
+            ref int filePosition,
+            byte[] bytes,
+            int lineNumber,
+            int pc,
+            ref Dictionary<string, string[]> dataStatements,
             ref List<string> illegalOpCodes
             )
         {
@@ -106,7 +106,7 @@ namespace C64CodeRelocator
     }
 
     /// <summary>
-    /// 
+    /// Populate OpCode List
     /// </summary>
     public static class PopulateOpCodeList
     {
