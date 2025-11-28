@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace C64CodeRelocator
+namespace C64BinaryToAssemblyConverter
 {
     static class Program
     {
