@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 
-namespace C64CodeRelocator
+namespace C64BinaryToAssemblyConverter
 {
     public class OpCode
     {
         public string Code { get; private set; }
-        public bool Illegal { get; private set; }
+        private bool Illegal { get; set; }
         public string LineNumber { get; private set; }
 
-        private readonly int m_numberOfBytes = 0;
-        private readonly string m_name;
-        private readonly string m_prefix;
-        private readonly string m_suffix;
+        private readonly int _numberOfBytes = 0;
+        private readonly string _name;
+        private readonly string _prefix;
+        private readonly string _suffix;
 
         public OpCode(
             string code,
@@ -22,10 +22,10 @@ namespace C64CodeRelocator
             bool illegal)
         {
             Code = code;
-            m_name = name;
-            m_numberOfBytes = numberOfBytes;
-            m_prefix = prefix;
-            m_suffix = suffix;
+            _name = name;
+            _numberOfBytes = numberOfBytes;
+            _prefix = prefix;
+            _suffix = suffix;
             Illegal = illegal;
         }
 
@@ -44,7 +44,7 @@ namespace C64CodeRelocator
         {
             LineNumber = lineNumber.ToString("X2");
             string[] temp;
-            if (m_numberOfBytes == 1)
+            if (_numberOfBytes == 1)
             {
                 if (Illegal)
                 {
@@ -55,10 +55,10 @@ namespace C64CodeRelocator
                 temp = new string[1];
                 temp[0] = "!byte $" + Code;
                 dataStatements.Add(pc.ToString("X4"), temp);
-                line += "          " + m_name;
+                line += "          " + _name;
                 filePosition += 1;
             }
-            if (m_numberOfBytes == 2)
+            if (_numberOfBytes == 2)
             {
                 if (Illegal)
                 {
@@ -70,22 +70,22 @@ namespace C64CodeRelocator
                 dataStatements.Add(pc.ToString("X4"), temp);
                 line += " " + bytes[filePosition + 1].ToString("X2");
 
-                if (m_name.Contains("BCC") || m_name.Contains("BCS") ||
-                    m_name.Contains("BEQ") || m_name.Contains("BMI") ||
-                    m_name.Contains("BNE") || m_name.Contains("BPL") ||
-                    m_name.Contains("BVC") || m_name.Contains("BVS"))
+                if (_name.Contains("BCC") || _name.Contains("BCS") ||
+                    _name.Contains("BEQ") || _name.Contains("BMI") ||
+                    _name.Contains("BNE") || _name.Contains("BPL") ||
+                    _name.Contains("BVC") || _name.Contains("BVS"))
                 {
                     sbyte s = unchecked((sbyte)bytes[filePosition + 1]);
                     s += 2;
-                    line += "       " + m_name + " " + m_prefix + (pc + s).ToString("X4");
+                    line += "       " + _name + " " + _prefix + (pc + s).ToString("X4");
                 }
                 else
                 {
-                    line += "       " + m_name + " " + m_prefix + bytes[filePosition + 1].ToString("X2") + m_suffix;
+                    line += "       " + _name + " " + _prefix + bytes[filePosition + 1].ToString("X2") + _suffix;
                 }
                 filePosition += 2;
             }
-            else if (m_numberOfBytes == 3)
+            else if (_numberOfBytes == 3)
             {
                 if (Illegal)
                 {
@@ -99,7 +99,7 @@ namespace C64CodeRelocator
                 dataStatements.Add(pc.ToString("X4"), temp);
 
                 line += " " + bytes[filePosition + 1].ToString("X2") + " " + bytes[filePosition + 2].ToString("X2");
-                line += "    " + m_name + " " + m_prefix + bytes[filePosition + 2].ToString("X2") + bytes[filePosition + 1].ToString("X2") + m_suffix;
+                line += "    " + _name + " " + _prefix + bytes[filePosition + 2].ToString("X2") + bytes[filePosition + 1].ToString("X2") + _suffix;
                 filePosition += 3;
             }
         }
