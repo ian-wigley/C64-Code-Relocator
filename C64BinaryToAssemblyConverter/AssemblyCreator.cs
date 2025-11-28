@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace C64CodeRelocator
+namespace C64BinaryToAssemblyConverter
 {
     public class AssemblyCreator
     {
@@ -11,7 +11,7 @@ namespace C64CodeRelocator
         private int labelCount = 0;
         private int branchCount = 0;
 
-        public List<string> code { get; private set; } = new List<string>();
+        private List<string> code { get; set; } = new List<string>();
         public List<string> lineNumbers { get; private set; } = new List<string>();
         public List<string> illegalOpcodes { get; private set; } = new List<string>();
         public List<string> passOne { get; private set; } = new List<string>();
