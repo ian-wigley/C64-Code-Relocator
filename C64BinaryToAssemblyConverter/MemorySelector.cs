@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace C64CodeRelocator
+namespace C64BinaryToAssemblyConverter
 {
     public partial class MemorySelector : Form
     {
         private readonly IList<object> memValues = new List<object>();
-        public string GetSelectedMemStartLocation { get { return comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text; } }
-        public string GetSelectedMemEndLocation { get { return comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text; } }
+        public string GetSelectedMemStartLocation => comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text;
+        public string GetSelectedMemEndLocation => comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text;
 
-        public MemorySelector(char[] startAdress, char[] endAdress)
+        public MemorySelector(char[] startAddress, char[] endAddress)
         {
             InitializeComponent();
 
@@ -32,15 +32,15 @@ namespace C64CodeRelocator
             InitialiseComboBoxes(comboBox7);
             InitialiseComboBoxes(comboBox8);
 
-            comboBox1.Text = startAdress[0].ToString();
-            comboBox2.Text = startAdress[1].ToString();
-            comboBox3.Text = startAdress[2].ToString();
-            comboBox4.Text = startAdress[3].ToString();
+            comboBox1.Text = startAddress[0].ToString();
+            comboBox2.Text = startAddress[1].ToString();
+            comboBox3.Text = startAddress[2].ToString();
+            comboBox4.Text = startAddress[3].ToString();
 
-            comboBox5.Text = endAdress[0].ToString();
-            comboBox6.Text = endAdress[1].ToString();
-            comboBox7.Text = endAdress[2].ToString();
-            comboBox8.Text = endAdress[3].ToString();
+            comboBox5.Text = endAddress[0].ToString();
+            comboBox6.Text = endAddress[1].ToString();
+            comboBox7.Text = endAddress[2].ToString();
+            comboBox8.Text = endAddress[3].ToString();
         }
 
         /// <summary>
