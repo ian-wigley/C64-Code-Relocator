@@ -1,10 +1,10 @@
 ﻿using System.Windows.Forms;
 
-namespace C64CodeRelocator
+namespace C64BinaryToAssemblyConverter
 {
     public partial class MemoryLocation : Form
     {
-        public string GetMemStartLocation { get { return comboBox1.SelectedValue.ToString(); } }
+        public string GetMemStartLocation => comboBox1.SelectedValue.ToString();
 
         public MemoryLocation()
         {
