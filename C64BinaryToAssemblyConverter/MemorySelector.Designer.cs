@@ -1,4 +1,4 @@
-﻿namespace C64CodeRelocator
+﻿namespace C64BinaryToAssemblyConverter
 {
     partial class MemorySelector
     {
