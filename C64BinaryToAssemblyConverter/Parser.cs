@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
-namespace C64CodeRelocator
+namespace C64BinaryToAssemblyConverter
 {
     public class Parser
     {
         public List<string> Code { get; set; } = new List<string>();
-        public List<OpCode> CodeList { get; set; } = new List<OpCode>();
+        private List<OpCode> CodeList { get; set; } = new List<OpCode>();
         private List<string> illegalOpcodes = new List<string>();
         private Dictionary<string, string[]> dataStatements = new Dictionary<string, string[]>();
-        public Dictionary<string, string[]> DataStatements { get { return dataStatements; } }
+        public Dictionary<string, string[]> DataStatements => dataStatements;
 
         /// <summary>
         /// Load Binary Data
@@ -24,8 +25,8 @@ namespace C64CodeRelocator
             }
             catch (Exception exception)
             {
-                MessageBox.Show("Error occurred whilst loading data ", exception.Message);
-                return new byte[0];
+                MessageBox.Show(@"Error occurred whilst loading data ", exception.Message);
+                return Array.Empty<byte>();
             }
         }
 
@@ -41,7 +42,7 @@ namespace C64CodeRelocator
         {
             textBox.Clear();
             int filePosition = 0;
-            var m_OpCodes = PopulateOpCodeList.GetOpCodes;
+            var opCodes = PopulateOpCodeList.GetOpCodes;
 
             while (filePosition < data.Length)
             {
@@ -51,14 +52,11 @@ namespace C64CodeRelocator
                 string line = (startAddress + filePosition).ToString("X4");
                 line += "  " + opCode.ToString("X2");
                 int pc = startAddress + filePosition;
-                foreach (OpCode oc in m_OpCodes)
+                foreach (var oc in opCodes.Where(oc => oc.Code == opCode.ToString("X2")))
                 {
-                    if (oc.Code == opCode.ToString("X2"))
-                    {
-                        oc.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref dataStatements, ref illegalOpcodes);
-                        CodeList.Add(oc);
-                        break;
-                    }
+                    oc.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref dataStatements, ref illegalOpcodes);
+                    CodeList.Add(oc);
+                    break;
                 }
                 Code.Add(line);
             }
