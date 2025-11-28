@@ -4,7 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
-namespace C64CodeRelocator
+namespace C64BinaryToAssemblyConverter
 {
     public partial class C64BinaryToAssemblyConverter : Form
     {
