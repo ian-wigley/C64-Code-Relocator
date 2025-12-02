@@ -8,11 +8,12 @@ namespace C64BinaryToAssemblyConverter
 {
     public class Parser
     {
+        private List<OpCode> CodeList { get;} = new List<OpCode>();
+        private List<string> _illegalOpcodes = new List<string>();
+        private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
         public List<string> Code { get; set; } = new List<string>();
-        private List<OpCode> CodeList { get; set; } = new List<OpCode>();
-        private List<string> illegalOpcodes = new List<string>();
-        private Dictionary<string, string[]> dataStatements = new Dictionary<string, string[]>();
-        public Dictionary<string, string[]> DataStatements => dataStatements;
+        public List<string> IllegalOpCodes => _illegalOpcodes;
+        public Dictionary<string, string[]> DataStatements => _dataStatements;
 
         /// <summary>
         /// Load Binary Data
@@ -41,20 +42,20 @@ namespace C64BinaryToAssemblyConverter
             )
         {
             textBox.Clear();
-            int filePosition = 0;
+            var filePosition = 0;
             var opCodes = PopulateOpCodeList.GetOpCodes;
 
             while (filePosition < data.Length)
             {
                 int opCode = data[filePosition];
-                int lineNumber = startAddress + filePosition;
+                var lineNumber = startAddress + filePosition;
                 lineNumbers.Add(lineNumber.ToString("X4"));
-                string line = (startAddress + filePosition).ToString("X4");
+                var line = (startAddress + filePosition).ToString("X4");
                 line += "  " + opCode.ToString("X2");
-                int pc = startAddress + filePosition;
+                var pc = startAddress + filePosition;
                 foreach (var oc in opCodes.Where(oc => oc.Code == opCode.ToString("X2")))
                 {
-                    oc.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref dataStatements, ref illegalOpcodes);
+                    oc.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref _dataStatements, ref _illegalOpcodes);
                     CodeList.Add(oc);
                     break;
                 }
