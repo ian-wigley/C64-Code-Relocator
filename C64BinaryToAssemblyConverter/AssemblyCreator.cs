@@ -6,23 +6,24 @@ namespace C64BinaryToAssemblyConverter
 {
     public class AssemblyCreator
     {
-        private readonly string label = "label";
-        private readonly string branch = "branch";
-        private int labelCount = 0;
-        private int branchCount = 0;
+        private const string Label = "label";
+        private const string Branch = "branch";
+        private int _labelCount;
+        private int _branchCount;
 
-        private List<string> code { get; set; } = new List<string>();
-        public List<string> lineNumbers { get; private set; } = new List<string>();
-        public List<string> illegalOpcodes { get; private set; } = new List<string>();
-        public List<string> passOne { get; private set; } = new List<string>();
-        public List<string> passTwo { get; private set; } = new List<string>();
-        public List<string> passThree { get; private set; } = new List<string>();
-        public List<string> found { get; private set; } = new List<string>();
-        public Dictionary<string, string> labelLoc { get; private set; } = new Dictionary<string, string>();
-        public Dictionary<string, string> branchLoc { get; private set; } = new Dictionary<string, string>();
+        // public List<string> LineNumbers { get; private set; } = new List<string>();
+        // public List<string> IllegalOpcodes { get; private set; } = new List<string>();
+        
+        private List<string> Code { get; set; } = new List<string>();
+        public List<string> PassOne { get; } = new List<string>();
+        public List<string> PassTwo { get; } = new List<string>();
+        public List<string> PassThree { get; } = new List<string>();
+        public List<string> Found { get; } = new List<string>();
+        public Dictionary<string, string> LabelLocations { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> BranchLocations { get; } = new Dictionary<string, string>();
 
         /// <summary>
-        /// Initial Pass
+        /// Initial Pass - parses the content looking for branch & jump conditions
         /// </summary>
         public void InitialPass(
             int delta, 
@@ -32,11 +33,11 @@ namespace C64BinaryToAssemblyConverter
             List<string> originalFileContent
             )
         {
-            int count = 0;
-            bool firstPass = true;
-            code = originalFileContent;
-            int originalFileLength = code.Count;
-            // First pass parses the content looking for branch & jump conditions
+            var count = 0;
+            var firstPass = true;
+            Code = originalFileContent;
+            var originalFileLength = Code.Count;
+
             while (firstPass)
             {
                 // Split each line into an array
@@ -47,9 +48,9 @@ namespace C64BinaryToAssemblyConverter
                     // Replace the Illegal Opcodes with data statement
                     if (replaceIllegalOpcodes && replacedWithDataStatements.TryGetValue(lineDetails[0], out string[] dataValue))
                     {
-                        foreach (string str in dataValue)
+                        foreach (var str in dataValue)
                         {
-                            passOne.Add(str);
+                            PassOne.Add(str);
                         }
                     }
                     else
@@ -58,11 +59,11 @@ namespace C64BinaryToAssemblyConverter
                         {
                             case "20": // JSR
                             case "4C": // JMP
-                                if (!labelLoc.Keys.Contains(lineDetails[4] + lineDetails[3]))
+                                if (!LabelLocations.Keys.Contains(lineDetails[4] + lineDetails[3]))
                                 {
-                                    labelLoc.Add(lineDetails[4] + lineDetails[3], label + labelCount++.ToString());
+                                    LabelLocations.Add(lineDetails[4] + lineDetails[3], Label + _labelCount++.ToString());
                                 }
-                                passOne.Add(lineDetails[8] + " " + lineDetails[9]);
+                                PassOne.Add(lineDetails[8] + " " + lineDetails[9]);
                                 break;
                             case "90": // BCC
                             case "B0": // BCS
@@ -72,24 +73,24 @@ namespace C64BinaryToAssemblyConverter
                             case "10": // BPL
                             case "50": // BVC
                             case "70": // BVS
-                                if (!branchLoc.Keys.Contains(lineDetails[11].Replace("$", "")))
+                                if (!BranchLocations.Keys.Contains(lineDetails[11].Replace("$", "")))
                                 {
-                                    branchLoc.Add(lineDetails[11].Replace("$", ""), branch + branchCount++.ToString());
+                                    BranchLocations.Add(lineDetails[11].Replace("$", ""), Branch + _branchCount++.ToString());
                                 }
-                                passOne.Add(lineDetails[10] + " " + lineDetails[11]);
+                                PassOne.Add(lineDetails[10] + " " + lineDetails[11]);
                                 break;
                             default:
                                 if (lineDetails[3] == "" && lineDetails[4] == "")
                                 {
-                                    passOne.Add(lineDetails[12]);
+                                    PassOne.Add(lineDetails[12]);
                                 }
                                 else if (lineDetails[3] != "" && lineDetails[4] == "")
                                 {
-                                    passOne.Add(lineDetails[10] + " " + lineDetails[11]);
+                                    PassOne.Add(lineDetails[10] + " " + lineDetails[11]);
                                 }
                                 else if (lineDetails[3] != "" && lineDetails[4] != "")
                                 {
-                                    passOne.Add(lineDetails[8] + " " + lineDetails[9]);
+                                    PassOne.Add(lineDetails[8] + " " + lineDetails[9]);
                                 }
                                 break;
                         }
@@ -103,18 +104,17 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// Second Pass
+        /// Second Pass - iterates through first pass collection adding labels and branches into the code
         /// </summary>
         public void SecondPass(List<string> originalFileContent)
         {
-            // Second pass iterates through first pass collection adding labels and branches into the code
-            int counter = 0;
-            for (int i = 0; i < passOne.Count; i++)
+            var counter = 0;
+            for (var i = 0; i < PassOne.Count; i++)
             {
-                string assembly = passOne[counter++];
-                foreach (KeyValuePair<String, String> memLocation in labelLoc)
+                var assembly = PassOne[counter++];
+                foreach (var memLocation in LabelLocations)
                 {
-                    if (passOne[i].ToUpper().Contains(memLocation.Key))
+                    if (PassOne[i].ToUpper().Contains(memLocation.Key))
                     //   if (originalFileContent[i].ToUpper().Contains(memLocation.Key))
                     {
                         var dets = assembly.Split(' ');
@@ -124,7 +124,7 @@ namespace C64BinaryToAssemblyConverter
                         }
                     }
                 }
-                foreach (KeyValuePair<String, String> memLocation in branchLoc)
+                foreach (var memLocation in BranchLocations)
                 {
                     if (originalFileContent[i].ToUpper().Contains(memLocation.Key))
                     {
@@ -135,50 +135,63 @@ namespace C64BinaryToAssemblyConverter
                         }
                     }
                 }
-                passTwo.Add(assembly);
+                PassTwo.Add(assembly);
             }
         }
 
         /// <summary>
-        /// Final Pass
+        /// Final Pass - Method to add the labels to the front of the code
         /// </summary>
         public List<string> FinalPass(List<string> originalFileContent, string start)
         {
-            passThree.Add("                *=$" + start);
-            // Add the labels to the front of the code
-            int counter = 0;
-            for (int i = 0; i < passOne.Count; i++)
+            PassThree.Add("                *=$" + start);
+            var counter = 0;
+            var i = 0;
+            try
             {
-                var detail = originalFileContent[counter++].Split(' ');
-                string label = "                ";
-                foreach (var memLocation in from KeyValuePair<String, String> memLocation in labelLoc
-                                            where detail[0].ToUpper().Contains(memLocation.Key)
-                                            select memLocation)
+                // The length of passOne can be longer if invalid opcodes have been found & converted to bytes 
+                for (i = 0; i < PassOne.Count; i++)
                 {
-                    label = memLocation.Value + "          ";
-                    // The memory address has been found add it another list
-                    found.Add(memLocation.Key);
-                }
-
-                foreach (KeyValuePair<String, String> memLocation in branchLoc)
-                {
-                    if (detail[0].ToUpper().Contains(memLocation.Key))
+                    var label = "                ";
+                    if (!PassOne[i].Contains("!byte $"))
                     {
-                        label = memLocation.Value + "         ";
+                        var detail = originalFileContent[counter++].Split(' ');
+                        foreach (var memLocation in from KeyValuePair<string, string> memLocation in LabelLocations
+                                 where detail[0].ToUpper().Contains(memLocation.Key)
+                                 select memLocation)
+                        {
+                            label = memLocation.Value + "          ";
+                            // The memory address has been found add it another list
+                            Found.Add(memLocation.Key);
+                        }
+
+                        foreach (var memLocation in BranchLocations.Where(memLocation =>
+                                     detail[0].ToUpper().Contains(memLocation.Key)))
+                        {
+                            label = memLocation.Value + "         ";
+                        }
+
+                        // passThree.Add(label + passTwo[i]);
                     }
+                    PassThree.Add(label + PassTwo[i]);
+                    // else
+                    // {
+                    //     passThree.Add()
+                    // }
                 }
-                passThree.Add(label + passTwo[i]);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                var broken = ex.Message;
             }
 
             // Finally iterate through the found list & add references to the address not found
-            foreach (KeyValuePair<String, String> memLocation in labelLoc)
+            foreach (var memLocation in LabelLocations.Where(memLocation => !Found.Contains(memLocation.Key)))
             {
-                if (!found.Contains(memLocation.Key))
-                {
-                    passThree.Add(memLocation.Value + " = $" + memLocation.Key);
-                }
+                PassThree.Add(memLocation.Value + " = $" + memLocation.Key);
             }
-            return passThree;
+            return PassThree;
         }
     }
 }
