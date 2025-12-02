@@ -52,17 +52,17 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="MemoryLocation.cs">
+    <Compile Include="LoadIntoMemoryLocationSelector.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MemoryLocation.Designer.cs">
-      <DependentUpon>MemoryLocation.cs</DependentUpon>
+    <Compile Include="LoadIntoMemoryLocationSelector.Designer.cs">
+      <DependentUpon>LoadIntoMemoryLocationSelector.cs</DependentUpon>
     </Compile>
-    <Compile Include="MemorySelector.cs">
+    <Compile Include="MemoryLocationsToConvertSelector.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MemorySelector.Designer.cs">
-      <DependentUpon>MemorySelector.cs</DependentUpon>
+    <Compile Include="MemoryLocationsToConvertSelector.Designer.cs">
+      <DependentUpon>MemoryLocationsToConvertSelector.cs</DependentUpon>
     </Compile>
     <Compile Include="OpCode.cs" />
     <Compile Include="Parser.cs" />
@@ -71,11 +71,11 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MemoryLocation.resx">
-      <DependentUpon>MemoryLocation.cs</DependentUpon>
+    <EmbeddedResource Include="LoadIntoMemoryLocationSelector.resx">
+      <DependentUpon>LoadIntoMemoryLocationSelector.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MemorySelector.resx">
-      <DependentUpon>MemorySelector.cs</DependentUpon>
+    <EmbeddedResource Include="MemoryLocationsToConvertSelector.resx">
+      <DependentUpon>MemoryLocationsToConvertSelector.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
