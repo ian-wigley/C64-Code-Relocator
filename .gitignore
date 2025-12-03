@@ -58,3 +58,4 @@ C64CodeRelocatorTests/obj/Debug/C64CodeRelocatorTests.csproj.FileListAbsolute.tx
 /C64BinaryToAssemblyConverterTests/obj
 /C64BinaryToAssemblyConverter/bin
 /.idea/.idea.C64BinaryToAssemblyConverter/.idea
+/C64BinaryToAssemblyConverterTests/bin
