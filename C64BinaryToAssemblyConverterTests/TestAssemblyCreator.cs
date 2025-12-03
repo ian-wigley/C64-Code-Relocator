@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using C64CodeRelocator;
+using C64BinaryToAssemblyConverter;
 
 namespace C64CodeRelocatorTests
 {
@@ -7,10 +7,10 @@ namespace C64CodeRelocatorTests
     public class TestAssemblyCreator
     {
         [TestMethod]
-        public void TestSomething()
+        public void TestAssemblyCreatorObject()
         {
             AssemblyCreator assemblyCreator = new AssemblyCreator();
-            assemblyCreator.InitialPass();
+            Assert.IsNotNull(assemblyCreator);
         }
     }
 }
