@@ -14,7 +14,7 @@ namespace C64BinaryToAssemblyConverter
         // public List<string> LineNumbers { get; private set; } = new List<string>();
         // public List<string> IllegalOpcodes { get; private set; } = new List<string>();
         
-        private List<string> Code { get; set; } = new List<string>();
+        public List<string> Code { get; set; } = new List<string>();
         public List<string> PassOne { get; } = new List<string>();
         public List<string> PassTwo { get; } = new List<string>();
         public List<string> PassThree { get; } = new List<string>();
@@ -112,26 +112,31 @@ namespace C64BinaryToAssemblyConverter
             for (var i = 0; i < PassOne.Count; i++)
             {
                 var assembly = PassOne[counter++];
-                foreach (var memLocation in LabelLocations)
+                if (!PassOne[i].Contains("!byte $"))
                 {
-                    if (PassOne[i].ToUpper().Contains(memLocation.Key))
-                    //   if (originalFileContent[i].ToUpper().Contains(memLocation.Key))
+                    foreach (var memLocation in LabelLocations)
                     {
-                        var dets = assembly.Split(' ');
-                        if (dets[0].Contains("JSR") || dets[0].Contains("JMP"))
+                        if (PassOne[i].ToUpper().Contains(memLocation.Key))
+                        //   if (originalFileContent[i].ToUpper().Contains(memLocation.Key))
                         {
-                            assembly = dets[0] + " " + memLocation.Value;
+                            var dets = assembly.Split(' ');
+                            if (dets[0].Contains("JSR") || dets[0].Contains("JMP"))
+                            {
+                                assembly = dets[0] + " " + memLocation.Value;
+                            }
                         }
                     }
-                }
-                foreach (var memLocation in BranchLocations)
-                {
-                    if (originalFileContent[i].ToUpper().Contains(memLocation.Key))
+                    foreach (var memLocation in BranchLocations)
                     {
-                        var dets = assembly.Split(' ');
-                        if (dets[0].Contains("BNE") || dets[0].Contains("BEQ") || dets[0].Contains("BPL"))
+                        // if (originalFileContent[i].ToUpper().Contains(memLocation.Key))                        
+                        // if (originalFileContent[innerCount++].ToUpper().Contains(memLocation.Key))
+                        if(PassOne[i].ToUpper().Contains(memLocation.Key))
                         {
-                            assembly = dets[0] + " " + memLocation.Value;
+                            var dets = assembly.Split(' ');
+                            if (dets[0].Contains("BNE") || dets[0].Contains("BEQ") || dets[0].Contains("BPL"))
+                            {
+                                assembly = dets[0] + " " + memLocation.Value;
+                            }
                         }
                     }
                 }
