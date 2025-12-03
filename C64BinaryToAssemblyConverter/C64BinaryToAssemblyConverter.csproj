@@ -46,11 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyCreator.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="C64BinaryToAssemblyConverter.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="C64BinaryToAssemblyConverter.Designer.cs">
+      <DependentUpon>C64BinaryToAssemblyConverter.cs</DependentUpon>
     </Compile>
     <Compile Include="LoadIntoMemoryLocationSelector.cs">
       <SubType>Form</SubType>
@@ -68,8 +68,8 @@
     <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="C64BinaryToAssemblyConverter.resx">
+      <DependentUpon>C64BinaryToAssemblyConverter.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoadIntoMemoryLocationSelector.resx">
       <DependentUpon>LoadIntoMemoryLocationSelector.cs</DependentUpon>
