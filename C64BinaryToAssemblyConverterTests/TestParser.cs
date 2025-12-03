@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+using C64BinaryToAssemblyConverter;
 
 namespace C64CodeRelocatorTests
 {
@@ -7,8 +7,10 @@ namespace C64CodeRelocatorTests
     public class TestParser
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestParserObject()
         {
+            Parser parser = new Parser();
+            Assert.IsNotNull(parser);
         }
     }
 }
