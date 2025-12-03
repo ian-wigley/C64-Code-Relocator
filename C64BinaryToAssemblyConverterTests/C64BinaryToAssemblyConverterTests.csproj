@@ -57,7 +57,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\C64CodeRelocator\C64BinaryToAssemblyConverter.csproj">
+    <ProjectReference Include="..\C64BinaryToAssemblyConverter\C64BinaryToAssemblyConverter.csproj">
       <Project>{c7e3ef2b-2b8f-41b1-8893-0bfe0d5b464a}</Project>
       <Name>C64BinaryToAssemblyConverter</Name>
     </ProjectReference>
