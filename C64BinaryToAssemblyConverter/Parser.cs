@@ -44,7 +44,8 @@ namespace C64BinaryToAssemblyConverter
             textBox.Clear();
             var filePosition = 0;
             var opCodes = PopulateOpCodeList.GetOpCodes;
-
+            if (opCodes.Count.Equals(0)) { return Array.Empty<string>();} 
+            
             while (filePosition < data.Length)
             {
                 int opCode = data[filePosition];
