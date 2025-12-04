@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using C64BinaryToAssemblyConverter;
+﻿using C64BinaryToAssemblyConverter;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace C64CodeRelocatorTests
+namespace C64BinaryToAssemblyConverterTests
 {
     [TestClass]
     public class TestAssemblyCreator
@@ -11,6 +11,11 @@ namespace C64CodeRelocatorTests
         {
             AssemblyCreator assemblyCreator = new AssemblyCreator();
             Assert.IsNotNull(assemblyCreator);
+        }
+        
+        public void TestLoadBinaryData()
+        {
+            AssemblyCreator assemblyCreator = new AssemblyCreator();
         }
     }
 }
