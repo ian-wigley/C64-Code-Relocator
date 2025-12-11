@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.ComponentModel.Design;
 
 namespace C64BinaryToAssemblyConverter
 {
@@ -18,6 +19,7 @@ namespace C64BinaryToAssemblyConverter
         public C64BinaryToAssemblyConverter()
         {
             InitializeComponent();
+            byteviewer.SetDisplayMode(DisplayMode.Hexdump);
             MaximizeBox = false;
             MinimizeBox = false;
             GenerateLabels.Enabled = false;
@@ -76,6 +78,8 @@ namespace C64BinaryToAssemblyConverter
             
             GenerateLabels.Enabled = true;
             leftWindowToolStripMenuItem.Enabled = true;
+            byteviewer.SetFile(openFileDialog.FileName);
+            FileLoaded.Text = openFileDialog.SafeFileName;
         }
 
         /// <summary>
