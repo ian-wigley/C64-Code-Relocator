@@ -40,7 +40,8 @@ namespace C64BinaryToAssemblyConverter
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GenerateLabels = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
-            this.byteviewer = new System.ComponentModel.Design.ByteViewer();
+            //this.byteviewer = new System.ComponentModel.Design.ByteViewer();
+            this.byteviewer = new BytesView();
             this.FileLoaded = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -256,7 +257,8 @@ namespace C64BinaryToAssemblyConverter
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.ToolStripMenuItem leftWindowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rightWindowToolStripMenuItem;
-        private System.ComponentModel.Design.ByteViewer byteviewer;
+//        private System.ComponentModel.Design.ByteViewer byteviewer;
+        private BytesView byteviewer;
         private Label FileLoaded;
     }
 }
