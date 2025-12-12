@@ -9,12 +9,12 @@ namespace C64BinaryToAssemblyConverter
 {
     public partial class C64BinaryToAssemblyConverter : Form
     {
-        private byte[] data;
-        private readonly AssemblyCreator assemblyCreator;
-        private readonly Parser parser = new Parser();
-        private List<string> lineNumbers = new List<string>();
-        private List<string> illegalOpcodes = new List<string>();
-        private Dictionary<string, string[]> dataStatements = new Dictionary<string, string[]>();
+        private byte[] _data;
+        private readonly AssemblyCreator _assemblyCreator;
+        private readonly Parser _parser = new Parser();
+        private List<string> _lineNumbers = new List<string>();
+        private List<string> _illegalOpcodes = new List<string>();
+        private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
 
         public C64BinaryToAssemblyConverter()
         {
@@ -26,7 +26,7 @@ namespace C64BinaryToAssemblyConverter
             leftWindowToolStripMenuItem.Enabled = false;
             rightWindowToolStripMenuItem.Enabled = false;
             PopulateOpCodeList.Init();
-            assemblyCreator = new AssemblyCreator();
+            _assemblyCreator = new AssemblyCreator();
         }
 
         /// <summary>
@@ -42,9 +42,9 @@ namespace C64BinaryToAssemblyConverter
             textBox2.Clear();
             ClearRightWindow();
             textBox2.Font = new Font(FontFamily.GenericMonospace, textBox2.Font.Size);
-            assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, replacedWithDataStatements, parser.Code);
-            assemblyCreator.SecondPass(parser.Code);
-            textBox2.Lines = assemblyCreator.FinalPass(parser.Code, start).ToArray();
+            _assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, replacedWithDataStatements, _parser.Code);
+            _assemblyCreator.SecondPass(_parser.Code);
+            textBox2.Lines = _assemblyCreator.FinalPass(_parser.Code, start).ToArray();
             rightWindowToolStripMenuItem.Enabled = true;
         }
 
@@ -70,11 +70,11 @@ namespace C64BinaryToAssemblyConverter
             // Use a monospaced font
             textBox1.Font = new Font(FontFamily.GenericMonospace, textBox1.Font.Size);
             _ = int.TryParse(ml.GetMemStartLocation, out var startAddress);
-            data = parser.LoadBinaryData(openFileDialog.FileName);
-            textBox1.Lines = parser.ParseFileContent(data, textBox1, startAddress, ref lineNumbers);
+            _data = _parser.LoadBinaryData(openFileDialog.FileName);
+            textBox1.Lines = _parser.ParseFileContent(_data, textBox1, startAddress, ref _lineNumbers);
             
-            dataStatements = parser.DataStatements;
-            illegalOpcodes = parser.IllegalOpCodes;            
+            _dataStatements = _parser.DataStatements;
+            _illegalOpcodes = _parser.IllegalOpCodes;            
             
             GenerateLabels.Enabled = true;
             leftWindowToolStripMenuItem.Enabled = true;
@@ -95,18 +95,18 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void GenerateLabelsClickEvent(object sender, EventArgs e)
         {
-            char[] startAddress = new char[lineNumbers[0].Length];
-            char[] endAddress = new char[lineNumbers[lineNumbers.Count - 1].Length];
+            char[] startAddress = new char[_lineNumbers[0].Length];
+            char[] endAddress = new char[_lineNumbers[_lineNumbers.Count - 1].Length];
             int firstOccurence = 0;
             int lastOccurrence = 0;
 
             int count = 0;
-            foreach (char chr in lineNumbers[0])
+            foreach (char chr in _lineNumbers[0])
             {
                 startAddress[count++] = chr;
             }
             count = 0;
-            foreach (char chr in lineNumbers[lineNumbers.Count - 1])
+            foreach (char chr in _lineNumbers[_lineNumbers.Count - 1])
             {
                 endAddress[count++] = chr;
             }
@@ -126,7 +126,7 @@ namespace C64BinaryToAssemblyConverter
                 //Check to see if illegal opcodes exist within the code selection
                 for (var i = start; i < end; i++)
                 {
-                    if (illegalOpcodes.Contains(i.ToString("X4")))
+                    if (_illegalOpcodes.Contains(i.ToString("X4")))
                     {
                         if (i > firstOccurence && !firstIllegalOpcodeFound)
                         {
@@ -142,12 +142,12 @@ namespace C64BinaryToAssemblyConverter
 
                 var temp = lastOccurrence.ToString("X4");
                 int index = 0;
-                foreach (string str in parser.Code)
+                foreach (string str in _parser.Code)
                 {
                     if (str.Contains(temp))
                     {
                         // nudge the last Occurrence along to the next valid opCode
-                        lastOccurrence = int.Parse(lineNumbers[++index], System.Globalization.NumberStyles.HexNumber);
+                        lastOccurrence = int.Parse(_lineNumbers[++index], System.Globalization.NumberStyles.HexNumber);
                     }
                     index++;
                 }
@@ -155,7 +155,7 @@ namespace C64BinaryToAssemblyConverter
                 for (int i = firstOccurence; i < lastOccurrence; i++)
                 {
                     // Replace the Illegal Opcodes with data statement
-                    if (dataStatements.TryGetValue(i.ToString("X4"), out string[] dataValue))
+                    if (_dataStatements.TryGetValue(i.ToString("X4"), out string[] dataValue))
                     {
                         replacedWithDataStatements.Add(i.ToString("X4"), dataValue);
                     }
@@ -177,7 +177,7 @@ namespace C64BinaryToAssemblyConverter
             }
             else
             {
-                MessageBox.Show(@"The selected end address exceeds the length of the bytes $" + lineNumbers[lineNumbers.Count - 1]);
+                MessageBox.Show(@"The selected end address exceeds the length of the bytes $" + _lineNumbers[_lineNumbers.Count - 1]);
             }
         }
 
@@ -195,8 +195,8 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void ClearLeftWindow()
         {
-            parser.Code.Clear();
-            parser.DataStatements.Clear();
+            _parser.Code.Clear();
+            _parser.DataStatements.Clear();
         }
 
         /// <summary>
@@ -204,12 +204,12 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void ClearRightWindow()
         {
-            assemblyCreator.PassOne.Clear();
-            assemblyCreator.PassTwo.Clear();
-            assemblyCreator.PassThree.Clear();
-            assemblyCreator.Found.Clear();
-            assemblyCreator.LabelLocations.Clear();
-            assemblyCreator.BranchLocations.Clear();
+            _assemblyCreator.PassOne.Clear();
+            _assemblyCreator.PassTwo.Clear();
+            _assemblyCreator.PassThree.Clear();
+            _assemblyCreator.Found.Clear();
+            _assemblyCreator.LabelLocations.Clear();
+            _assemblyCreator.BranchLocations.Clear();
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void LeftWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save(parser.Code);
+            Save(_parser.Code);
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void RightWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save(assemblyCreator.PassThree);
+            Save(_assemblyCreator.PassThree);
         }
 
         /// <summary>
