@@ -23,20 +23,20 @@ namespace C64BinaryToAssemblyConverter
             MaximizeBox = false;
             MinimizeBox = false;
             GenerateLabels.Enabled = false;
-            leftWindowToolStripMenuItem.Enabled = false;
-            rightWindowToolStripMenuItem.Enabled = false;
+            LeftWindowMenuItem.Enabled = false;
+            RightWindowMenuItem.Enabled = false;
             PopulateOpCodeList.Init();
             _assemblyCreator = new AssemblyCreator();
         }
 
         /// <summary>
-        ///
+        /// Add Labels
         /// </summary>
         private void AddLabels(
             int delta,
-            string start, 
-            string end, 
-            bool replaceIllegalOpcodes, 
+            string start,
+            string end,
+            bool replaceIllegalOpcodes,
             Dictionary<string, string[]> replacedWithDataStatements)
         {
             textBox2.Clear();
@@ -45,7 +45,7 @@ namespace C64BinaryToAssemblyConverter
             _assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, replacedWithDataStatements, _parser.Code);
             _assemblyCreator.SecondPass(_parser.Code);
             textBox2.Lines = _assemblyCreator.FinalPass(_parser.Code, start).ToArray();
-            rightWindowToolStripMenuItem.Enabled = true;
+            RightWindowMenuItem.Enabled = true;
         }
 
         /// <summary>
@@ -72,14 +72,16 @@ namespace C64BinaryToAssemblyConverter
             _ = int.TryParse(ml.GetMemStartLocation, out var startAddress);
             _data = _parser.LoadBinaryData(openFileDialog.FileName);
             textBox1.Lines = _parser.ParseFileContent(_data, textBox1, startAddress, ref _lineNumbers);
-            
+
             _dataStatements = _parser.DataStatements;
-            _illegalOpcodes = _parser.IllegalOpCodes;            
-            
+            _illegalOpcodes = _parser.IllegalOpCodes;
+
             GenerateLabels.Enabled = true;
-            leftWindowToolStripMenuItem.Enabled = true;
+            LeftWindowMenuItem.Enabled = true;
+            //byteviewer.SetFile(openFileDialog.FileName, startAddress);
             byteviewer.SetFile(openFileDialog.FileName);
             FileLoaded.Text = openFileDialog.SafeFileName;
+            FileLoaded.Left = 340;
         }
 
         /// <summary>
@@ -116,7 +118,7 @@ namespace C64BinaryToAssemblyConverter
             var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
             var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
             //var dataStatmentsRequired = ms.GetConvertIllegalOpCodes;
-                
+
             var delta = end - start;
             var firstIllegalOpcodeFound = false;
             var replacedWithDataStatements = new Dictionary<string, string[]>();
@@ -245,6 +247,42 @@ namespace C64BinaryToAssemblyConverter
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 File.WriteAllLines(saveFileDialog.FileName, collection);
+            }
+        }
+
+        private void ExportBytesClicked(object sender, EventArgs e)
+        {
+            var start = 0;
+            var end = 1984;
+            var fileName = "TestByes.bin";
+            var dataStatements = new List<string>();
+            string eightBytes = "!byte $";
+            int byteCounter = 0;
+
+            if (_data.Length > 0 && end <= _data.Length)
+            {
+                using (FileStream fileStream = new FileStream(fileName, FileMode.Create))
+                {
+                    // Write the data to the file, byte by byte.
+                    for (int i = start; i <= end; i++)
+                    {
+                        fileStream.WriteByte(_data[i]);
+                        if (byteCounter != 8)
+                        {
+                            eightBytes += _data[i].ToString("X2") + ",$";
+                            byteCounter++;
+                        }
+                        else {
+                            //var index = eightBytes.LastIndexOf(",");
+                            //eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), eightBytes.Length);
+                            eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
+                            dataStatements.Add(eightBytes);
+                            eightBytes = "!byte $";
+                            byteCounter = 0;
+                        }
+                    }
+                }
+                File.WriteAllLines(fileName + ".txt", dataStatements);
             }
         }
     }
