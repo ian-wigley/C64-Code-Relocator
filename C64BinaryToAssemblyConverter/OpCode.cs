@@ -60,46 +60,52 @@ namespace C64BinaryToAssemblyConverter
             }
             if (_numberOfBytes == 2)
             {
-                if (Illegal)
+                if (filePosition + 1 < bytes.Length)
                 {
-                    illegalOpCodes.Add(pc.ToString("X4"));
-                }
-                temp = new string[2];
-                temp[0] = "!byte $" + Code;
-                temp[1] = "!byte $" + bytes[filePosition + 1].ToString("X2");
-                dataStatements.Add(pc.ToString("X4"), temp);
-                line += " " + bytes[filePosition + 1].ToString("X2");
 
-                if (_name.Contains("BCC") || _name.Contains("BCS") ||
-                    _name.Contains("BEQ") || _name.Contains("BMI") ||
-                    _name.Contains("BNE") || _name.Contains("BPL") ||
-                    _name.Contains("BVC") || _name.Contains("BVS"))
-                {
-                    sbyte s = unchecked((sbyte)bytes[filePosition + 1]);
-                    s += 2;
-                    line += "       " + _name + " " + _prefix + (pc + s).ToString("X4");
-                }
-                else
-                {
-                    line += "       " + _name + " " + _prefix + bytes[filePosition + 1].ToString("X2") + _suffix;
+                    if (Illegal)
+                    {
+                        illegalOpCodes.Add(pc.ToString("X4"));
+                    }
+                    temp = new string[2];
+                    temp[0] = "!byte $" + Code;
+                    temp[1] = "!byte $" + bytes[filePosition + 1].ToString("X2");
+                    dataStatements.Add(pc.ToString("X4"), temp);
+                    line += " " + bytes[filePosition + 1].ToString("X2");
+
+                    if (_name.Contains("BCC") || _name.Contains("BCS") ||
+                        _name.Contains("BEQ") || _name.Contains("BMI") ||
+                        _name.Contains("BNE") || _name.Contains("BPL") ||
+                        _name.Contains("BVC") || _name.Contains("BVS"))
+                    {
+                        sbyte s = unchecked((sbyte)bytes[filePosition + 1]);
+                        s += 2;
+                        line += "       " + _name + " " + _prefix + (pc + s).ToString("X4");
+                    }
+                    else
+                    {
+                        line += "       " + _name + " " + _prefix + bytes[filePosition + 1].ToString("X2") + _suffix;
+                    }
                 }
                 filePosition += 2;
             }
-            else if (_numberOfBytes == 3)
-            {
-                if (Illegal)
+            else if (_numberOfBytes == 3) {
+                if (filePosition + 2 < bytes.Length)
                 {
-                    illegalOpCodes.Add(pc.ToString("X4"));
+                    if (Illegal)
+                    {
+                        illegalOpCodes.Add(pc.ToString("X4"));
+                    }
+
+                    temp = new string[3];
+                    temp[0] = "!byte $" + Code;
+                    temp[1] = "!byte $" + bytes[filePosition + 1].ToString("X2");
+                    temp[2] = "!byte $" + bytes[filePosition + 2].ToString("X2");
+                    dataStatements.Add(pc.ToString("X4"), temp);
+
+                    line += " " + bytes[filePosition + 1].ToString("X2") + " " + bytes[filePosition + 2].ToString("X2");
+                    line += "    " + _name + " " + _prefix + bytes[filePosition + 2].ToString("X2") + bytes[filePosition + 1].ToString("X2") + _suffix;
                 }
-
-                temp = new string[3];
-                temp[0] = "!byte $" + Code;
-                temp[1] = "!byte $" + bytes[filePosition + 1].ToString("X2");
-                temp[2] = "!byte $" + bytes[filePosition + 2].ToString("X2");
-                dataStatements.Add(pc.ToString("X4"), temp);
-
-                line += " " + bytes[filePosition + 1].ToString("X2") + " " + bytes[filePosition + 2].ToString("X2");
-                line += "    " + _name + " " + _prefix + bytes[filePosition + 2].ToString("X2") + bytes[filePosition + 1].ToString("X2") + _suffix;
                 filePosition += 3;
             }
         }
