@@ -39,12 +39,12 @@ namespace C64BinaryToAssemblyConverter
             bool replaceIllegalOpcodes,
             Dictionary<string, string[]> replacedWithDataStatements)
         {
-            textBox2.Clear();
+            RightTextBox.Clear();
             ClearRightWindow();
-            textBox2.Font = new Font(FontFamily.GenericMonospace, textBox2.Font.Size);
+            RightTextBox.Font = new Font(FontFamily.GenericMonospace, RightTextBox.Font.Size);
             _assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, replacedWithDataStatements, _parser.Code);
             _assemblyCreator.SecondPass(_parser.Code);
-            textBox2.Lines = _assemblyCreator.FinalPass(_parser.Code, start).ToArray();
+            RightTextBox.Lines = _assemblyCreator.FinalPass(_parser.Code, start).ToArray();
             RightWindowMenuItem.Enabled = true;
         }
 
@@ -64,14 +64,14 @@ namespace C64BinaryToAssemblyConverter
 
             if (openFileDialog.ShowDialog() != DialogResult.OK) return;
             ClearCollections();
-            textBox1.Clear();
+            LeftTextBox.Clear();
             var ml = new LoadIntoMemoryLocationSelector();
             if (ml.ShowDialog() != DialogResult.OK) return;
             // Use a monospaced font
-            textBox1.Font = new Font(FontFamily.GenericMonospace, textBox1.Font.Size);
+            LeftTextBox.Font = new Font(FontFamily.GenericMonospace, LeftTextBox.Font.Size);
             _ = int.TryParse(ml.GetMemStartLocation, out var startAddress);
             _data = _parser.LoadBinaryData(openFileDialog.FileName);
-            textBox1.Lines = _parser.ParseFileContent(_data, textBox1, startAddress, ref _lineNumbers);
+            LeftTextBox.Lines = _parser.ParseFileContent(_data, LeftTextBox, startAddress, ref _lineNumbers);
 
             _dataStatements = _parser.DataStatements;
             _illegalOpcodes = _parser.IllegalOpCodes;
