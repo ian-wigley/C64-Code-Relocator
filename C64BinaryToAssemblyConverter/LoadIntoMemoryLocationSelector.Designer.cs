@@ -94,7 +94,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Name = "LoadIntoMemoryLocationSelector";
-            this.Text = "MemoryLocation";
+            this.Text = "Select Location";
             this.ResumeLayout(false);
             this.PerformLayout();
 
