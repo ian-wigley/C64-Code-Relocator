@@ -170,11 +170,7 @@ namespace C64BinaryToAssemblyConverter
                                              + @"Replace Illegal Opcodes with data statements ?", @" ", MessageBoxButtons.YesNo);
                 }
 
-                var convertToBytes = false;
-                if (result == DialogResult.Yes)
-                {
-                    convertToBytes = true;
-                }
+                var convertToBytes = false || result == DialogResult.Yes;
                 AddLabels(delta, ms.GetSelectedMemStartLocation, ms.GetSelectedMemEndLocation, convertToBytes, replacedWithDataStatements);
             }
             else
