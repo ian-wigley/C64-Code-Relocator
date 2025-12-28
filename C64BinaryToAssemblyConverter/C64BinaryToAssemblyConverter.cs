@@ -123,7 +123,7 @@ namespace C64BinaryToAssemblyConverter
             var firstIllegalOpcodeFound = false;
             var replacedWithDataStatements = new Dictionary<string, string[]>();
 
-            if (start <= end)
+            if (start <= end && end <= _lineNumbers.Count)
             {
                 //Check to see if illegal opcodes exist within the code selection
                 for (var i = start; i < end; i++)
