@@ -123,7 +123,7 @@ namespace C64BinaryToAssemblyConverter
             var firstIllegalOpcodeFound = false;
             var replacedWithDataStatements = new Dictionary<string, string[]>();
 
-            if (start <= end && end <= _lineNumbers.Count)
+            if (start <= end && end >= _lineNumbers.Count)
             {
                 //Check to see if illegal opcodes exist within the code selection
                 for (var i = start; i < end; i++)
@@ -143,7 +143,7 @@ namespace C64BinaryToAssemblyConverter
                 }
 
                 var temp = lastOccurrence.ToString("X4");
-                int index = 0;
+                var index = 0;
                 foreach (string str in _parser.Code)
                 {
                     if (str.Contains(temp))
