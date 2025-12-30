@@ -122,8 +122,9 @@ namespace C64BinaryToAssemblyConverter
             var delta = end - start;
             var firstIllegalOpcodeFound = false;
             var replacedWithDataStatements = new Dictionary<string, string[]>();
-
-            if (start <= end && end >= _lineNumbers.Count)
+            var lastLineNum = int.Parse(_lineNumbers[_lineNumbers.Count - 1], System.Globalization.NumberStyles.HexNumber);
+            
+            if (start <= end && end <= lastLineNum)
             {
                 //Check to see if illegal opcodes exist within the code selection
                 for (var i = start; i < end; i++)
