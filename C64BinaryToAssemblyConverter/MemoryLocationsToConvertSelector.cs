@@ -56,12 +56,21 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///
+        /// Button Click event handler
         /// </summary>
-        private void Button1_Click(object sender, System.EventArgs e)
+        private void ButtonClick(object sender, System.EventArgs e)
         {
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        /// <summary>
+        /// Selected End address Index Change event handler
+        /// </summary>
+        private void SelectedIndexChanged(object sender, System.EventArgs e)
+        {
+            var selected = sender as ComboBox;
+            var t = selected.Text;
         }
     }
 }
