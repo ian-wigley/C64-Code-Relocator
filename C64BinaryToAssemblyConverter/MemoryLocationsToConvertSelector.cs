@@ -81,8 +81,8 @@ namespace C64BinaryToAssemblyConverter
         {
             int.TryParse(comboBox5.Text, System.Globalization.NumberStyles.HexNumber, null, out var one);
             int.TryParse(comboBox6.Text, System.Globalization.NumberStyles.HexNumber, null,  out var two);
-            int.TryParse(comboBox6.Text, System.Globalization.NumberStyles.HexNumber, null,  out var three);
-            int.TryParse(comboBox6.Text, System.Globalization.NumberStyles.HexNumber, null,  out var four);
+            int.TryParse(comboBox7.Text, System.Globalization.NumberStyles.HexNumber, null,  out var three);
+            int.TryParse(comboBox8.Text, System.Globalization.NumberStyles.HexNumber, null,  out var four);
             
             if (one > int.Parse(endAddress[0].ToString(), System.Globalization.NumberStyles.HexNumber))
             {
