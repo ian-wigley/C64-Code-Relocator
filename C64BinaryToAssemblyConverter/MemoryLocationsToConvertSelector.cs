@@ -9,11 +9,16 @@ namespace C64BinaryToAssemblyConverter
         public string GetSelectedMemStartLocation => comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text;
         public string GetSelectedMemEndLocation => comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text;
         public bool GetConvertIllegalOpCodes => checkBox1.Checked;
+        private char[] startAddress;
+        private char[] endAddress;
         
-        public MemoryLocationsToConvertSelector(char[] startAddress, char[] endAddress)
+        public MemoryLocationsToConvertSelector(char[] startAddressValues, char[] endAddressValues)
         {
             InitializeComponent();
 
+            startAddress = startAddressValues;
+            endAddress = endAddressValues;
+            
             MaximizeBox = false;
             MinimizeBox = false;
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -33,15 +38,15 @@ namespace C64BinaryToAssemblyConverter
             InitialiseComboBoxes(comboBox7);
             InitialiseComboBoxes(comboBox8);
 
-            comboBox1.Text = startAddress[0].ToString();
-            comboBox2.Text = startAddress[1].ToString();
-            comboBox3.Text = startAddress[2].ToString();
-            comboBox4.Text = startAddress[3].ToString();
+            comboBox1.Text = startAddressValues[0].ToString();
+            comboBox2.Text = startAddressValues[1].ToString();
+            comboBox3.Text = startAddressValues[2].ToString();
+            comboBox4.Text = startAddressValues[3].ToString();
 
-            comboBox5.Text = endAddress[0].ToString();
-            comboBox6.Text = endAddress[1].ToString();
-            comboBox7.Text = endAddress[2].ToString();
-            comboBox8.Text = endAddress[3].ToString();
+            comboBox5.Text = endAddressValues[0].ToString();
+            comboBox6.Text = endAddressValues[1].ToString();
+            comboBox7.Text = endAddressValues[2].ToString();
+            comboBox8.Text = endAddressValues[3].ToString();
         }
 
         /// <summary>
@@ -69,8 +74,20 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            var selected = sender as ComboBox;
-            var t = selected.Text;
+            InvalidEndAddress();
         }
+
+        private void InvalidEndAddress()
+        {
+            int.TryParse(comboBox5.Text, System.Globalization.NumberStyles.HexNumber, null, out var one);
+            int.TryParse(comboBox6.Text, System.Globalization.NumberStyles.HexNumber, null,  out var two);
+            int.TryParse(comboBox6.Text, System.Globalization.NumberStyles.HexNumber, null,  out var three);
+            int.TryParse(comboBox6.Text, System.Globalization.NumberStyles.HexNumber, null,  out var four);
+            
+            if (one > int.Parse(endAddress[0].ToString(), System.Globalization.NumberStyles.HexNumber))
+            {
+                comboBox5.Text = endAddress[0].ToString();
+            }
+        } 
     }
 }
