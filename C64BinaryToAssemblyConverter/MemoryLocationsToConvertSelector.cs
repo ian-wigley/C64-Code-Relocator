@@ -75,29 +75,34 @@ namespace C64BinaryToAssemblyConverter
         private void SelectedIndexChangedOne(object sender, System.EventArgs e)
         {
             int.TryParse(comboBox5.Text, System.Globalization.NumberStyles.HexNumber, null, out var one);
-            InvalidEndAddressOne(one);
+            InvalidEndAddressOne(one, comboBox5, endAddress[0].ToString());
         }
 
         private void SelectedIndexChangedTwo(object sender, System.EventArgs e)
         {
             int.TryParse(comboBox6.Text, System.Globalization.NumberStyles.HexNumber, null, out var two);
+            InvalidEndAddressOne(two, comboBox6, endAddress[1].ToString());
         }
 
         private void SelectedIndexChangedThree(object sender, System.EventArgs e)
         {
             int.TryParse(comboBox7.Text, System.Globalization.NumberStyles.HexNumber, null, out var three);
+            InvalidEndAddressOne(three, comboBox7, endAddress[2].ToString());
         }
 
         private void SelectedIndexChangedFour(object sender, System.EventArgs e)
         {
             int.TryParse(comboBox8.Text, System.Globalization.NumberStyles.HexNumber, null, out var four);
+            InvalidEndAddressOne(four, comboBox8, endAddress[3].ToString());
         }
 
-        private void InvalidEndAddressOne(int one)
+        private void InvalidEndAddressOne(int one, ComboBox comboBox, string endAddresses)
         {
-            if (one > int.Parse(endAddress[0].ToString(), System.Globalization.NumberStyles.HexNumber))
+            if (one > int.Parse(endAddresses, System.Globalization.NumberStyles.HexNumber))
+            //if (one > int.Parse(endAddress[0].ToString(), System.Globalization.NumberStyles.HexNumber))
             {
-                comboBox5.Text = endAddress[0].ToString();
+                comboBox.Text = endAddresses;// endAddress[0].ToString();
+                //comboBox5.Text = endAddress[0].ToString();
             }
         }
     }
