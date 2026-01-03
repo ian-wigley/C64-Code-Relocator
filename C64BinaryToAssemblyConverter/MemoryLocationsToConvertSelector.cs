@@ -99,10 +99,8 @@ namespace C64BinaryToAssemblyConverter
         private void InvalidEndAddressOne(int one, ComboBox comboBox, string endAddresses)
         {
             if (one > int.Parse(endAddresses, System.Globalization.NumberStyles.HexNumber))
-            //if (one > int.Parse(endAddress[0].ToString(), System.Globalization.NumberStyles.HexNumber))
             {
-                comboBox.Text = endAddresses;// endAddress[0].ToString();
-                //comboBox5.Text = endAddress[0].ToString();
+                comboBox.Text = endAddresses;
             }
         }
     }
