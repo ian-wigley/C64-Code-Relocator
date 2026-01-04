@@ -291,7 +291,6 @@ namespace C64BinaryToAssemblyConverter
         private System.Windows.Forms.TextBox RightTextBox;
         private System.Windows.Forms.ToolStripMenuItem LeftWindowMenuItem;
         private System.Windows.Forms.ToolStripMenuItem RightWindowMenuItem;
-//        private System.ComponentModel.Design.ByteViewer byteviewer;
         private BytesView byteviewer;
         private Label FileLoaded;
         private ToolStripMenuItem ExportBytesMenuItem;
