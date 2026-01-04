@@ -247,14 +247,11 @@ namespace C64BinaryToAssemblyConverter
             }
         }
 
-        private void ExportBytesClicked(object sender, EventArgs e)
-        {
-
-        }
-
         private void ExportBytesAsBinaryMenuItemClicked(object sender, EventArgs e)
         {
-
+            // TODO
+            var dataStatements = new List<string>();
+            Save(dataStatements);
         }
 
         private void ExportBytesAsTextMenuItemClicked(object sender, EventArgs e)
@@ -281,8 +278,6 @@ namespace C64BinaryToAssemblyConverter
                         }
                         else
                         {
-                            //var index = eightBytes.LastIndexOf(",");
-                            //eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), eightBytes.Length);
                             eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
                             dataStatements.Add(eightBytes);
                             eightBytes = "!byte $";
@@ -290,7 +285,8 @@ namespace C64BinaryToAssemblyConverter
                         }
                     }
                 }
-                File.WriteAllLines(fileName + ".txt", dataStatements);
+                // File.WriteAllLines(fileName + ".txt", dataStatements);
+                Save(dataStatements);
             }
         }
     }
