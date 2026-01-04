@@ -15,6 +15,8 @@ namespace C64BinaryToAssemblyConverter
         private List<string> _lineNumbers = new List<string>();
         private List<string> _illegalOpcodes = new List<string>();
         private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
+        private char[] StartAddress;
+        private char[] EndAddress;
 
         public C64BinaryToAssemblyConverter()
         {
@@ -82,6 +84,9 @@ namespace C64BinaryToAssemblyConverter
             byteviewer.SetFile(openFileDialog.FileName);
             FileLoaded.Text = openFileDialog.SafeFileName;
             FileLoaded.Left = 340;
+
+            ConfigureStartAndEndAddresses();
+
         }
 
         /// <summary>
@@ -92,15 +97,11 @@ namespace C64BinaryToAssemblyConverter
             Application.Exit();
         }
 
-        /// <summary>
-        /// Generate Labels
-        /// </summary>
-        private void GenerateLabelsClickEvent(object sender, EventArgs e)
+
+        private void ConfigureStartAndEndAddresses()
         {
             char[] startAddress = new char[_lineNumbers[0].Length];
             char[] endAddress = new char[_lineNumbers[_lineNumbers.Count - 1].Length];
-            int firstOccurence = 0;
-            int lastOccurrence = 0;
 
             int count = 0;
             foreach (char chr in _lineNumbers[0])
@@ -112,8 +113,37 @@ namespace C64BinaryToAssemblyConverter
             {
                 endAddress[count++] = chr;
             }
+            StartAddress = startAddress;
+            EndAddress = endAddress;
+        }
 
-            var ms = new MemoryLocationsToConvertSelector(startAddress, endAddress);
+        /// <summary>
+        /// Generate Labels
+        /// </summary>
+        private void GenerateLabelsClickEvent(object sender, EventArgs e)
+        {
+            //char[] startAddress = new char[_lineNumbers[0].Length];
+            //char[] endAddress = new char[_lineNumbers[_lineNumbers.Count - 1].Length];
+            //int firstOccurence = 0;
+            //int lastOccurrence = 0;
+
+            //int count = 0;
+            //foreach (char chr in _lineNumbers[0])
+            //{
+            //    startAddress[count++] = chr;
+            //}
+            //count = 0;
+            //foreach (char chr in _lineNumbers[_lineNumbers.Count - 1])
+            //{
+            //    endAddress[count++] = chr;
+            //}
+            //EndAddress = endAddress;
+            //StartAddress = startAddress;
+
+            int firstOccurence = 0;
+            int lastOccurrence = 0;
+
+            var ms = new MemoryLocationsToConvertSelector(StartAddress, EndAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
             var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
             var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
@@ -216,7 +246,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void LeftWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save(_parser.Code);
+            Save(_parser.Code, "");
         }
 
         /// <summary>
@@ -224,13 +254,13 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void RightWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save(_assemblyCreator.PassThree);
+            Save(_assemblyCreator.PassThree, "");
         }
 
         /// <summary>
         ///
         /// </summary>
-        private void Save(List<string> collection)
+        private void Save(List<string> collection, string filter)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
@@ -252,17 +282,14 @@ namespace C64BinaryToAssemblyConverter
         {
             // TODO
             var dataStatements = new List<string>();
-            Save(dataStatements);
-        }
-
-        private void ExportBytesAsTextMenuItemClicked(object sender, EventArgs e)
-        {
-            var start = 0;
-            var end = 1984;
             var fileName = "TestByes.bin";
-            var dataStatements = new List<string>();
             string eightBytes = "!byte $";
             int byteCounter = 0;
+
+            var ms = new MemoryLocationsToConvertSelector(StartAddress, EndAddress);
+            if (ms.ShowDialog() != DialogResult.OK) return;
+            var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
+            var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
 
             if (_data.Length > 0 && end <= _data.Length)
             {
@@ -286,8 +313,49 @@ namespace C64BinaryToAssemblyConverter
                         }
                     }
                 }
+            }
+
+            Save(dataStatements, "");
+        }
+
+        private void ExportBytesAsTextMenuItemClicked(object sender, EventArgs e)
+        {
+            var ms = new MemoryLocationsToConvertSelector(StartAddress, EndAddress);
+            if (ms.ShowDialog() != DialogResult.OK) return;
+            var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
+            var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
+
+//            var start = 0;
+//            var end = 1984;
+            var fileName = "TestByes.bin";
+            var dataStatements = new List<string>();
+            string eightBytes = "!byte $";
+            int byteCounter = 0;
+
+            if (_data.Length > 0 && end <= _data.Length)
+            {
+                //using (FileStream fileStream = new FileStream(fileName, FileMode.Create))
+                {
+                    // Write the data to the file, byte by byte.
+                    for (int i = start; i <= end; i++)
+                    {
+                        //fileStream.WriteByte(_data[i]);
+                        if (byteCounter != 8)
+                        {
+                            eightBytes += _data[i].ToString("X2") + ",$";
+                            byteCounter++;
+                        }
+                        else
+                        {
+                            eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
+                            dataStatements.Add(eightBytes);
+                            eightBytes = "!byte $";
+                            byteCounter = 0;
+                        }
+                    }
+                }
                 // File.WriteAllLines(fileName + ".txt", dataStatements);
-                Save(dataStatements);
+                Save(dataStatements, "All files (*.bin)|*.bin");
             }
         }
     }
