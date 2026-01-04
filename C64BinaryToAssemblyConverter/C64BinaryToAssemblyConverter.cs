@@ -236,7 +236,8 @@ namespace C64BinaryToAssemblyConverter
             {
                 Title = @"Save File",
                 InitialDirectory = @"*.*",
-                Filter = @"All files (*.*)|*.*|All files (*.a)|*.a",
+                //Filter = @"All files (*.*)|*.*|All files (*.a)|*.a",
+                Filter = @"All files (*.*)|*.*|All files (*.a)|*.a|All files (*.txt)|*.txt|All files (*.bin)|*.bin",
                 FilterIndex = 2,
                 RestoreDirectory = true
             };
