@@ -249,6 +249,16 @@ namespace C64BinaryToAssemblyConverter
 
         private void ExportBytesClicked(object sender, EventArgs e)
         {
+
+        }
+
+        private void ExportBytesAsBinaryMenuItemClicked(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ExportBytesAsTextMenuItemClicked(object sender, EventArgs e)
+        {
             var start = 0;
             var end = 1984;
             var fileName = "TestByes.bin";
@@ -269,7 +279,8 @@ namespace C64BinaryToAssemblyConverter
                             eightBytes += _data[i].ToString("X2") + ",$";
                             byteCounter++;
                         }
-                        else {
+                        else
+                        {
                             //var index = eightBytes.LastIndexOf(",");
                             //eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), eightBytes.Length);
                             eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
