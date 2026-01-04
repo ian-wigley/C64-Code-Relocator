@@ -17,6 +17,7 @@ namespace C64BinaryToAssemblyConverter
         private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
         private char[] StartAddress;
         private char[] EndAddress;
+        private int UserDefinedStartAddress;
 
         public C64BinaryToAssemblyConverter()
         {
@@ -84,6 +85,8 @@ namespace C64BinaryToAssemblyConverter
             byteviewer.SetFile(openFileDialog.FileName);
             FileLoaded.Text = openFileDialog.SafeFileName;
             FileLoaded.Left = 340;
+
+            UserDefinedStartAddress = 0;
 
             ConfigureStartAndEndAddresses();
 
@@ -153,7 +156,7 @@ namespace C64BinaryToAssemblyConverter
             var firstIllegalOpcodeFound = false;
             var replacedWithDataStatements = new Dictionary<string, string[]>();
             var lastLineNum = int.Parse(_lineNumbers[_lineNumbers.Count - 1], System.Globalization.NumberStyles.HexNumber);
-            
+
             if (start <= end && end <= lastLineNum)
             {
                 //Check to see if illegal opcodes exist within the code selection
@@ -322,39 +325,32 @@ namespace C64BinaryToAssemblyConverter
         {
             var ms = new MemoryLocationsToConvertSelector(StartAddress, EndAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
-            var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
+            var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber) - UserDefinedStartAddress;
             var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
 
-//            var start = 0;
-//            var end = 1984;
-            var fileName = "TestByes.bin";
             var dataStatements = new List<string>();
+            dataStatements.Add("*=" + start.ToString("x4"));
+            dataStatements.Add("; start address:" + start.ToString("x4") + "-" + end.ToString("x4")); 
             string eightBytes = "!byte $";
             int byteCounter = 0;
 
             if (_data.Length > 0 && end <= _data.Length)
             {
-                //using (FileStream fileStream = new FileStream(fileName, FileMode.Create))
+                for (int i = start; i <= end; i++)
                 {
-                    // Write the data to the file, byte by byte.
-                    for (int i = start; i <= end; i++)
+                    if (byteCounter != 8)
                     {
-                        //fileStream.WriteByte(_data[i]);
-                        if (byteCounter != 8)
-                        {
-                            eightBytes += _data[i].ToString("X2") + ",$";
-                            byteCounter++;
-                        }
-                        else
-                        {
-                            eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
-                            dataStatements.Add(eightBytes);
-                            eightBytes = "!byte $";
-                            byteCounter = 0;
-                        }
+                        eightBytes += _data[i].ToString("X2") + ",$";
+                        byteCounter++;
+                    }
+                    else
+                    {
+                        eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
+                        dataStatements.Add(eightBytes);
+                        eightBytes = "!byte $";
+                        byteCounter = 0;
                     }
                 }
-                // File.WriteAllLines(fileName + ".txt", dataStatements);
                 Save(dataStatements, "All files (*.bin)|*.bin");
             }
         }
