@@ -43,7 +43,7 @@ namespace C64BinaryToAssemblyConverter
             this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GenerateLabels = new System.Windows.Forms.Button();
             this.RightTextBox = new System.Windows.Forms.TextBox();
-            this.byteviewer = new C64BinaryToAssemblyConverter.BytesView();
+            this.byteviewer = new BytesView();
             this.FileLoaded = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
