@@ -15,6 +15,9 @@ namespace C64BinaryToAssemblyConverter
         private List<string> _lineNumbers = new List<string>();
         private List<string> _illegalOpcodes = new List<string>();
         private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
+        private char[] _startAddress;
+        private char[] _endAddress;
+        private int _userDefinedStartAddress;
 
         public C64BinaryToAssemblyConverter()
         {
@@ -25,6 +28,8 @@ namespace C64BinaryToAssemblyConverter
             GenerateLabels.Enabled = false;
             LeftWindowMenuItem.Enabled = false;
             RightWindowMenuItem.Enabled = false;
+            ExportBytesAsBinaryMenuItem.Enabled = false;
+            ExportBytesAsTextMenuItem.Enabled = false;
             PopulateOpCodeList.Init();
             _assemblyCreator = new AssemblyCreator();
         }
@@ -69,7 +74,8 @@ namespace C64BinaryToAssemblyConverter
             if (ml.ShowDialog() != DialogResult.OK) return;
             // Use a monospaced font
             LeftTextBox.Font = new Font(FontFamily.GenericMonospace, LeftTextBox.Font.Size);
-            _ = int.TryParse(ml.GetMemStartLocation, out var startAddress);
+            if (!int.TryParse(ml.GetMemStartLocation, out var startAddress)) return;
+            _userDefinedStartAddress = startAddress;
             _data = _parser.LoadBinaryData(openFileDialog.FileName);
             LeftTextBox.Lines = _parser.ParseFileContent(_data, LeftTextBox, startAddress, ref _lineNumbers);
 
@@ -78,10 +84,15 @@ namespace C64BinaryToAssemblyConverter
 
             GenerateLabels.Enabled = true;
             LeftWindowMenuItem.Enabled = true;
+            ExportBytesAsBinaryMenuItem.Enabled = true;
+            ExportBytesAsTextMenuItem.Enabled = true;
+            
             //byteviewer.SetFile(openFileDialog.FileName, startAddress);
             byteviewer.SetFile(openFileDialog.FileName);
             FileLoaded.Text = openFileDialog.SafeFileName;
             FileLoaded.Left = 340;
+
+            ConfigureStartAndEndAddresses();
         }
 
         /// <summary>
@@ -93,14 +104,12 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// Generate Labels
+        ///
         /// </summary>
-        private void GenerateLabelsClickEvent(object sender, EventArgs e)
+        private void ConfigureStartAndEndAddresses()
         {
             char[] startAddress = new char[_lineNumbers[0].Length];
             char[] endAddress = new char[_lineNumbers[_lineNumbers.Count - 1].Length];
-            int firstOccurence = 0;
-            int lastOccurrence = 0;
 
             int count = 0;
             foreach (char chr in _lineNumbers[0])
@@ -112,8 +121,19 @@ namespace C64BinaryToAssemblyConverter
             {
                 endAddress[count++] = chr;
             }
+            _startAddress = startAddress;
+            _endAddress = endAddress;
+        }
 
-            var ms = new MemoryLocationsToConvertSelector(startAddress, endAddress);
+        /// <summary>
+        /// Generate Labels
+        /// </summary>
+        private void GenerateLabelsClickEvent(object sender, EventArgs e)
+        {
+            int firstOccurence = 0;
+            int lastOccurrence = 0;
+
+            var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
             var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
             var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
@@ -123,7 +143,7 @@ namespace C64BinaryToAssemblyConverter
             var firstIllegalOpcodeFound = false;
             var replacedWithDataStatements = new Dictionary<string, string[]>();
             var lastLineNum = int.Parse(_lineNumbers[_lineNumbers.Count - 1], System.Globalization.NumberStyles.HexNumber);
-            
+
             if (start <= end && end <= lastLineNum)
             {
                 //Check to see if illegal opcodes exist within the code selection
@@ -216,7 +236,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void LeftWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save(_parser.Code);
+            Save(_parser.Code, "ASM files(*.a) | *.asm");
         }
 
         /// <summary>
@@ -224,22 +244,15 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void RightWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save(_assemblyCreator.PassThree);
+            Save(_assemblyCreator.PassThree, "ASM files(*.a) | *.asm");
         }
 
         /// <summary>
         ///
         /// </summary>
-        private void Save(List<string> collection)
+        private void Save(List<string> collection, string filter)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                Title = @"Save File",
-                InitialDirectory = @"*.*",
-                Filter = @"All files (*.*)|*.*|All files (*.a)|*.a",
-                FilterIndex = 2,
-                RestoreDirectory = true
-            };
+            var saveFileDialog = SaveFileDialogue(filter);
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -247,39 +260,77 @@ namespace C64BinaryToAssemblyConverter
             }
         }
 
-        private void ExportBytesClicked(object sender, EventArgs e)
+        private static SaveFileDialog SaveFileDialogue(string filter)
         {
-            var start = 0;
-            var end = 1984;
-            var fileName = "TestByes.bin";
-            var dataStatements = new List<string>();
-            string eightBytes = "!byte $";
-            int byteCounter = 0;
+            var saveFileDialog = new SaveFileDialog
+            {
+                Title = @"Save File",
+                InitialDirectory = @"*.*",
+                //Filter = @"All files (*.*)|*.*|All files (*.a)|*.a",
+                //Filter = @"All files (*.*)|*.*|All files (*.a)|*.a|All files (*.txt)|*.txt|All files (*.bin)|*.bin",
+                Filter = filter,
+                
+                FilterIndex = 2,
+                RestoreDirectory = true
+            };
+            return saveFileDialog;
+        }
+
+        private void ExportBytesAsBinaryMenuItemClicked(object sender, EventArgs e)
+        {
+            var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
+            if (ms.ShowDialog() != DialogResult.OK) return;
+            var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
+            var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
+
+            var saveFileDialog = SaveFileDialogue("Binary files (*.bin)|*.bin");
+            if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
 
             if (_data.Length > 0 && end <= _data.Length)
             {
-                using (FileStream fileStream = new FileStream(fileName, FileMode.Create))
+                using (var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
                 {
-                    // Write the data to the file, byte by byte.
-                    for (int i = start; i <= end; i++)
+                    for (var i = start; i <= end; i++)
                     {
                         fileStream.WriteByte(_data[i]);
-                        if (byteCounter != 8)
-                        {
-                            eightBytes += _data[i].ToString("X2") + ",$";
-                            byteCounter++;
-                        }
-                        else {
-                            //var index = eightBytes.LastIndexOf(",");
-                            //eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), eightBytes.Length);
-                            eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
-                            dataStatements.Add(eightBytes);
-                            eightBytes = "!byte $";
-                            byteCounter = 0;
-                        }
                     }
                 }
-                File.WriteAllLines(fileName + ".txt", dataStatements);
+            }
+        }
+
+        private void ExportBytesAsTextMenuItemClicked(object sender, EventArgs e)
+        {
+            var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
+            if (ms.ShowDialog() != DialogResult.OK) return;
+            var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
+            var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
+
+            var dataStatements = new List<string>
+            {
+                "*=" + start.ToString("x4"),
+                "; start address:" + start.ToString("x4") + "-" + end.ToString("x4")
+            };
+            var eightBytes = "!byte $";
+            var byteCounter = 0;
+
+            if (_data.Length > 0 && end <= _data.Length)
+            {
+                for (int i = start; i <= end; i++)
+                {
+                    if (byteCounter != 8)
+                    {
+                        eightBytes += _data[i].ToString("X2") + ",$";
+                        byteCounter++;
+                    }
+                    else
+                    {
+                        eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
+                        dataStatements.Add(eightBytes);
+                        eightBytes = "!byte $";
+                        byteCounter = 0;
+                    }
+                }
+                Save(dataStatements, "Text files (*.txt)|*.TXT");
             }
         }
     }

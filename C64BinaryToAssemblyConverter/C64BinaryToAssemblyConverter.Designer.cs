@@ -38,10 +38,12 @@ namespace C64BinaryToAssemblyConverter
             this.LeftWindowMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RightWindowMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ExportBytesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ExportBytesAsBinaryMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ExportBytesAsTextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GenerateLabels = new System.Windows.Forms.Button();
             this.RightTextBox = new System.Windows.Forms.TextBox();
-            this.byteviewer = new BytesView();
+            this.byteviewer = new C64BinaryToAssemblyConverter.BytesView();
             this.FileLoaded = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -82,7 +84,7 @@ namespace C64BinaryToAssemblyConverter
             // OpenMenuItem
             // 
             this.OpenMenuItem.Name = "OpenMenuItem";
-            this.OpenMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.OpenMenuItem.Size = new System.Drawing.Size(138, 22);
             this.OpenMenuItem.Text = "Open";
             this.OpenMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
             // 
@@ -92,7 +94,7 @@ namespace C64BinaryToAssemblyConverter
             this.LeftWindowMenuItem,
             this.RightWindowMenuItem});
             this.SaveAsMenuItem.Name = "SaveAsMenuItem";
-            this.SaveAsMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.SaveAsMenuItem.Size = new System.Drawing.Size(138, 22);
             this.SaveAsMenuItem.Text = "Save As";
             // 
             // LeftWindowMenuItem
@@ -111,15 +113,31 @@ namespace C64BinaryToAssemblyConverter
             // 
             // ExportBytesMenuItem
             // 
+            this.ExportBytesMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ExportBytesAsBinaryMenuItem,
+            this.ExportBytesAsTextMenuItem});
             this.ExportBytesMenuItem.Name = "ExportBytesMenuItem";
-            this.ExportBytesMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ExportBytesMenuItem.Size = new System.Drawing.Size(138, 22);
             this.ExportBytesMenuItem.Text = "Export Bytes";
-            this.ExportBytesMenuItem.Click += new System.EventHandler(this.ExportBytesClicked);
+            // 
+            // ExportBytesAsBinaryMenuItem
+            // 
+            this.ExportBytesAsBinaryMenuItem.Name = "ExportBytesAsBinaryMenuItem";
+            this.ExportBytesAsBinaryMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.ExportBytesAsBinaryMenuItem.Text = "As Binary";
+            this.ExportBytesAsBinaryMenuItem.Click += new System.EventHandler(this.ExportBytesAsBinaryMenuItemClicked);
+            // 
+            // ExportBytesAsTextMenuItem
+            // 
+            this.ExportBytesAsTextMenuItem.Name = "ExportBytesAsTextMenuItem";
+            this.ExportBytesAsTextMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.ExportBytesAsTextMenuItem.Text = "As Text";
+            this.ExportBytesAsTextMenuItem.Click += new System.EventHandler(this.ExportBytesAsTextMenuItemClicked);
             // 
             // ExitMenuItem
             // 
             this.ExitMenuItem.Name = "ExitMenuItem";
-            this.ExitMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ExitMenuItem.Size = new System.Drawing.Size(138, 22);
             this.ExitMenuItem.Text = "Exit";
             this.ExitMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
@@ -185,9 +203,15 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.Location = new System.Drawing.Point(70, 620);
             this.byteviewer.Name = "byteviewer";
             this.byteviewer.RowCount = 1;
+            this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -269,9 +293,10 @@ namespace C64BinaryToAssemblyConverter
         private System.Windows.Forms.TextBox RightTextBox;
         private System.Windows.Forms.ToolStripMenuItem LeftWindowMenuItem;
         private System.Windows.Forms.ToolStripMenuItem RightWindowMenuItem;
-//        private System.ComponentModel.Design.ByteViewer byteviewer;
         private BytesView byteviewer;
         private Label FileLoaded;
         private ToolStripMenuItem ExportBytesMenuItem;
+        private ToolStripMenuItem ExportBytesAsBinaryMenuItem;
+        private ToolStripMenuItem ExportBytesAsTextMenuItem;
     }
 }
