@@ -103,7 +103,9 @@ namespace C64BinaryToAssemblyConverter
             Application.Exit();
         }
 
-
+        /// <summary>
+        ///
+        /// </summary>
         private void ConfigureStartAndEndAddresses()
         {
             char[] startAddress = new char[_lineNumbers[0].Length];
@@ -128,24 +130,6 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void GenerateLabelsClickEvent(object sender, EventArgs e)
         {
-            //char[] startAddress = new char[_lineNumbers[0].Length];
-            //char[] endAddress = new char[_lineNumbers[_lineNumbers.Count - 1].Length];
-            //int firstOccurence = 0;
-            //int lastOccurrence = 0;
-
-            //int count = 0;
-            //foreach (char chr in _lineNumbers[0])
-            //{
-            //    startAddress[count++] = chr;
-            //}
-            //count = 0;
-            //foreach (char chr in _lineNumbers[_lineNumbers.Count - 1])
-            //{
-            //    endAddress[count++] = chr;
-            //}
-            //EndAddress = endAddress;
-            //StartAddress = startAddress;
-
             int firstOccurence = 0;
             int lastOccurrence = 0;
 
@@ -252,7 +236,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void LeftWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save(_parser.Code, "");
+            Save(_parser.Code, "ASM files(*.a) | *.asm");
         }
 
         /// <summary>
@@ -260,7 +244,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void RightWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save(_assemblyCreator.PassThree, "");
+            Save(_assemblyCreator.PassThree, "ASM files(*.a) | *.asm");
         }
 
         /// <summary>
