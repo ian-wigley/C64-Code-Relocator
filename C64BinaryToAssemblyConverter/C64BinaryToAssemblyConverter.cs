@@ -260,6 +260,9 @@ namespace C64BinaryToAssemblyConverter
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private static SaveFileDialog SaveFileDialogue(string filter)
         {
             var saveFileDialog = new SaveFileDialog
@@ -267,24 +270,35 @@ namespace C64BinaryToAssemblyConverter
                 Title = @"Save File",
                 InitialDirectory = @"*.*",
                 //Filter = @"All files (*.*)|*.*|All files (*.a)|*.a",
-                //Filter = @"All files (*.*)|*.*|All files (*.a)|*.a|All files (*.txt)|*.txt|All files (*.bin)|*.bin",
                 Filter = filter,
-                
                 FilterIndex = 2,
                 RestoreDirectory = true
             };
             return saveFileDialog;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void ExportBytesAsBinaryMenuItemClicked(object sender, EventArgs e)
         {
             var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
             var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
             var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
-
             var saveFileDialog = SaveFileDialogue("Binary files (*.bin)|*.bin");
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+
+            //byte[] by = new byte[end-start];
+            //if (_data.Length > 0 && end <= _data.Length)
+            //{
+            //    var count = 0;
+            //    for (var i = start; i < end; i++)
+            //    {
+            //        by[count++] = _data[i];
+            //    }
+            //    File.WriteAllBytes(saveFileDialog.FileName, by);
+            //}
 
             if (_data.Length > 0 && end <= _data.Length)
             {
@@ -298,17 +312,22 @@ namespace C64BinaryToAssemblyConverter
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void ExportBytesAsTextMenuItemClicked(object sender, EventArgs e)
         {
             var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
-            var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
-            var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
+            var fileStart = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
+            var fileEnd = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
+            var start = fileStart - _userDefinedStartAddress;
+            var end = fileEnd - _userDefinedStartAddress;
 
             var dataStatements = new List<string>
             {
-                "*=" + start.ToString("x4"),
-                "; start address:" + start.ToString("x4") + "-" + end.ToString("x4")
+                "*=$" + fileStart.ToString("x4"),
+                "; start address:" + fileStart.ToString("x4") + "-" + fileEnd.ToString("x4")
             };
             var eightBytes = "!byte $";
             var byteCounter = 0;
@@ -330,7 +349,7 @@ namespace C64BinaryToAssemblyConverter
                         byteCounter = 0;
                     }
                 }
-                Save(dataStatements, "Text files (*.txt)|*.TXT");
+                Save(dataStatements, "Text files (*.txt)|*.txt");
             }
         }
     }
