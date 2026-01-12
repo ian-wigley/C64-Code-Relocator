@@ -30,7 +30,10 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void InitializeComponent()
         {
-            this.LeftTextBox = new System.Windows.Forms.TextBox();
+            this.components = new System.ComponentModel.Container();
+            this.DisAssemblyView = new System.Windows.Forms.TextBox();
+            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.convertSelectionToBytes = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -42,23 +45,40 @@ namespace C64BinaryToAssemblyConverter
             this.ExportBytesAsTextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GenerateLabels = new System.Windows.Forms.Button();
-            this.RightTextBox = new System.Windows.Forms.TextBox();
+            this.AssemblyView = new System.Windows.Forms.TextBox();
             this.byteviewer = new BytesView();
             this.FileLoaded = new System.Windows.Forms.Label();
+            this.contextMenu.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // LeftTextBox
+            // DisAssemblyView
             // 
-            this.LeftTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.DisAssemblyView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.LeftTextBox.Location = new System.Drawing.Point(13, 38);
-            this.LeftTextBox.Multiline = true;
-            this.LeftTextBox.Name = "LeftTextBox";
-            this.LeftTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.LeftTextBox.Size = new System.Drawing.Size(362, 529);
-            this.LeftTextBox.TabIndex = 0;
+            this.DisAssemblyView.ContextMenuStrip = this.contextMenu;
+            this.DisAssemblyView.Location = new System.Drawing.Point(13, 38);
+            this.DisAssemblyView.Multiline = true;
+            this.DisAssemblyView.Name = "DisAssemblyView";
+            this.DisAssemblyView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.DisAssemblyView.Size = new System.Drawing.Size(362, 529);
+            this.DisAssemblyView.TabIndex = 0;
+            // 
+            // contextMenu
+            // 
+            this.contextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.convertSelectionToBytes});
+            this.contextMenu.Name = "contextMenuStrip1";
+            this.contextMenu.Size = new System.Drawing.Size(212, 26);
+            // 
+            // convertSelectionToBytes
+            // 
+            this.convertSelectionToBytes.Name = "convertSelectionToBytes";
+            this.convertSelectionToBytes.Size = new System.Drawing.Size(211, 22);
+            this.convertSelectionToBytes.Text = "Convert selection to Bytes";
+            this.convertSelectionToBytes.Click += new System.EventHandler(this.ConvertToDataBytesClick);
             // 
             // menuStrip1
             // 
@@ -151,14 +171,14 @@ namespace C64BinaryToAssemblyConverter
             this.GenerateLabels.UseVisualStyleBackColor = true;
             this.GenerateLabels.Click += new System.EventHandler(this.GenerateLabelsClickEvent);
             // 
-            // RightTextBox
+            // AssemblyView
             // 
-            this.RightTextBox.Location = new System.Drawing.Point(382, 38);
-            this.RightTextBox.Multiline = true;
-            this.RightTextBox.Name = "RightTextBox";
-            this.RightTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.RightTextBox.Size = new System.Drawing.Size(390, 529);
-            this.RightTextBox.TabIndex = 3;
+            this.AssemblyView.Location = new System.Drawing.Point(382, 38);
+            this.AssemblyView.Multiline = true;
+            this.AssemblyView.Name = "AssemblyView";
+            this.AssemblyView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.AssemblyView.Size = new System.Drawing.Size(390, 529);
+            this.AssemblyView.TabIndex = 3;
             // 
             // byteviewer
             // 
@@ -168,6 +188,8 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer.BackColor = System.Drawing.Color.Transparent;
             this.byteviewer.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Inset;
             this.byteviewer.ColumnCount = 1;
+            this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -247,6 +269,8 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.Size = new System.Drawing.Size(634, 199);
             this.byteviewer.TabIndex = 6;
             // 
@@ -267,13 +291,14 @@ namespace C64BinaryToAssemblyConverter
             this.Controls.Add(this.FileLoaded);
             this.Controls.Add(this.GenerateLabels);
             this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.RightTextBox);
-            this.Controls.Add(this.LeftTextBox);
+            this.Controls.Add(this.AssemblyView);
+            this.Controls.Add(this.DisAssemblyView);
             this.Controls.Add(this.byteviewer);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "C64BinaryToAssemblyConverter";
             this.Text = "C64 Binary To Assembly Converter";
+            this.contextMenu.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -283,14 +308,14 @@ namespace C64BinaryToAssemblyConverter
 
         #endregion
 
-        private System.Windows.Forms.TextBox LeftTextBox;
+        private System.Windows.Forms.TextBox DisAssemblyView;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem FileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem OpenMenuItem;
         private System.Windows.Forms.ToolStripMenuItem SaveAsMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ExitMenuItem;
         private System.Windows.Forms.Button GenerateLabels;
-        private System.Windows.Forms.TextBox RightTextBox;
+        private System.Windows.Forms.TextBox AssemblyView;
         private System.Windows.Forms.ToolStripMenuItem LeftWindowMenuItem;
         private System.Windows.Forms.ToolStripMenuItem RightWindowMenuItem;
         private BytesView byteviewer;
@@ -298,5 +323,7 @@ namespace C64BinaryToAssemblyConverter
         private ToolStripMenuItem ExportBytesMenuItem;
         private ToolStripMenuItem ExportBytesAsBinaryMenuItem;
         private ToolStripMenuItem ExportBytesAsTextMenuItem;
+        private ContextMenuStrip contextMenu;
+        private ToolStripMenuItem convertSelectionToBytes;
     }
 }
