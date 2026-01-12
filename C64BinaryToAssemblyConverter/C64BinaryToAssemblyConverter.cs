@@ -4,6 +4,9 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.ComponentModel.Design;
+using System.Text;
+using System.Linq;
+using System.Globalization;
 
 namespace C64BinaryToAssemblyConverter
 {
@@ -44,12 +47,12 @@ namespace C64BinaryToAssemblyConverter
             bool replaceIllegalOpcodes,
             Dictionary<string, string[]> replacedWithDataStatements)
         {
-            RightTextBox.Clear();
+            AssemblyView.Clear();
             ClearRightWindow();
-            RightTextBox.Font = new Font(FontFamily.GenericMonospace, RightTextBox.Font.Size);
+            AssemblyView.Font = new Font(FontFamily.GenericMonospace, AssemblyView.Font.Size);
             _assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, replacedWithDataStatements, _parser.Code);
             _assemblyCreator.SecondPass(_parser.Code);
-            RightTextBox.Lines = _assemblyCreator.FinalPass(_parser.Code, start).ToArray();
+            AssemblyView.Lines = _assemblyCreator.FinalPass(_parser.Code, start).ToArray();
             RightWindowMenuItem.Enabled = true;
         }
 
@@ -69,15 +72,15 @@ namespace C64BinaryToAssemblyConverter
 
             if (openFileDialog.ShowDialog() != DialogResult.OK) return;
             ClearCollections();
-            LeftTextBox.Clear();
+            DisAssemblyView.Clear();
             var ml = new LoadIntoMemoryLocationSelector();
             if (ml.ShowDialog() != DialogResult.OK) return;
             // Use a monospaced font
-            LeftTextBox.Font = new Font(FontFamily.GenericMonospace, LeftTextBox.Font.Size);
+            DisAssemblyView.Font = new Font(FontFamily.GenericMonospace, DisAssemblyView.Font.Size);
             if (!int.TryParse(ml.GetMemStartLocation, out var startAddress)) return;
             _userDefinedStartAddress = startAddress;
             _data = _parser.LoadBinaryData(openFileDialog.FileName);
-            LeftTextBox.Lines = _parser.ParseFileContent(_data, LeftTextBox, startAddress, ref _lineNumbers);
+            DisAssemblyView.Lines = _parser.ParseFileContent(_data, DisAssemblyView, startAddress, ref _lineNumbers);
 
             _dataStatements = _parser.DataStatements;
             _illegalOpcodes = _parser.IllegalOpCodes;
@@ -351,6 +354,89 @@ namespace C64BinaryToAssemblyConverter
                 }
                 Save(dataStatements, "Text files (*.txt)|*.txt");
             }
+        }
+
+        private void ConvertToDataBytesClick(object sender, EventArgs e)
+        {
+            CheckStartOfTheSelectionText();
+            string selectedText = CheckEndOfTheSelectionText();
+            string[] splitSelectedText = selectedText.Split('\n');
+            var startText = splitSelectedText[0].Split(' ');
+            int start = Convert.ToInt32(startText[0], 16);
+            var endText = splitSelectedText[splitSelectedText.Length - 1].Split(' ');
+            int end = Convert.ToInt32(endText[0], 16);
+            var converted = Encoding.ASCII.GetString(_data, start, end - start);
+            string str = startText[0] + "                         DC.B '" + converted + "'";
+            var splitLines = SplitToNewLines(str).ToArray();
+            DisAssemblyView.SelectedText = string.Join("", splitLines);
+        }
+
+        public string CheckStartOfTheSelectionText()
+        {
+            string selectedText = DisAssemblyView.SelectedText;
+            string[] splitSelectedText = selectedText.Split('\n');
+            var startText = splitSelectedText[0].Split(' ');
+            if (!uint.TryParse(startText[0], NumberStyles.HexNumber, null, out uint parseResult))
+            {
+                // Try the next line
+                startText = splitSelectedText[1].Split(' ');
+                if (uint.TryParse(startText[0], NumberStyles.HexNumber, null, out parseResult))
+                {
+                    List<string> textBoxLines = DisAssemblyView.Lines.ToList();
+                    // Find the index to the full line in the DisAssemblyView.Lines
+                    int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(startText[0])) - 1;
+                    splitSelectedText[index] = textBoxLines[index];
+                    DisAssemblyView.Select(index, splitSelectedText.Length);
+                }
+            }
+            return "TODO !";
+        }
+
+
+        /// <summary>
+        /// Method to check the selection text is valid
+        /// </summary>
+        public string CheckEndOfTheSelectionText()
+        {
+            string selectedText = DisAssemblyView.SelectedText;
+            int lastNewLineFound = selectedText.LastIndexOf("\n") + 1;
+            if (lastNewLineFound != selectedText.Length)
+            {
+                // The whole line has not been highlighted
+                string shortLine = selectedText.Substring(lastNewLineFound, selectedText.Length - lastNewLineFound);
+                List<string> textBoxLines = DisAssemblyView.Lines.ToList();
+                // Find the index to the full line in the DisAssemblyView.Lines
+                int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(shortLine));
+                string removedShortLine = selectedText.Remove(lastNewLineFound, selectedText.Length - lastNewLineFound);
+                selectedText = removedShortLine + textBoxLines[index];
+                // Finally update the selection
+                DisAssemblyView.SelectionLength += (textBoxLines[index].Length - shortLine.Length);
+            }
+            return selectedText;
+        }
+
+
+        /// <summary>
+        /// Split To New Lines
+        /// </summary>
+        protected IEnumerable<string> SplitToNewLines(string value)
+        {
+            int maximumLineLength = 60;
+            var words = value.Split(' ');
+            var line = new StringBuilder();
+
+            foreach (var word in words)
+            {
+                if ((line.Length + word.Length) >= maximumLineLength)
+                {
+                    line.Append("'\r\n");
+                    yield return line.ToString();
+                    line = new StringBuilder();
+                    line.Append("                         DC.B '");
+                }
+                line.AppendFormat("{0}{1}", (line.Length > 0) ? " " : "", word);
+            }
+            yield return line.ToString().ToString();
         }
     }
 }
