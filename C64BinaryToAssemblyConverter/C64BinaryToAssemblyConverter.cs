@@ -21,6 +21,7 @@ namespace C64BinaryToAssemblyConverter
         private char[] _startAddress;
         private char[] _endAddress;
         private int _userDefinedStartAddress;
+        private const string _byteDefinition = "!byte $";
 
         public C64BinaryToAssemblyConverter()
         {
@@ -50,8 +51,9 @@ namespace C64BinaryToAssemblyConverter
             AssemblyView.Clear();
             ClearRightWindow();
             AssemblyView.Font = new Font(FontFamily.GenericMonospace, AssemblyView.Font.Size);
-            _assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, replacedWithDataStatements, _parser.Code);
-            _assemblyCreator.SecondPass(_parser.Code);
+            _assemblyCreator.Code = DisAssemblyView.Lines;
+            _assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, replacedWithDataStatements);
+            _assemblyCreator.SecondPass();
             AssemblyView.Lines = _assemblyCreator.FinalPass(_parser.Code, start).ToArray();
             RightWindowMenuItem.Enabled = true;
         }
@@ -138,14 +140,14 @@ namespace C64BinaryToAssemblyConverter
 
             var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
-            var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
-            var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
+            var start = int.Parse(ms.GetSelectedMemStartLocation, NumberStyles.HexNumber);
+            var end = int.Parse(ms.GetSelectedMemEndLocation, NumberStyles.HexNumber);
             //var dataStatmentsRequired = ms.GetConvertIllegalOpCodes;
 
             var delta = end - start;
             var firstIllegalOpcodeFound = false;
             var replacedWithDataStatements = new Dictionary<string, string[]>();
-            var lastLineNum = int.Parse(_lineNumbers[_lineNumbers.Count - 1], System.Globalization.NumberStyles.HexNumber);
+            var lastLineNum = int.Parse(_lineNumbers[_lineNumbers.Count - 1], NumberStyles.HexNumber);
 
             if (start <= end && end <= lastLineNum)
             {
@@ -316,127 +318,141 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///
+        /// Export Bytes As Text Menu Item Clicked
         /// </summary>
         private void ExportBytesAsTextMenuItemClicked(object sender, EventArgs e)
         {
             var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
-            var fileStart = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
-            var fileEnd = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
-            var start = fileStart - _userDefinedStartAddress;
-            var end = fileEnd - _userDefinedStartAddress;
+            var fileStart = int.Parse(ms.GetSelectedMemStartLocation, NumberStyles.HexNumber);
+            var fileEnd = int.Parse(ms.GetSelectedMemEndLocation, NumberStyles.HexNumber);
+            var start = (uint)(fileStart - _userDefinedStartAddress);
+            var end = (uint)(fileEnd - _userDefinedStartAddress);
 
             var dataStatements = new List<string>
             {
                 "*=$" + fileStart.ToString("x4"),
                 "; start address:" + fileStart.ToString("x4") + "-" + fileEnd.ToString("x4")
             };
-            var eightBytes = "!byte $";
-            var byteCounter = 0;
 
             if (_data.Length > 0 && end <= _data.Length)
             {
-                for (int i = start; i <= end; i++)
-                {
-                    if (byteCounter != 8)
-                    {
-                        eightBytes += _data[i].ToString("X2") + ",$";
-                        byteCounter++;
-                    }
-                    else
-                    {
-                        eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
-                        dataStatements.Add(eightBytes);
-                        eightBytes = "!byte $";
-                        byteCounter = 0;
-                    }
-                }
+                ConstructByteValues(start, end, dataStatements);
                 Save(dataStatements, "Text files (*.txt)|*.txt");
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        private void ConstructByteValues(uint start, uint end, List<string> dataStatements)
+        {
+            //StringBuilder eightBytesBld = new StringBuilder();
+            //eightBytesBld.Append("!byte $");
+            var eightBytes = _byteDefinition;
+            var byteCounter = 0;
+
+            for (uint i = start; i <= end; i++)
+            {
+                if (byteCounter != 8)
+                {
+                    eightBytes += _data[i].ToString("X2") + ",$";
+                    //eightBytesBld.Append(_data[i].ToString("X2") + ",$");
+                    byteCounter++;
+                }
+                if(i == end || byteCounter == 8)
+                {
+                    //var newEightBytes = eightBytesBld.ToString();
+                    //newEightBytes = newEightBytes.Remove(newEightBytes.LastIndexOf(","), 2);
+                    //dataStatements.Add(newEightBytes);
+                    eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
+                    dataStatements.Add(eightBytes + "\n");
+                    eightBytes = _byteDefinition;
+                    byteCounter = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Method to Convert To Data Bytes Click
+        /// </summary>
         private void ConvertToDataBytesClick(object sender, EventArgs e)
         {
             CheckStartOfTheSelectionText();
             string selectedText = CheckEndOfTheSelectionText();
-            string[] splitSelectedText = selectedText.Split('\n');
+            if (selectedText.Contains(_byteDefinition) || selectedText == "") { return; }
+            char[] delimiters = { '\r', '\n' };
+            string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+            
             var startText = splitSelectedText[0].Split(' ');
-            int start = Convert.ToInt32(startText[0], 16);
+            var validResultOne = ushort.TryParse(startText[0], NumberStyles.HexNumber, null, out ushort parseResult);
+            uint start = (ushort)(parseResult - _userDefinedStartAddress);
+
             var endText = splitSelectedText[splitSelectedText.Length - 1].Split(' ');
-            int end = Convert.ToInt32(endText[0], 16);
-            var converted = Encoding.ASCII.GetString(_data, start, end - start);
-            string str = startText[0] + "                         DC.B '" + converted + "'";
-            var splitLines = SplitToNewLines(str).ToArray();
-            DisAssemblyView.SelectedText = string.Join("", splitLines);
+            var validResultTwo = ushort.TryParse(endText[0], NumberStyles.HexNumber, null, out ushort parseResultTwo);
+            uint end = (ushort)(parseResultTwo - _userDefinedStartAddress);
+
+            List<string> dataStatements = new List<string>
+            {
+                "*=$" + startText[0]
+            };
+
+            ConstructByteValues(start, end, dataStatements);
+            DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
         }
 
-        public string CheckStartOfTheSelectionText()
+        /// <summary>
+        /// Method to check the Start Of the Selection Text
+        /// </summary>
+        private void CheckStartOfTheSelectionText()
         {
             string selectedText = DisAssemblyView.SelectedText;
-            string[] splitSelectedText = selectedText.Split('\n');
+            if (selectedText == "" || selectedText.Contains("*=$")) { return; }
+            char[] delimiters = { '\r', '\n' };
+            string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
             var startText = splitSelectedText[0].Split(' ');
-            if (!uint.TryParse(startText[0], NumberStyles.HexNumber, null, out uint parseResult))
+            if (!uint.TryParse(startText[0], NumberStyles.HexNumber, null, out uint parseResult) && splitSelectedText.Length > 1)
             {
                 // Try the next line
                 startText = splitSelectedText[1].Split(' ');
                 if (uint.TryParse(startText[0], NumberStyles.HexNumber, null, out parseResult))
                 {
                     List<string> textBoxLines = DisAssemblyView.Lines.ToList();
-                    // Find the index to the full line in the DisAssemblyView.Lines
-                    int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(startText[0])) - 1;
-                    splitSelectedText[index] = textBoxLines[index];
-                    DisAssemblyView.Select(index, splitSelectedText.Length);
+                    // Get the index to the full line in the DisAssemblyView.Lines
+                    // TODO why was this index - 1 ?
+                    int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(startText[0]));
+                    if (index <= splitSelectedText.Length) {
+                        splitSelectedText[index] = textBoxLines[index];
+                        DisAssemblyView.Select(index, splitSelectedText.Length);
+                    }
                 }
             }
-            return "TODO !";
         }
-
 
         /// <summary>
         /// Method to check the selection text is valid
         /// </summary>
-        public string CheckEndOfTheSelectionText()
+        private string CheckEndOfTheSelectionText()
         {
             string selectedText = DisAssemblyView.SelectedText;
-            int lastNewLineFound = selectedText.LastIndexOf("\n") + 1;
-            if (lastNewLineFound != selectedText.Length)
+            int lastNewLineFound = selectedText.LastIndexOf("\n");// + 1;
+            // Only one line may be selected & this is indicated by no \n found
+            if (lastNewLineFound == -1)
             {
-                // The whole line has not been highlighted
-                string shortLine = selectedText.Substring(lastNewLineFound, selectedText.Length - lastNewLineFound);
-                List<string> textBoxLines = DisAssemblyView.Lines.ToList();
-                // Find the index to the full line in the DisAssemblyView.Lines
-                int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(shortLine));
-                string removedShortLine = selectedText.Remove(lastNewLineFound, selectedText.Length - lastNewLineFound);
-                selectedText = removedShortLine + textBoxLines[index];
-                // Finally update the selection
-                DisAssemblyView.SelectionLength += (textBoxLines[index].Length - shortLine.Length);
+                // TODO finsih implementation
+                //selectedText = selectedText.Substring(0, lastNewLineFound);
+                //DisAssemblyView.SelectionLength = lastNewLineFound;
+                //// The whole line has not been highlighted
+                //string shortLine = selectedText.Substring(lastNewLineFound, selectedText.Length - lastNewLineFound);
+                //List<string> textBoxLines = DisAssemblyView.Lines.ToList();
+                //// Find the index to the full line in the DisAssemblyView.Lines
+                //int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(shortLine));
+                //string removedShortLine = selectedText.Remove(lastNewLineFound, selectedText.Length - lastNewLineFound);
+                //selectedText = removedShortLine + textBoxLines[index];
+                //// Finally update the selection
+                //DisAssemblyView.SelectionLength += (textBoxLines[index].Length - shortLine.Length);
             }
             return selectedText;
-        }
-
-
-        /// <summary>
-        /// Split To New Lines
-        /// </summary>
-        protected IEnumerable<string> SplitToNewLines(string value)
-        {
-            int maximumLineLength = 60;
-            var words = value.Split(' ');
-            var line = new StringBuilder();
-
-            foreach (var word in words)
-            {
-                if ((line.Length + word.Length) >= maximumLineLength)
-                {
-                    line.Append("'\r\n");
-                    yield return line.ToString();
-                    line = new StringBuilder();
-                    line.Append("                         DC.B '");
-                }
-                line.AppendFormat("{0}{1}", (line.Length > 0) ? " " : "", word);
-            }
-            yield return line.ToString().ToString();
         }
     }
 }
