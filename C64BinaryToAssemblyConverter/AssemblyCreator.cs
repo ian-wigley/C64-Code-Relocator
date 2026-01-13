@@ -6,15 +6,12 @@ namespace C64BinaryToAssemblyConverter
 {
     public class AssemblyCreator
     {
-        private const string Label = "label";
-        private const string Branch = "branch";
         private int _labelCount;
         private int _branchCount;
+        private const string Label = "label";
+        private const string Branch = "branch";
 
-        // public List<string> LineNumbers { get; private set; } = new List<string>();
-        // public List<string> IllegalOpcodes { get; private set; } = new List<string>();
-        
-        public List<string> Code { get; set; } = new List<string>();
+        public string[] Code { get; set; }
         public List<string> PassOne { get; } = new List<string>();
         public List<string> PassTwo { get; } = new List<string>();
         public List<string> PassThree { get; } = new List<string>();
@@ -29,21 +26,26 @@ namespace C64BinaryToAssemblyConverter
             int delta, 
             string end, 
             bool replaceIllegalOpcodes, 
-            Dictionary<string, string[]> replacedWithDataStatements, 
-            List<string> originalFileContent
+            Dictionary<string, string[]> replacedWithDataStatements
             )
         {
             var count = 0;
+            var originalFileLength = Code.Length;
             var firstPass = true;
-            Code = originalFileContent;
-            var originalFileLength = Code.Count;
 
             while (firstPass)
             {
-                // Split each line into an array
-                var lineDetails = originalFileContent[count++].Split(' ');
+                if (Code[count].Contains("!byte $"))
+                {
+                    var byteString = Code[count];
+                    int startLocation = byteString.IndexOf("!byte $");
+                    byteString = byteString.Substring(startLocation, byteString.Length - startLocation);
+                    PassOne.Add(byteString);
+                }
 
-                if (lineDetails.Length > 1)
+                // Split each line into an array
+                var lineDetails = Code[count++].Split(' ');
+                if (lineDetails.Length > 2) //1)
                 {
                     // Replace the Illegal Opcodes with data statement
                     if (replaceIllegalOpcodes && replacedWithDataStatements.TryGetValue(lineDetails[0], out string[] dataValue))
@@ -106,7 +108,7 @@ namespace C64BinaryToAssemblyConverter
         /// <summary>
         /// Second Pass - iterates through first pass collection adding labels and branches into the code
         /// </summary>
-        public void SecondPass(List<string> originalFileContent)
+        public void SecondPass()
         {
             var counter = 0;
             for (var i = 0; i < PassOne.Count; i++)
@@ -114,29 +116,21 @@ namespace C64BinaryToAssemblyConverter
                 var assembly = PassOne[counter++];
                 if (!PassOne[i].Contains("!byte $"))
                 {
-                    foreach (var memLocation in LabelLocations)
+                    foreach (var memLocation in LabelLocations.Where(memLocation => PassOne[i].ToUpper().Contains(memLocation.Key)))
                     {
-                        if (PassOne[i].ToUpper().Contains(memLocation.Key))
-                        //   if (originalFileContent[i].ToUpper().Contains(memLocation.Key))
+                        var dets = assembly.Split(' ');
+                        if (dets[0].Contains("JSR") || dets[0].Contains("JMP"))
                         {
-                            var dets = assembly.Split(' ');
-                            if (dets[0].Contains("JSR") || dets[0].Contains("JMP"))
-                            {
-                                assembly = dets[0] + " " + memLocation.Value;
-                            }
+                            assembly = dets[0] + " " + memLocation.Value;
                         }
                     }
-                    foreach (var memLocation in BranchLocations)
+
+                    foreach (var memLocation in BranchLocations.Where(memLocation => PassOne[i].ToUpper().Contains(memLocation.Key)))
                     {
-                        // if (originalFileContent[i].ToUpper().Contains(memLocation.Key))                        
-                        // if (originalFileContent[innerCount++].ToUpper().Contains(memLocation.Key))
-                        if(PassOne[i].ToUpper().Contains(memLocation.Key))
+                        var dets = assembly.Split(' ');
+                        if (dets[0].Contains("BNE") || dets[0].Contains("BEQ") || dets[0].Contains("BPL"))
                         {
-                            var dets = assembly.Split(' ');
-                            if (dets[0].Contains("BNE") || dets[0].Contains("BEQ") || dets[0].Contains("BPL"))
-                            {
-                                assembly = dets[0] + " " + memLocation.Value;
-                            }
+                            assembly = dets[0] + " " + memLocation.Value;
                         }
                     }
                 }
@@ -175,20 +169,13 @@ namespace C64BinaryToAssemblyConverter
                         {
                             label = memLocation.Value + "         ";
                         }
-
-                        // passThree.Add(label + passTwo[i]);
                     }
                     PassThree.Add(label + PassTwo[i]);
-                    // else
-                    // {
-                    //     passThree.Add()
-                    // }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                var broken = ex.Message;
             }
 
             // Finally iterate through the found list & add references to the address not found
