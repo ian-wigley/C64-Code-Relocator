@@ -7,6 +7,7 @@ using System.ComponentModel.Design;
 using System.Text;
 using System.Linq;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace C64BinaryToAssemblyConverter
 {
@@ -22,6 +23,7 @@ namespace C64BinaryToAssemblyConverter
         private char[] _endAddress;
         private int _userDefinedStartAddress;
         private const string _byteDefinition = "!byte $";
+        private readonly Regex regex = new Regex(@"^[0-9A-Fa-f]{4}\s?");
 
         public C64BinaryToAssemblyConverter()
         {
@@ -91,7 +93,7 @@ namespace C64BinaryToAssemblyConverter
             LeftWindowMenuItem.Enabled = true;
             ExportBytesAsBinaryMenuItem.Enabled = true;
             ExportBytesAsTextMenuItem.Enabled = true;
-            
+
             //byteviewer.SetFile(openFileDialog.FileName, startAddress);
             byteviewer.SetFile(openFileDialog.FileName);
             FileLoaded.Text = openFileDialog.SafeFileName;
@@ -360,7 +362,7 @@ namespace C64BinaryToAssemblyConverter
                     //eightBytesBld.Append(_data[i].ToString("X2") + ",$");
                     byteCounter++;
                 }
-                if(i == end || byteCounter == 8)
+                if (i == end || byteCounter == 8)
                 {
                     //var newEightBytes = eightBytesBld.ToString();
                     //newEightBytes = newEightBytes.Remove(newEightBytes.LastIndexOf(","), 2);
@@ -378,55 +380,52 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void ConvertToDataBytesClick(object sender, EventArgs e)
         {
-            CheckStartOfTheSelectionText();
-            string selectedText = CheckEndOfTheSelectionText();
-            if (selectedText.Contains(_byteDefinition) || selectedText == "") { return; }
-            char[] delimiters = { '\r', '\n' };
-            string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-            
-            var startText = splitSelectedText[0].Split(' ');
-            var validResultOne = ushort.TryParse(startText[0], NumberStyles.HexNumber, null, out ushort parseResult);
-            uint start = (ushort)(parseResult - _userDefinedStartAddress);
+            if (CheckStartOfTheSelectionText())
+            {
+                string selectedText = CheckEndOfTheSelectionText();
+                if (selectedText.Contains(_byteDefinition) || selectedText == "") { return; }
+                char[] delimiters = { '\r', '\n' };
+                string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+                var startText = splitSelectedText[0].Split(' ');
+                var validResultOne = ushort.TryParse(startText[0], NumberStyles.HexNumber, null, out ushort parseResult);
+                uint start = (ushort)(parseResult - _userDefinedStartAddress);
+                uint end = 0;
+                for (uint i = start; i < splitSelectedText.Length; i++)
+                {
+                    if (!regex.IsMatch(splitSelectedText[i]))
+                    {
+                        end = i - 1;
+                        i = (ushort)(splitSelectedText.Length);
+                    }
+                    else
+                    {
+                        end++;
+                    }
+                }
+                if (end != 0)
+                {
+                    var endText1 = splitSelectedText[splitSelectedText.Length - 1].Split(' ');
+                    var validResultTwo2 = ushort.TryParse(endText1[0], NumberStyles.HexNumber, null, out ushort parseResultTwo1);
+                    end = (ushort)(parseResultTwo1 - _userDefinedStartAddress);
+                }
 
-            var endText = splitSelectedText[splitSelectedText.Length - 1].Split(' ');
-            var validResultTwo = ushort.TryParse(endText[0], NumberStyles.HexNumber, null, out ushort parseResultTwo);
-            uint end = (ushort)(parseResultTwo - _userDefinedStartAddress);
-
-            List<string> dataStatements = new List<string>
+                List<string> dataStatements = new List<string>
             {
                 "*=$" + startText[0]
             };
 
-            ConstructByteValues(start, end, dataStatements);
-            DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
+                ConstructByteValues(start, end, dataStatements);
+                DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
+            }
         }
 
         /// <summary>
         /// Method to check the Start Of the Selection Text
         /// </summary>
-        private void CheckStartOfTheSelectionText()
+        private bool CheckStartOfTheSelectionText()
         {
             string selectedText = DisAssemblyView.SelectedText;
-            if (selectedText == "" || selectedText.Contains("*=$")) { return; }
-            char[] delimiters = { '\r', '\n' };
-            string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-            var startText = splitSelectedText[0].Split(' ');
-            if (!uint.TryParse(startText[0], NumberStyles.HexNumber, null, out uint parseResult) && splitSelectedText.Length > 1)
-            {
-                // Try the next line
-                startText = splitSelectedText[1].Split(' ');
-                if (uint.TryParse(startText[0], NumberStyles.HexNumber, null, out parseResult))
-                {
-                    List<string> textBoxLines = DisAssemblyView.Lines.ToList();
-                    // Get the index to the full line in the DisAssemblyView.Lines
-                    // TODO why was this index - 1 ?
-                    int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(startText[0]));
-                    if (index <= splitSelectedText.Length) {
-                        splitSelectedText[index] = textBoxLines[index];
-                        DisAssemblyView.Select(index, splitSelectedText.Length);
-                    }
-                }
-            }
+            return regex.IsMatch(selectedText);
         }
 
         /// <summary>
