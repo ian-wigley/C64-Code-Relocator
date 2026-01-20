@@ -8,6 +8,8 @@ namespace C64BinaryToAssemblyConverter
         private bool Illegal { get; set; }
         public string LineNumber { get; private set; }
 
+        public string Codes { get; private set; }
+
         private readonly int _numberOfBytes = 0;
         private readonly string _name;
         private readonly string _prefix;
@@ -51,7 +53,7 @@ namespace C64BinaryToAssemblyConverter
                     //Add the programme counter location to the list of illegal opcodes found
                     illegalOpCodes.Add(pc.ToString("X4"));
                 }
-
+                Codes = "$" + Code;
                 temp = new string[1];
                 temp[0] = "!byte $" + Code;
                 dataStatements.Add(pc.ToString("X4"), temp);
@@ -67,6 +69,7 @@ namespace C64BinaryToAssemblyConverter
                     {
                         illegalOpCodes.Add(pc.ToString("X4"));
                     }
+                    Codes = "$" + Code + ", $" + bytes[filePosition + 1].ToString("X2");
                     temp = new string[2];
                     temp[0] = "!byte $" + Code;
                     temp[1] = "!byte $" + bytes[filePosition + 1].ToString("X2");
@@ -96,7 +99,7 @@ namespace C64BinaryToAssemblyConverter
                     {
                         illegalOpCodes.Add(pc.ToString("X4"));
                     }
-
+                    Codes = "$" + Code + ", $" + bytes[filePosition + 1].ToString("X2") + ", $" + bytes[filePosition + 2].ToString("X2");
                     temp = new string[3];
                     temp[0] = "!byte $" + Code;
                     temp[1] = "!byte $" + bytes[filePosition + 1].ToString("X2");
@@ -109,6 +112,21 @@ namespace C64BinaryToAssemblyConverter
                 filePosition += 3;
             }
         }
+
+        public string GetBytes()
+        {
+            string returnValue = "$";
+            for (int i=0; i< _numberOfBytes; i++)
+            {
+                var b = 0;
+                returnValue += Code;
+            }
+
+            return Codes;// returnValue;
+        }
+
+
+
     }
 
     /// <summary>
