@@ -23,7 +23,11 @@ namespace C64BinaryToAssemblyConverter
         private char[] _endAddress;
         private int _userDefinedStartAddress;
         private const string _byteDefinition = "!byte $";
-        private readonly Regex regex = new Regex(@"^[0-9A-Fa-f]{4}\s?");
+
+        private readonly Regex regex = new Regex(@"^(?:[0-9A-Fa-f]{4}\s+[0-9A-Fa-f]{2}(?:\s+[0-9A-Fa-f]{2})*\s*(?:[^\r\n]*)\r?\n?)+$");
+
+        //private readonly Regex regex = new Regex(@"^[0-9A-Fa-f]{4}\s?");
+        //private readonly Regex regex = new Regex(@"^[0-9A-Fa-f]{4}\s+[0-9A-Fa-f]{2}(\s+[0-9A-Fa-f]{2})*\s*$", RegexOptions.Multiline);
 
         public C64BinaryToAssemblyConverter()
         {
@@ -38,6 +42,49 @@ namespace C64BinaryToAssemblyConverter
             ExportBytesAsTextMenuItem.Enabled = false;
             PopulateOpCodeList.Init();
             _assemblyCreator = new AssemblyCreator();
+        }
+
+        /// <summary>
+        /// OpenToolStripMenuItem_Click
+        /// </summary>
+        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Title = @"Open File",
+                InitialDirectory = @"*.*",
+                Filter = @"All files (*.prg)|*.PRG|All files (*.*)|*.*",
+                FilterIndex = 2,
+                RestoreDirectory = true
+            };
+
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+            ClearCollections();
+
+            var ml = new LoadIntoMemoryLocationSelector();
+            if (ml.ShowDialog() != DialogResult.OK) return;
+            // Use a monospaced font
+            DisAssemblyView.Font = new Font(FontFamily.GenericMonospace, DisAssemblyView.Font.Size);
+            if (!int.TryParse(ml.GetMemStartLocation, out var startAddress)) return;
+            _userDefinedStartAddress = startAddress;
+            _data = _parser.LoadBinaryData(openFileDialog.FileName);
+
+            DisAssemblyView.Lines = _parser.ParseFileContent(_data, DisAssemblyView, startAddress, ref _lineNumbers);
+
+            _dataStatements = _parser.DataStatements;
+            _illegalOpcodes = _parser.IllegalOpCodes;
+
+            GenerateLabels.Enabled = true;
+            LeftWindowMenuItem.Enabled = true;
+            ExportBytesAsBinaryMenuItem.Enabled = true;
+            ExportBytesAsTextMenuItem.Enabled = true;
+
+            //byteviewer.SetFile(openFileDialog.FileName, startAddress);
+            byteviewer.SetFile(openFileDialog.FileName);
+            FileLoaded.Text = openFileDialog.SafeFileName;
+            FileLoaded.Left = 340;
+
+            ConfigureStartAndEndAddresses();
         }
 
         /// <summary>
@@ -60,47 +107,6 @@ namespace C64BinaryToAssemblyConverter
             RightWindowMenuItem.Enabled = true;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var openFileDialog = new OpenFileDialog
-            {
-                Title = @"Open File",
-                InitialDirectory = @"*.*",
-                Filter = @"All files (*.prg)|*.PRG|All files (*.*)|*.*",
-                FilterIndex = 2,
-                RestoreDirectory = true
-            };
-
-            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
-            ClearCollections();
-            DisAssemblyView.Clear();
-            var ml = new LoadIntoMemoryLocationSelector();
-            if (ml.ShowDialog() != DialogResult.OK) return;
-            // Use a monospaced font
-            DisAssemblyView.Font = new Font(FontFamily.GenericMonospace, DisAssemblyView.Font.Size);
-            if (!int.TryParse(ml.GetMemStartLocation, out var startAddress)) return;
-            _userDefinedStartAddress = startAddress;
-            _data = _parser.LoadBinaryData(openFileDialog.FileName);
-            DisAssemblyView.Lines = _parser.ParseFileContent(_data, DisAssemblyView, startAddress, ref _lineNumbers);
-
-            _dataStatements = _parser.DataStatements;
-            _illegalOpcodes = _parser.IllegalOpCodes;
-
-            GenerateLabels.Enabled = true;
-            LeftWindowMenuItem.Enabled = true;
-            ExportBytesAsBinaryMenuItem.Enabled = true;
-            ExportBytesAsTextMenuItem.Enabled = true;
-
-            //byteviewer.SetFile(openFileDialog.FileName, startAddress);
-            byteviewer.SetFile(openFileDialog.FileName);
-            FileLoaded.Text = openFileDialog.SafeFileName;
-            FileLoaded.Left = 340;
-
-            ConfigureStartAndEndAddresses();
-        }
 
         /// <summary>
         ///
@@ -214,6 +220,7 @@ namespace C64BinaryToAssemblyConverter
         {
             ClearLeftWindow();
             ClearRightWindow();
+            DisAssemblyView.Clear();
         }
 
         /// <summary>
@@ -380,10 +387,73 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void ConvertToDataBytesClick(object sender, EventArgs e)
         {
-            if (CheckStartOfTheSelectionText())
+            var ops = _parser.CodeList;
+            string selectedText = DisAssemblyView.SelectedText;
+            if (CheckStartOfTheSelectionText(selectedText))
             {
-                string selectedText = CheckEndOfTheSelectionText();
+                //selectedText = CheckEndOfTheSelectionText();
+
+                //if (selectedText.Contains(_byteDefinition) || selectedText == "") { return; }
+
+                char[] delimiters = { '\r', '\n' };
+                string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+                var startText = splitSelectedText[0].Split(' ');
+                List<string> dataStatements = new List<string> { "*=$" + startText[0] };
+
+                var validResultOne = ushort.TryParse(startText[0], NumberStyles.HexNumber, null, out ushort parseResult);
+
+
+                //          =>      int index = Enumerable.Range(0, DisAssemblyView.Text.Length).FirstOrDefault(i => DisAssemblyView.Text.StartsWith(startText[0]));
+                List<string> textBoxLines = DisAssemblyView.Lines.ToList();
+                //// Find the index to the full line in the DisAssemblyView.Lines
+                int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(startText[0]));
+
+
+                int start = (ushort)(parseResult - _userDefinedStartAddress);
+                //uint end = 0;
+                for (int i = 0; i < splitSelectedText.Length; i++)
+                {
+                    if (CheckStartOfTheSelectionText(splitSelectedText[i]))
+                    //if (!regex.IsMatch(splitSelectedText[i]))
+                    {
+                        var a = ops[start];
+                        a.GetBytes();
+                        var b = a;
+                        //end = i - 1;
+                        //break;
+                    }
+                    //else
+                    //{
+                    //    end++;
+                    //}
+                }
+                //if (end != 0)
+                //{
+                //    var endText1 = splitSelectedText[end].Split(' ');
+                //    var validResultTwo2 = ushort.TryParse(endText1[0], NumberStyles.HexNumber, null, out ushort parseResultTwo1);
+                //    end = (ushort)(parseResultTwo1 - _userDefinedStartAddress);
+                //}
+
+
+
+                //ConstructByteValues(start, end, dataStatements);
+                DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
+            }
+        }
+
+
+        /// <summary>
+        /// Method to Convert To Data Bytes Click
+        /// </summary>
+        private void OldConvertToDataBytesClick(object sender, EventArgs e)
+        {
+            string selectedText = DisAssemblyView.SelectedText;
+            if (CheckStartOfTheSelectionText(selectedText))
+            {
+                selectedText = CheckEndOfTheSelectionText();
+
                 if (selectedText.Contains(_byteDefinition) || selectedText == "") { return; }
+
                 char[] delimiters = { '\r', '\n' };
                 string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
                 var startText = splitSelectedText[0].Split(' ');
@@ -395,7 +465,7 @@ namespace C64BinaryToAssemblyConverter
                     if (!regex.IsMatch(splitSelectedText[i]))
                     {
                         end = i - 1;
-                        i = (ushort)(splitSelectedText.Length);
+                        break;
                     }
                     else
                     {
@@ -404,15 +474,12 @@ namespace C64BinaryToAssemblyConverter
                 }
                 if (end != 0)
                 {
-                    var endText1 = splitSelectedText[splitSelectedText.Length - 1].Split(' ');
+                    var endText1 = splitSelectedText[end].Split(' ');
                     var validResultTwo2 = ushort.TryParse(endText1[0], NumberStyles.HexNumber, null, out ushort parseResultTwo1);
                     end = (ushort)(parseResultTwo1 - _userDefinedStartAddress);
                 }
 
-                List<string> dataStatements = new List<string>
-            {
-                "*=$" + startText[0]
-            };
+                List<string> dataStatements = new List<string> { "*=$" + startText[0] };
 
                 ConstructByteValues(start, end, dataStatements);
                 DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
@@ -422,9 +489,8 @@ namespace C64BinaryToAssemblyConverter
         /// <summary>
         /// Method to check the Start Of the Selection Text
         /// </summary>
-        private bool CheckStartOfTheSelectionText()
+        private bool CheckStartOfTheSelectionText(string selectedText)
         {
-            string selectedText = DisAssemblyView.SelectedText;
             return regex.IsMatch(selectedText);
         }
 
@@ -442,10 +508,10 @@ namespace C64BinaryToAssemblyConverter
                 //selectedText = selectedText.Substring(0, lastNewLineFound);
                 //DisAssemblyView.SelectionLength = lastNewLineFound;
                 //// The whole line has not been highlighted
-                //string shortLine = selectedText.Substring(lastNewLineFound, selectedText.Length - lastNewLineFound);
-                //List<string> textBoxLines = DisAssemblyView.Lines.ToList();
+                string shortLine = selectedText.Substring(lastNewLineFound, selectedText.Length - lastNewLineFound);
+                List<string> textBoxLines = DisAssemblyView.Lines.ToList();
                 //// Find the index to the full line in the DisAssemblyView.Lines
-                //int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(shortLine));
+                int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(shortLine));
                 //string removedShortLine = selectedText.Remove(lastNewLineFound, selectedText.Length - lastNewLineFound);
                 //selectedText = removedShortLine + textBoxLines[index];
                 //// Finally update the selection
