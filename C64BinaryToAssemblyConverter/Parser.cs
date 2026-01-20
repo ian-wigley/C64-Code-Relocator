@@ -9,11 +9,11 @@ namespace C64BinaryToAssemblyConverter
     public class Parser
     {
         public List<OpCode> CodeList { get;} = new List<OpCode>();
-        private List<string> _illegalOpcodes = new List<string>();
-        private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
         public List<string> Code { get; set; } = new List<string>();
         public List<string> IllegalOpCodes => _illegalOpcodes;
         public Dictionary<string, string[]> DataStatements => _dataStatements;
+        private List<string> _illegalOpcodes = new List<string>();
+        private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
 
         /// <summary>
         /// Load Binary Data
@@ -56,13 +56,13 @@ namespace C64BinaryToAssemblyConverter
                 var pc = startAddress + filePosition;
                 foreach (var oc in opCodes.Where(oc => oc.Code == opCode.ToString("X2")))
                 {
-                    oc.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref _dataStatements, ref _illegalOpcodes);
-                    CodeList.Add(oc);
+                    var opCodeCopy = new OpCode(oc);
+                    opCodeCopy.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref _dataStatements, ref _illegalOpcodes);
+                    CodeList.Add(opCodeCopy);
                     break;
                 }
                 Code.Add(line);
             }
-
             return Code.ToArray();
         }
     }
