@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
 using System.ComponentModel.Design;
-using System.Text;
-using System.Linq;
+using System.Drawing;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace C64BinaryToAssemblyConverter
 {
@@ -23,11 +22,7 @@ namespace C64BinaryToAssemblyConverter
         private char[] _endAddress;
         private int _userDefinedStartAddress;
         private const string _byteDefinition = "!byte $";
-
         private readonly Regex regex = new Regex(@"^(?:[0-9A-Fa-f]{4}\s+[0-9A-Fa-f]{2}(?:\s+[0-9A-Fa-f]{2})*\s*(?:[^\r\n]*)\r?\n?)+$");
-
-        //private readonly Regex regex = new Regex(@"^[0-9A-Fa-f]{4}\s?");
-        //private readonly Regex regex = new Regex(@"^[0-9A-Fa-f]{4}\s+[0-9A-Fa-f]{2}(\s+[0-9A-Fa-f]{2})*\s*$", RegexOptions.Multiline);
 
         public C64BinaryToAssemblyConverter()
         {
@@ -352,7 +347,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///
+        /// ConstructByteValues
         /// </summary>
         private void ConstructByteValues(uint start, uint end, List<string> dataStatements)
         {
@@ -387,107 +382,40 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void ConvertToDataBytesClick(object sender, EventArgs e)
         {
-            var ops = _parser.CodeList;
+            var codeList = _parser.CodeList;
             string selectedText = DisAssemblyView.SelectedText;
             if (CheckStartOfTheSelectionText(selectedText))
             {
-                //selectedText = CheckEndOfTheSelectionText();
-
-                //if (selectedText.Contains(_byteDefinition) || selectedText == "") { return; }
-
+                // Split the text selection up into seperate lines
                 char[] delimiters = { '\r', '\n' };
                 string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+
+                // Split the line up into the seperate items
                 var startText = splitSelectedText[0].Split(' ');
                 List<string> dataStatements = new List<string> { "*=$" + startText[0] };
 
-                var validResultOne = ushort.TryParse(startText[0], NumberStyles.HexNumber, null, out ushort parseResult);
-
-
-                //          =>      int index = Enumerable.Range(0, DisAssemblyView.Text.Length).FirstOrDefault(i => DisAssemblyView.Text.StartsWith(startText[0]));
-                List<string> textBoxLines = DisAssemblyView.Lines.ToList();
-                //// Find the index to the full line in the DisAssemblyView.Lines
-                int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(startText[0]));
-
-
-                int start = (ushort)(parseResult - _userDefinedStartAddress);
-                //uint end = 0;
                 for (int i = 0; i < splitSelectedText.Length; i++)
                 {
+                    startText = splitSelectedText[i].Split(' ');
+                    var index = GetIndex(startText[0]);
                     if (CheckStartOfTheSelectionText(splitSelectedText[i]))
-                    //if (!regex.IsMatch(splitSelectedText[i]))
                     {
-                        var a = ops[start];
-                        a.GetBytes();
-                        var b = a;
-                        //end = i - 1;
-                        //break;
-                    }
-                    //else
-                    //{
-                    //    end++;
-                    //}
-                }
-                //if (end != 0)
-                //{
-                //    var endText1 = splitSelectedText[end].Split(' ');
-                //    var validResultTwo2 = ushort.TryParse(endText1[0], NumberStyles.HexNumber, null, out ushort parseResultTwo1);
-                //    end = (ushort)(parseResultTwo1 - _userDefinedStartAddress);
-                //}
-
-
-
-                //ConstructByteValues(start, end, dataStatements);
-                DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
-            }
-        }
-
-
-        /// <summary>
-        /// Method to Convert To Data Bytes Click
-        /// </summary>
-        private void OldConvertToDataBytesClick(object sender, EventArgs e)
-        {
-            string selectedText = DisAssemblyView.SelectedText;
-            if (CheckStartOfTheSelectionText(selectedText))
-            {
-                selectedText = CheckEndOfTheSelectionText();
-
-                if (selectedText.Contains(_byteDefinition) || selectedText == "") { return; }
-
-                char[] delimiters = { '\r', '\n' };
-                string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-                var startText = splitSelectedText[0].Split(' ');
-                var validResultOne = ushort.TryParse(startText[0], NumberStyles.HexNumber, null, out ushort parseResult);
-                uint start = (ushort)(parseResult - _userDefinedStartAddress);
-                uint end = 0;
-                for (uint i = start; i < splitSelectedText.Length; i++)
-                {
-                    if (!regex.IsMatch(splitSelectedText[i]))
-                    {
-                        end = i - 1;
-                        break;
-                    }
-                    else
-                    {
-                        end++;
+                        var opCode = codeList[index];
+                        dataStatements.Add("!byte " + opCode.Bytes);
+                        // Does the selected text length need increasing ?
+                        if (opCode.LineLength != splitSelectedText[i].Length)
+                        {
+                            DisAssemblyView.SelectionLength += (opCode.LineLength - splitSelectedText[i].Length);
+                        }
                     }
                 }
-                if (end != 0)
-                {
-                    var endText1 = splitSelectedText[end].Split(' ');
-                    var validResultTwo2 = ushort.TryParse(endText1[0], NumberStyles.HexNumber, null, out ushort parseResultTwo1);
-                    end = (ushort)(parseResultTwo1 - _userDefinedStartAddress);
-                }
-
-                List<string> dataStatements = new List<string> { "*=$" + startText[0] };
-
-                ConstructByteValues(start, end, dataStatements);
                 DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
             }
         }
 
         /// <summary>
-        /// Method to check the Start Of the Selection Text
+        /// Method to check the Start of the selection text
+        /// matches the expected format
         /// </summary>
         private bool CheckStartOfTheSelectionText(string selectedText)
         {
@@ -495,29 +423,11 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// Method to check the selection text is valid
+        /// Method to find the index utilising the Line number
         /// </summary>
-        private string CheckEndOfTheSelectionText()
+        private int GetIndex(string startText)
         {
-            string selectedText = DisAssemblyView.SelectedText;
-            int lastNewLineFound = selectedText.LastIndexOf("\n");// + 1;
-            // Only one line may be selected & this is indicated by no \n found
-            if (lastNewLineFound == -1)
-            {
-                // TODO finsih implementation
-                //selectedText = selectedText.Substring(0, lastNewLineFound);
-                //DisAssemblyView.SelectionLength = lastNewLineFound;
-                //// The whole line has not been highlighted
-                string shortLine = selectedText.Substring(lastNewLineFound, selectedText.Length - lastNewLineFound);
-                List<string> textBoxLines = DisAssemblyView.Lines.ToList();
-                //// Find the index to the full line in the DisAssemblyView.Lines
-                int index = Enumerable.Range(0, textBoxLines.Count).FirstOrDefault(i => textBoxLines[i].StartsWith(shortLine));
-                //string removedShortLine = selectedText.Remove(lastNewLineFound, selectedText.Length - lastNewLineFound);
-                //selectedText = removedShortLine + textBoxLines[index];
-                //// Finally update the selection
-                //DisAssemblyView.SelectionLength += (textBoxLines[index].Length - shortLine.Length);
-            }
-            return selectedText;
+            return Enumerable.Range(0, _parser.CodeList.Count).FirstOrDefault(i => _parser.CodeList[i].LineNumber.StartsWith(startText));
         }
     }
 }
