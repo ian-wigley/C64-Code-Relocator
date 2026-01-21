@@ -1,4 +1,4 @@
-# C64 Binary to Assembly convertor
+# C64 Binary to Assembly convertor (WIP)
 This is a small tool to reverse engineer a `Commodore 64` binary file & convert it back into assembly code.
 
 The tool will load the selected file, reverse engineer the binary and display C64 assembly code, it can also add labels for branches, jumps and loops which allows the code to be relocateable.
