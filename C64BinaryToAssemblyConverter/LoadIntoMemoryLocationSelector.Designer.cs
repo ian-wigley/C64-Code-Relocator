@@ -30,7 +30,7 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.StartAddressSelector = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -54,14 +54,17 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
-            // comboBox1
+            // StartAddressSelector
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(73, 40);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(75, 21);
-            this.comboBox1.TabIndex = 3;
-            this.comboBox1.Text = "0800";
+            this.StartAddressSelector.FormattingEnabled = true;
+            this.StartAddressSelector.Location = new System.Drawing.Point(73, 40);
+            this.StartAddressSelector.MaxLength = 4;
+            this.StartAddressSelector.Name = "StartAddressSelector";
+            this.StartAddressSelector.Size = new System.Drawing.Size(75, 21);
+            this.StartAddressSelector.TabIndex = 3;
+            this.StartAddressSelector.Text = "0801";
+            this.StartAddressSelector.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateKeyInput);
+            this.StartAddressSelector.Validating += new System.ComponentModel.CancelEventHandler(this.ValidateInput);
             // 
             // label2
             // 
@@ -90,7 +93,7 @@
             this.ClientSize = new System.Drawing.Size(229, 103);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.StartAddressSelector);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Name = "LoadIntoMemoryLocationSelector";
@@ -104,7 +107,7 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox StartAddressSelector;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
     }
