@@ -60,7 +60,7 @@ namespace C64BinaryToAssemblyConverter
             if (ml.ShowDialog() != DialogResult.OK) return;
             // Use a monospaced font
             DisAssemblyView.Font = new Font(FontFamily.GenericMonospace, DisAssemblyView.Font.Size);
-            if (!int.TryParse(ml.GetMemStartLocation, out var startAddress)) return;
+            if (!int.TryParse(ml.GetMemStartLocation, NumberStyles.HexNumber, null, out var startAddress)) return;
             _userDefinedStartAddress = startAddress;
             _data = _parser.LoadBinaryData(openFileDialog.FileName);
 
@@ -216,6 +216,7 @@ namespace C64BinaryToAssemblyConverter
             ClearLeftWindow();
             ClearRightWindow();
             DisAssemblyView.Clear();
+            _assemblyCreator.ResetLabelAndBranchCounts();
         }
 
         /// <summary>
@@ -428,6 +429,89 @@ namespace C64BinaryToAssemblyConverter
         private int GetIndex(string startText)
         {
             return Enumerable.Range(0, _parser.CodeList.Count).FirstOrDefault(i => _parser.CodeList[i].LineNumber.StartsWith(startText));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void FindTextInTextBox(object sender, EventArgs e)
+        {
+            ShowFindDialog();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ShowFindDialog()
+        {
+            using (Form findForm = new Form())
+            using (TextBox txtFind = new TextBox())
+            using (Button btnFind = new Button())
+            {
+                findForm.Text = "Find";
+                findForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+                findForm.StartPosition = FormStartPosition.CenterParent;
+                findForm.ClientSize = new Size(280, 80);
+                findForm.MaximizeBox = false;
+                findForm.MinimizeBox = false;
+
+                txtFind.Location = new Point(10, 10);
+                txtFind.Width = 260;
+
+                btnFind.Text = "Find Next";
+                btnFind.Location = new Point(190, 40);
+                btnFind.DialogResult = DialogResult.OK;
+
+                findForm.AcceptButton = btnFind;
+
+                findForm.Controls.Add(txtFind);
+                findForm.Controls.Add(btnFind);
+
+                if (findForm.ShowDialog(this) == DialogResult.OK)
+                {
+                    FindText(txtFind.Text);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void FindText(string searchText)
+        {
+            if (string.IsNullOrEmpty(searchText)) { return; }
+
+            int startIndex = DisAssemblyView.SelectionStart + DisAssemblyView.SelectionLength;
+
+            int index = DisAssemblyView.Text.IndexOf(
+                searchText,
+                startIndex,
+                StringComparison.OrdinalIgnoreCase);
+
+            if (index >= 0)
+            {
+                DisAssemblyView.SelectionStart = index;
+                DisAssemblyView.SelectionLength = searchText.Length;
+                DisAssemblyView.ScrollToCaret();
+                DisAssemblyView.Focus();
+            }
+            else
+            {
+                MessageBox.Show("Text not found.", "Find");
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.F))
+            {
+                ShowFindDialog();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }
