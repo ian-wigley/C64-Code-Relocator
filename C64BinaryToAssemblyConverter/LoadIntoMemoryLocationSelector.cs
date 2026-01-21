@@ -1,10 +1,12 @@
 ﻿using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System;
 
 namespace C64BinaryToAssemblyConverter
 {
     public partial class LoadIntoMemoryLocationSelector : Form
     {
-        public string GetMemStartLocation => comboBox1.SelectedValue.ToString();
+        public string GetMemStartLocation => StartAddressSelector.Text;
 
         public LoadIntoMemoryLocationSelector()
         {
@@ -14,12 +16,12 @@ namespace C64BinaryToAssemblyConverter
             MinimizeBox = false;
             FormBorderStyle = FormBorderStyle.FixedSingle;
 
-            comboBox1.DisplayMember = "Text";
-            comboBox1.ValueMember = "Value";
+            StartAddressSelector.DisplayMember = "Text";
+            StartAddressSelector.ValueMember = "Value";
 
             var items = new[] {
                 new { Text = "0400", Value = 1024 },
-                new { Text = "0800", Value = 2048 },
+                new { Text = "0801", Value = 2049 },
                 new { Text = "0900", Value = 2304 },
                 new { Text = "0A00", Value = 2566 },
                 new { Text = "0C00", Value = 3072 },
@@ -43,8 +45,8 @@ namespace C64BinaryToAssemblyConverter
                 new { Text = "F000", Value = 61440 }
             };
 
-            comboBox1.DataSource = items;
-            comboBox1.SelectedIndex = 1;
+            StartAddressSelector.DataSource = items;
+            StartAddressSelector.SelectedIndex = 1;
         }
 
         /// <summary>
@@ -54,6 +56,38 @@ namespace C64BinaryToAssemblyConverter
         {
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        /// <summary>
+        /// Validate the users Key Input
+        /// </summary>
+        private void ValidateKeyInput(object sender, KeyPressEventArgs e)
+        {
+            if (char.IsControl(e.KeyChar)) { return; }
+            char c = char.ToUpper(e.KeyChar);
+            if (!Uri.IsHexDigit(c))
+            {
+                e.Handled = true;
+                return;
+            }
+            e.KeyChar = c;
+        }
+
+        /// <summary>
+        /// Validate Input when the user clicks OK
+        /// </summary>
+        private void ValidateInput(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!Regex.IsMatch(StartAddressSelector.Text, @"\A[0-9A-F]{1,4}\z"))
+            {
+                MessageBox.Show(
+                    "Enter a hexadecimal value (1–4 characters).",
+                    "Invalid Input",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                e.Cancel = true;
+            }
         }
     }
 }
