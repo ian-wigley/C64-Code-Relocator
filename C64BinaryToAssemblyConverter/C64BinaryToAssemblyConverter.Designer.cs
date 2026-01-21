@@ -48,6 +48,7 @@ namespace C64BinaryToAssemblyConverter
             this.AssemblyView = new System.Windows.Forms.TextBox();
             this.byteviewer = new BytesView();
             this.FileLoaded = new System.Windows.Forms.Label();
+            this.findText = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenu.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -69,9 +70,10 @@ namespace C64BinaryToAssemblyConverter
             // 
             this.contextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.convertSelectionToBytes});
+            this.convertSelectionToBytes,
+            this.findText});
             this.contextMenu.Name = "contextMenuStrip1";
-            this.contextMenu.Size = new System.Drawing.Size(212, 26);
+            this.contextMenu.Size = new System.Drawing.Size(212, 70);
             // 
             // convertSelectionToBytes
             // 
@@ -228,9 +230,11 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.Location = new System.Drawing.Point(70, 620);
             this.byteviewer.Name = "byteviewer";
             this.byteviewer.RowCount = 1;
+            this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -283,6 +287,13 @@ namespace C64BinaryToAssemblyConverter
             this.FileLoaded.Size = new System.Drawing.Size(0, 13);
             this.FileLoaded.TabIndex = 9;
             // 
+            // findText
+            // 
+            this.findText.Name = "findText";
+            this.findText.Size = new System.Drawing.Size(211, 22);
+            this.findText.Text = "Find";
+            this.findText.Click += new System.EventHandler(this.FindTextInTextBox);
+            // 
             // C64BinaryToAssemblyConverter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -325,5 +336,6 @@ namespace C64BinaryToAssemblyConverter
         private ToolStripMenuItem ExportBytesAsTextMenuItem;
         private ContextMenuStrip contextMenu;
         private ToolStripMenuItem convertSelectionToBytes;
+        private ToolStripMenuItem findText;
     }
 }
