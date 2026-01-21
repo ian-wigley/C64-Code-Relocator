@@ -45,7 +45,7 @@ namespace C64BinaryToAssemblyConverter
 
                 // Split each line into an array
                 var lineDetails = Code[count++].Split(' ');
-                if (lineDetails.Length > 2) //1)
+                if (lineDetails.Length > 2 && !lineDetails[0].Contains("!byte"))
                 {
                     // Replace the Illegal Opcodes with data statement
                     if (replaceIllegalOpcodes && replacedWithDataStatements.TryGetValue(lineDetails[0], out string[] dataValue))
@@ -184,6 +184,15 @@ namespace C64BinaryToAssemblyConverter
                 PassThree.Add(memLocation.Value + " = $" + memLocation.Key);
             }
             return PassThree;
+        }
+
+        /// <summary>
+        /// Reset Label And Branch Counts
+        /// </summary>
+        public void ResetLabelAndBranchCounts()
+        {
+            _branchCount = 0;
+            _labelCount = 0;
         }
     }
 }
