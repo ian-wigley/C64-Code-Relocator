@@ -106,7 +106,6 @@ namespace C64BinaryToAssemblyConverter
         private void InvalidStartAddress(int value, ComboBox comboBox, string startAddresses)
         {
             if (int.Parse(GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber) < startAddress)
-            //if (value < int.Parse(startAddresses, System.Globalization.NumberStyles.HexNumber))
             {
                 comboBox.Text = startAddresses;
             }
