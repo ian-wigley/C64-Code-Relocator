@@ -13,14 +13,15 @@ I plan to extend this functionality to include Loads(LDA) and Stores(STA) in the
 
 Either windows output can be saved, as long as it's populated.
 
-The resulting code can then be saved to disk & loaded into C64 Studio.
+The resulting code can then be saved to disk & load and compiled with your favourite IDE.
+<br>I have successfully compiled and executed the reverse engineered code with both C64 Studio & the VSCode VS64 extension.
 
 ![](Application.jpg)
 
 If Illegal opcodes are found during the add labels processing, you will be prompted if you would like them automatically converting to data statements an appending into the code.
 
 
-The reason for creating this tool... some 30 something years after learning to write 6502 & a few C64 demo's i wanted to view the code.
+The reason for creating this tool... some 40 something years after learning to write 6502 & a few C64 demo's i wanted to view the code.
 
 After trying to save Commodore 64 dis-assembled code & manually adding labels by hand, i quickly became bored !
 So this seemed like a much better idea than adding labels by hand !!
