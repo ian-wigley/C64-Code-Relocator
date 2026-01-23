@@ -77,7 +77,7 @@ namespace C64BinaryToAssemblyConverter
             //byteviewer.SetFile(openFileDialog.FileName, startAddress);
             byteviewer.SetFile(openFileDialog.FileName);
             FileLoaded.Text = openFileDialog.SafeFileName;
-            FileLoaded.Left = 340;
+            FileLoaded.Left = Width / 2 - FileLoaded.Size.Width / 2 - 10;
 
             ConfigureStartAndEndAddresses();
         }
@@ -95,6 +95,7 @@ namespace C64BinaryToAssemblyConverter
             AssemblyView.Clear();
             ClearRightWindow();
             AssemblyView.Font = new Font(FontFamily.GenericMonospace, AssemblyView.Font.Size);
+            _assemblyCreator.ResetLabelAndBranchCounts();
             _assemblyCreator.Code = DisAssemblyView.Lines;
             _assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, replacedWithDataStatements);
             _assemblyCreator.SecondPass();
@@ -102,9 +103,8 @@ namespace C64BinaryToAssemblyConverter
             RightWindowMenuItem.Enabled = true;
         }
 
-
         /// <summary>
-        ///
+        /// ExitToolStripMenuItem_Click
         /// </summary>
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -112,7 +112,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///
+        /// ConfigureStartAndEndAddresses
         /// </summary>
         private void ConfigureStartAndEndAddresses()
         {
@@ -242,7 +242,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///
+        /// LeftWindowToolStripMenuItem_Click
         /// </summary>
         private void LeftWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -250,7 +250,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///
+        /// RightWindowToolStripMenuItem_Click
         /// </summary>
         private void RightWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -258,7 +258,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///
+        /// Save
         /// </summary>
         private void Save(List<string> collection, string filter)
         {
@@ -271,7 +271,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///
+        /// SaveFileDialogue
         /// </summary>
         private static SaveFileDialog SaveFileDialogue(string filter)
         {
@@ -288,7 +288,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///
+        /// ExportBytesAsBinaryMenuItemClicked
         /// </summary>
         private void ExportBytesAsBinaryMenuItemClicked(object sender, EventArgs e)
         {
@@ -432,7 +432,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// 
+        ///  FindTextInTextBox
         /// </summary>
         private void FindTextInTextBox(object sender, EventArgs e)
         {
@@ -440,7 +440,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// 
+        ///  ShowFindDialog
         /// </summary>
         private void ShowFindDialog()
         {
@@ -475,7 +475,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// 
+        ///  FindText
         /// </summary>
         private void FindText(string searchText)
         {
@@ -502,7 +502,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// 
+        ///  ProcessCmdKey
         /// </summary>
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
