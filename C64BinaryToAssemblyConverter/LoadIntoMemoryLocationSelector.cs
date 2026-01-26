@@ -63,7 +63,12 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void ValidateKeyInput(object sender, KeyPressEventArgs e)
         {
-            if (char.IsControl(e.KeyChar)) { return; }
+            if (e.KeyChar == '\r')
+            {
+                DialogResult = DialogResult.OK;
+                Close();
+            }
+            else if (char.IsControl(e.KeyChar)) { return; }
             char c = char.ToUpper(e.KeyChar);
             if (!Uri.IsHexDigit(c))
             {
