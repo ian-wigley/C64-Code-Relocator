@@ -23,13 +23,13 @@ namespace C64BinaryToAssemblyConverter
         /// Initial Pass - parses the content looking for branch & jump conditions
         /// </summary>
         public void InitialPass(
-            int delta, 
-            string end, 
+            int start,
+            int end,
             bool replaceIllegalOpcodes, 
             Dictionary<string, string[]> replacedWithDataStatements
             )
         {
-            var count = 0;
+            var count = start;
             var originalFileLength = Code.Length;
             var firstPass = true;
 
@@ -98,7 +98,7 @@ namespace C64BinaryToAssemblyConverter
                         }
                     }
                 }
-                if (count >= delta || count >= originalFileLength) // || lineDetails[0].ToLower().Contains(end.ToLower()))
+                if (count >= end || count >= originalFileLength)
                 {
                     firstPass = false;
                 }
@@ -141,9 +141,9 @@ namespace C64BinaryToAssemblyConverter
         /// <summary>
         /// Final Pass - Method to add the labels to the front of the code
         /// </summary>
-        public List<string> FinalPass(List<string> originalFileContent, string start)
+        public List<string> FinalPass(List<string> originalFileContent, int start)
         {
-            PassThree.Add("                *=$" + start);
+            PassThree.Add("                *=$" + start.ToString("X4"));
             var counter = 0;
             var i = 0;
             try
