@@ -44,20 +44,12 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var openFileDialog = new OpenFileDialog
-            {
-                Title = @"Open File",
-                InitialDirectory = @"*.*",
-                Filter = @"All files (*.prg)|*.PRG|All files (*.*)|*.*",
-                FilterIndex = 2,
-                RestoreDirectory = true
-            };
-
+            OpenFileDialog openFileDialog = OpenFileDialogue();
             if (openFileDialog.ShowDialog() != DialogResult.OK) return;
             ClearCollections();
-
             var ml = new LoadIntoMemoryLocationSelector();
             if (ml.ShowDialog() != DialogResult.OK) return;
+
             // Use a monospaced font
             DisAssemblyView.Font = new Font(FontFamily.GenericMonospace, DisAssemblyView.Font.Size);
             if (!int.TryParse(ml.GetMemStartLocation, NumberStyles.HexNumber, null, out var startAddress)) return;
@@ -73,8 +65,7 @@ namespace C64BinaryToAssemblyConverter
             LeftWindowMenuItem.Enabled = true;
             ExportBytesAsBinaryMenuItem.Enabled = true;
             ExportBytesAsTextMenuItem.Enabled = true;
-
-            //byteviewer.SetFile(openFileDialog.FileName, startAddress);
+            // TODO Update the Byte Viewer to show the memory locations
             byteviewer.SetFile(openFileDialog.FileName);
             FileLoaded.Text = openFileDialog.SafeFileName;
             FileLoaded.Left = Width / 2 - FileLoaded.Size.Width / 2 - 10;
@@ -86,9 +77,8 @@ namespace C64BinaryToAssemblyConverter
         /// Add Labels
         /// </summary>
         private void AddLabels(
-            int delta,
-            string start,
-            string end,
+            int start,
+            int end,
             bool replaceIllegalOpcodes,
             Dictionary<string, string[]> replacedWithDataStatements)
         {
@@ -97,9 +87,9 @@ namespace C64BinaryToAssemblyConverter
             AssemblyView.Font = new Font(FontFamily.GenericMonospace, AssemblyView.Font.Size);
             _assemblyCreator.ResetLabelAndBranchCounts();
             _assemblyCreator.Code = DisAssemblyView.Lines;
-            _assemblyCreator.InitialPass(delta, end, replaceIllegalOpcodes, replacedWithDataStatements);
+            _assemblyCreator.InitialPass(start, end, replaceIllegalOpcodes, replacedWithDataStatements);
             _assemblyCreator.SecondPass();
-            AssemblyView.Lines = _assemblyCreator.FinalPass(_parser.Code, start).ToArray();
+            AssemblyView.Lines = _assemblyCreator.FinalPass(_parser.Code, _userDefinedStartAddress+start).ToArray();
             RightWindowMenuItem.Enabled = true;
         }
 
@@ -143,9 +133,19 @@ namespace C64BinaryToAssemblyConverter
 
             var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
+
             var start = int.Parse(ms.GetSelectedMemStartLocation, NumberStyles.HexNumber);
             var end = int.Parse(ms.GetSelectedMemEndLocation, NumberStyles.HexNumber);
             //var dataStatmentsRequired = ms.GetConvertIllegalOpCodes;
+
+            var startingIndex = GetIndex(ms.GetSelectedMemStartLocation);
+            var endingIndex = GetIndex(ms.GetSelectedMemEndLocation);
+            if (startingIndex == endingIndex)
+            {
+                MessageBox.Show(@"It looks like one of the memory locations you specified doesn't exist.", @" ", MessageBoxButtons.OK);
+                return;
+            }
+
 
             var delta = end - start;
             var firstIllegalOpcodeFound = false;
@@ -178,7 +178,7 @@ namespace C64BinaryToAssemblyConverter
                     if (str.Contains(temp))
                     {
                         // nudge the last Occurrence along to the next valid opCode
-                        lastOccurrence = int.Parse(_lineNumbers[++index], System.Globalization.NumberStyles.HexNumber);
+                        lastOccurrence = int.Parse(_lineNumbers[++index], NumberStyles.HexNumber);
                     }
                     index++;
                 }
@@ -200,7 +200,7 @@ namespace C64BinaryToAssemblyConverter
                 }
 
                 var convertToBytes = false || result == DialogResult.Yes;
-                AddLabels(delta, ms.GetSelectedMemStartLocation, ms.GetSelectedMemEndLocation, convertToBytes, replacedWithDataStatements);
+                AddLabels(startingIndex, endingIndex, convertToBytes, replacedWithDataStatements);
             }
             else
             {
@@ -263,7 +263,6 @@ namespace C64BinaryToAssemblyConverter
         private void Save(List<string> collection, string filter)
         {
             var saveFileDialog = SaveFileDialogue(filter);
-
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 File.WriteAllLines(saveFileDialog.FileName, collection);
@@ -271,11 +270,26 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// SaveFileDialogue
+        /// Open File Dialog
+        /// </summary>
+        private static OpenFileDialog OpenFileDialogue()
+        {
+            return new OpenFileDialog
+            {
+                Title = @"Open File",
+                InitialDirectory = @"*.*",
+                Filter = @"All files (*.prg)|*.PRG|All files (*.*)|*.*",
+                FilterIndex = 2,
+                RestoreDirectory = true
+            };
+        }
+
+        /// <summary>
+        /// Save File Dialog
         /// </summary>
         private static SaveFileDialog SaveFileDialogue(string filter)
         {
-            var saveFileDialog = new SaveFileDialog
+            return new SaveFileDialog
             {
                 Title = @"Save File",
                 InitialDirectory = @"*.*",
@@ -284,7 +298,6 @@ namespace C64BinaryToAssemblyConverter
                 FilterIndex = 2,
                 RestoreDirectory = true
             };
-            return saveFileDialog;
         }
 
         /// <summary>
