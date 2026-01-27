@@ -10,7 +10,6 @@ namespace C64BinaryToAssemblyConverter
         private int _branchCount;
         private const string Label = "label";
         private const string Branch = "branch";
-
         public string[] Code { get; set; }
         public List<string> PassOne { get; } = new List<string>();
         public List<string> PassTwo { get; } = new List<string>();
@@ -25,7 +24,7 @@ namespace C64BinaryToAssemblyConverter
         public void InitialPass(
             int start,
             int end,
-            bool replaceIllegalOpcodes, 
+            bool replaceIllegalOpcodes,
             Dictionary<string, string[]> replacedWithDataStatements
             )
         {
@@ -141,9 +140,9 @@ namespace C64BinaryToAssemblyConverter
         /// <summary>
         /// Final Pass - Method to add the labels to the front of the code
         /// </summary>
-        public List<string> FinalPass(List<string> originalFileContent, int start)
+        public List<string> FinalPass(List<string> originalFileContent, string start)
         {
-            PassThree.Add("                *=$" + start.ToString("X4"));
+            PassThree.Add("                *=$" + start);
             var counter = 0;
             var i = 0;
             try
@@ -156,8 +155,8 @@ namespace C64BinaryToAssemblyConverter
                     {
                         var detail = originalFileContent[counter++].Split(' ');
                         foreach (var memLocation in from KeyValuePair<string, string> memLocation in LabelLocations
-                                 where detail[0].ToUpper().Contains(memLocation.Key)
-                                 select memLocation)
+                                                    where detail[0].ToUpper().Contains(memLocation.Key)
+                                                    select memLocation)
                         {
                             label = memLocation.Value + "          ";
                             // The memory address has been found add it another list
