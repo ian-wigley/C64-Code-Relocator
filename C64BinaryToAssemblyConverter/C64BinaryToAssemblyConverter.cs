@@ -65,6 +65,7 @@ namespace C64BinaryToAssemblyConverter
             LeftWindowMenuItem.Enabled = true;
             ExportBytesAsBinaryMenuItem.Enabled = true;
             ExportBytesAsTextMenuItem.Enabled = true;
+
             // TODO Update the Byte Viewer to show the memory locations
             byteviewer.SetFile(openFileDialog.FileName);
             FileLoaded.Text = openFileDialog.SafeFileName;
@@ -79,6 +80,7 @@ namespace C64BinaryToAssemblyConverter
         private void AddLabels(
             int start,
             int end,
+            string startMemoryLocation,
             bool replaceIllegalOpcodes,
             Dictionary<string, string[]> replacedWithDataStatements)
         {
@@ -89,7 +91,7 @@ namespace C64BinaryToAssemblyConverter
             _assemblyCreator.Code = DisAssemblyView.Lines;
             _assemblyCreator.InitialPass(start, end, replaceIllegalOpcodes, replacedWithDataStatements);
             _assemblyCreator.SecondPass();
-            AssemblyView.Lines = _assemblyCreator.FinalPass(_parser.Code, _userDefinedStartAddress+start).ToArray();
+            AssemblyView.Lines = _assemblyCreator.FinalPass(_parser.Code, startMemoryLocation).ToArray();
             RightWindowMenuItem.Enabled = true;
         }
 
@@ -128,16 +130,11 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void GenerateLabelsClickEvent(object sender, EventArgs e)
         {
-            int firstOccurence = 0;
-            int lastOccurrence = 0;
-
             var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
-
             var start = int.Parse(ms.GetSelectedMemStartLocation, NumberStyles.HexNumber);
             var end = int.Parse(ms.GetSelectedMemEndLocation, NumberStyles.HexNumber);
-            //var dataStatmentsRequired = ms.GetConvertIllegalOpCodes;
-
+            var startMemoryLocation = ms.GetSelectedMemStartLocation;
             var startingIndex = GetIndex(ms.GetSelectedMemStartLocation);
             var endingIndex = GetIndex(ms.GetSelectedMemEndLocation);
             if (startingIndex == endingIndex)
@@ -146,8 +143,8 @@ namespace C64BinaryToAssemblyConverter
                 return;
             }
 
-
-            var delta = end - start;
+            int firstOccurence = 0;
+            int lastOccurrence = 0;
             var firstIllegalOpcodeFound = false;
             var replacedWithDataStatements = new Dictionary<string, string[]>();
             var lastLineNum = int.Parse(_lineNumbers[_lineNumbers.Count - 1], NumberStyles.HexNumber);
@@ -200,7 +197,7 @@ namespace C64BinaryToAssemblyConverter
                 }
 
                 var convertToBytes = false || result == DialogResult.Yes;
-                AddLabels(startingIndex, endingIndex, convertToBytes, replacedWithDataStatements);
+                AddLabels(startingIndex, endingIndex, startMemoryLocation, convertToBytes, replacedWithDataStatements);
             }
             else
             {
@@ -365,6 +362,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void ConstructByteValues(uint start, uint end, List<string> dataStatements)
         {
+            // TODO utilise string builder
             //StringBuilder eightBytesBld = new StringBuilder();
             //eightBytesBld.Append("!byte $");
             var eightBytes = _byteDefinition;
@@ -392,7 +390,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// Method to Convert To Data Bytes Click
+        /// Method to handle the Convert To Data Bytes Click event
         /// </summary>
         private void ConvertToDataBytesClick(object sender, EventArgs e)
         {
@@ -445,7 +443,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///  FindTextInTextBox
+        ///  Find Text In TextBox
         /// </summary>
         private void FindTextInTextBox(object sender, EventArgs e)
         {
@@ -453,7 +451,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///  ShowFindDialog
+        /// Show Find Dialog
         /// </summary>
         private void ShowFindDialog()
         {
@@ -488,7 +486,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///  FindText
+        ///  Find Text
         /// </summary>
         private void FindText(string searchText)
         {
@@ -515,7 +513,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        ///  ProcessCmdKey
+        ///  Process Cmd Key
         /// </summary>
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
