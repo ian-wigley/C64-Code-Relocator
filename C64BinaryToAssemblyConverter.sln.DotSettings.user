@@ -27,6 +27,7 @@
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=C64BinaryToAssemblyConverter_002FC64BinaryToAssemblyConverter/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=C64BinaryToAssemblyConverter_002FExportMemoryLocationSelector/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=C64BinaryToAssemblyConverter_002FLoadIntoMemoryLocationSelector/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=C64BinaryToAssemblyConverter_002FMemoryLocationsToConvertSelector/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=C64BinaryToAssemblyConverter_002FProperties_002FResources/@EntryIndexedValue">True</s:Boolean>
