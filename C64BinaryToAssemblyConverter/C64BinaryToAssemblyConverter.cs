@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -21,8 +22,9 @@ namespace C64BinaryToAssemblyConverter
         private char[] _startAddress;
         private char[] _endAddress;
         private int _userDefinedStartAddress;
-        private const string _byteDefinition = "!byte $";
-        private readonly Regex regex = new Regex(@"^(?:[0-9A-Fa-f]{4}\s+[0-9A-Fa-f]{2}(?:\s+[0-9A-Fa-f]{2})*\s*(?:[^\r\n]*)\r?\n?)+$");
+        private const string BYTE_DEFINITION = "!byte $";
+        private readonly Regex regex =
+            new Regex(@"^(?:[0-9A-Fa-f]{4}\s+[0-9A-Fa-f]{2}(?:\s+[0-9A-Fa-f]{2})*\s*(?:[^\r\n]*)\r?\n?)+$");
 
         public C64BinaryToAssemblyConverter()
         {
@@ -66,7 +68,7 @@ namespace C64BinaryToAssemblyConverter
             ExportBytesAsBinaryMenuItem.Enabled = true;
             ExportBytesAsTextMenuItem.Enabled = true;
 
-            // TODO Update the Byte Viewer to show the memory locations
+            // TODO Update the Byte Viewer to include the memory locations
             byteviewer.SetFile(openFileDialog.FileName);
             FileLoaded.Text = openFileDialog.SafeFileName;
             FileLoaded.Left = Width / 2 - FileLoaded.Size.Width / 2 - 10;
@@ -116,11 +118,13 @@ namespace C64BinaryToAssemblyConverter
             {
                 startAddress[count++] = chr;
             }
+
             count = 0;
             foreach (char chr in _lineNumbers[_lineNumbers.Count - 1])
             {
                 endAddress[count++] = chr;
             }
+
             _startAddress = startAddress;
             _endAddress = endAddress;
         }
@@ -139,19 +143,20 @@ namespace C64BinaryToAssemblyConverter
             var endingIndex = GetIndex(ms.GetSelectedMemEndLocation);
             if (startingIndex == endingIndex)
             {
-                MessageBox.Show(@"It looks like one of the memory locations you specified doesn't exist.", @" ", MessageBoxButtons.OK);
+                MessageBox.Show(@"It looks like one of the memory locations you specified doesn't exist.",
+                    @" ", MessageBoxButtons.OK);
                 return;
             }
 
-            int firstOccurence = 0;
-            int lastOccurrence = 0;
+            var firstOccurence = 0;
+            var lastOccurrence = 0;
             var firstIllegalOpcodeFound = false;
             var replacedWithDataStatements = new Dictionary<string, string[]>();
             var lastLineNum = int.Parse(_lineNumbers[_lineNumbers.Count - 1], NumberStyles.HexNumber);
 
             if (start <= end && end <= lastLineNum)
             {
-                //Check to see if illegal opcodes exist within the code selection
+                // Check to see if illegal opcodes exist within the code selection
                 for (var i = start; i < end; i++)
                 {
                     if (_illegalOpcodes.Contains(i.ToString("X4")))
@@ -161,6 +166,7 @@ namespace C64BinaryToAssemblyConverter
                             firstOccurence = i;
                             firstIllegalOpcodeFound = true;
                         }
+
                         if (i > lastOccurrence)
                         {
                             lastOccurrence = i;
@@ -170,17 +176,18 @@ namespace C64BinaryToAssemblyConverter
 
                 var temp = lastOccurrence.ToString("X4");
                 var index = 0;
-                foreach (string str in _parser.Code)
+                foreach (var str in _parser.Code)
                 {
                     if (str.Contains(temp))
                     {
                         // nudge the last Occurrence along to the next valid opCode
                         lastOccurrence = int.Parse(_lineNumbers[++index], NumberStyles.HexNumber);
                     }
+
                     index++;
                 }
 
-                for (int i = firstOccurence; i < lastOccurrence; i++)
+                for (var i = firstOccurence; i < lastOccurrence; i++)
                 {
                     // Replace the Illegal Opcodes with data statement
                     if (_dataStatements.TryGetValue(i.ToString("X4"), out string[] dataValue))
@@ -192,16 +199,20 @@ namespace C64BinaryToAssemblyConverter
                 var result = DialogResult.No;
                 if (firstIllegalOpcodeFound)
                 {
-                    result = MessageBox.Show(@"Illegal Opcodes found within the selection from : " + firstOccurence.ToString("X4") + @" to " + lastOccurrence.ToString("X4") + "\n"
-                                             + @"Replace Illegal Opcodes with data statements ?", @" ", MessageBoxButtons.YesNo);
+                    result = MessageBox.Show(@"Illegal Opcodes found within the selection from : "
+                                             + firstOccurence.ToString("X4") + @" to "
+                                             + lastOccurrence.ToString("X4") + "\n"
+                                             + @"Replace Illegal Opcodes with data statements ?", @" ",
+                        MessageBoxButtons.YesNo);
                 }
 
-                var convertToBytes = false || result == DialogResult.Yes;
+                var convertToBytes = result == DialogResult.Yes;
                 AddLabels(startingIndex, endingIndex, startMemoryLocation, convertToBytes, replacedWithDataStatements);
             }
             else
             {
-                MessageBox.Show(@"The selected end address exceeds the length of the bytes $" + _lineNumbers[_lineNumbers.Count - 1]);
+                MessageBox.Show(@"The selected end address exceeds the length of the bytes $"
+                                + _lineNumbers[_lineNumbers.Count - 1]);
             }
         }
 
@@ -303,31 +314,17 @@ namespace C64BinaryToAssemblyConverter
         private void ExportBytesAsBinaryMenuItemClicked(object sender, EventArgs e)
         {
             var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
-            if (ms.ShowDialog() != DialogResult.OK) return;
-            var start = int.Parse(ms.GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
-            var end = int.Parse(ms.GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber) - _userDefinedStartAddress;
-            var saveFileDialog = SaveFileDialogue("Binary files (*.bin)|*.bin");
-            if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
-
-            //byte[] by = new byte[end-start];
-            //if (_data.Length > 0 && end <= _data.Length)
-            //{
-            //    var count = 0;
-            //    for (var i = start; i < end; i++)
-            //    {
-            //        by[count++] = _data[i];
-            //    }
-            //    File.WriteAllBytes(saveFileDialog.FileName, by);
-            //}
-
-            if (_data.Length > 0 && end <= _data.Length)
+            if (ms.ShowDialog() != DialogResult.OK) { return; }
+            var start = int.Parse(ms.GetSelectedMemStartLocation, NumberStyles.HexNumber) - _userDefinedStartAddress;
+            var end = int.Parse(ms.GetSelectedMemEndLocation, NumberStyles.HexNumber) - _userDefinedStartAddress;
+            var saveFileDialog = SaveFileDialogue("All files (*.*)|*.*|Binary files (*.bin)|*.bin");
+            if (saveFileDialog.ShowDialog() != DialogResult.OK) { return;  }
+            if (_data.Length <= 0 || end > _data.Length) { return; }
+            using (var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
             {
-                using (var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
+                for (var i = start; i <= end; i++)
                 {
-                    for (var i = start; i <= end; i++)
-                    {
-                        fileStream.WriteByte(_data[i]);
-                    }
+                    fileStream.WriteByte(_data[i]);
                 }
             }
         }
@@ -338,7 +335,7 @@ namespace C64BinaryToAssemblyConverter
         private void ExportBytesAsTextMenuItemClicked(object sender, EventArgs e)
         {
             var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
-            if (ms.ShowDialog() != DialogResult.OK) return;
+            if (ms.ShowDialog() != DialogResult.OK) { return; }
             var fileStart = int.Parse(ms.GetSelectedMemStartLocation, NumberStyles.HexNumber);
             var fileEnd = int.Parse(ms.GetSelectedMemEndLocation, NumberStyles.HexNumber);
             var start = (uint)(fileStart - _userDefinedStartAddress);
@@ -350,40 +347,31 @@ namespace C64BinaryToAssemblyConverter
                 "; start address:" + fileStart.ToString("x4") + "-" + fileEnd.ToString("x4")
             };
 
-            if (_data.Length > 0 && end <= _data.Length)
-            {
-                ConstructByteValues(start, end, dataStatements);
-                Save(dataStatements, "Text files (*.txt)|*.txt");
-            }
+            if (_data.Length <= 0 || end > _data.Length) { return; }
+            ConstructByteValues(start, end, dataStatements);
+            Save(dataStatements, "All files (*.*)|*.*|Text files (*.txt)|*.txt");
         }
 
         /// <summary>
-        /// ConstructByteValues
+        /// Construct Byte Values
         /// </summary>
         private void ConstructByteValues(uint start, uint end, List<string> dataStatements)
         {
-            // TODO utilise string builder
-            //StringBuilder eightBytesBld = new StringBuilder();
-            //eightBytesBld.Append("!byte $");
-            var eightBytes = _byteDefinition;
+            var byteStrings = new StringBuilder();
+            byteStrings.Append(BYTE_DEFINITION);
             var byteCounter = 0;
 
-            for (uint i = start; i <= end; i++)
+            for (var i = start; i <= end; i++)
             {
-                if (byteCounter != 8)
-                {
-                    eightBytes += _data[i].ToString("X2") + ",$";
-                    //eightBytesBld.Append(_data[i].ToString("X2") + ",$");
-                    byteCounter++;
-                }
+                byteStrings.Append(_data[i].ToString("X2") + ",$");
+                byteCounter++;
                 if (i == end || byteCounter == 8)
                 {
-                    //var newEightBytes = eightBytesBld.ToString();
-                    //newEightBytes = newEightBytes.Remove(newEightBytes.LastIndexOf(","), 2);
-                    //dataStatements.Add(newEightBytes);
-                    eightBytes = eightBytes.Remove(eightBytes.LastIndexOf(","), 2);
-                    dataStatements.Add(eightBytes + "\n");
-                    eightBytes = _byteDefinition;
+                    var byteString = byteStrings.ToString();
+                    byteString = byteString.Remove(byteString.LastIndexOf(",", StringComparison.Ordinal), 2);
+                    dataStatements.Add(byteString);
+                    byteStrings.Clear();
+                    byteStrings.Append(BYTE_DEFINITION);
                     byteCounter = 0;
                 }
             }
@@ -395,34 +383,37 @@ namespace C64BinaryToAssemblyConverter
         private void ConvertToDataBytesClick(object sender, EventArgs e)
         {
             var codeList = _parser.CodeList;
-            string selectedText = DisAssemblyView.SelectedText;
-            if (CheckStartOfTheSelectionText(selectedText))
+            var selectedText = DisAssemblyView.SelectedText;
+            if (!CheckStartOfTheSelectionText(selectedText))
             {
-                // Split the text selection up into seperate lines
-                char[] delimiters = { '\r', '\n' };
-                string[] splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+                return;
+            }
 
-                // Split the line up into the seperate items
-                var startText = splitSelectedText[0].Split(' ');
-                List<string> dataStatements = new List<string> { "*=$" + startText[0] };
+            // Split the text selection up into separate lines
+            char[] delimiters = { '\r', '\n' };
+            var splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
 
-                for (int i = 0; i < splitSelectedText.Length; i++)
+            // Split the line-up into the separate items
+            var startText = splitSelectedText[0].Split(' ');
+            var dataStatements = new List<string> { "*=$" + startText[0] };
+
+            foreach (var text in splitSelectedText)
+            {
+                startText = text.Split(' ');
+                var index = GetIndex(startText[0]);
+                if (CheckStartOfTheSelectionText(text))
                 {
-                    startText = splitSelectedText[i].Split(' ');
-                    var index = GetIndex(startText[0]);
-                    if (CheckStartOfTheSelectionText(splitSelectedText[i]))
+                    var opCode = codeList[index];
+                    dataStatements.Add("!byte " + opCode.Bytes);
+                    // Does the selected text length need increasing ?
+                    if (opCode.LineLength != text.Length)
                     {
-                        var opCode = codeList[index];
-                        dataStatements.Add("!byte " + opCode.Bytes);
-                        // Does the selected text length need increasing ?
-                        if (opCode.LineLength != splitSelectedText[i].Length)
-                        {
-                            DisAssemblyView.SelectionLength += (opCode.LineLength - splitSelectedText[i].Length);
-                        }
+                        DisAssemblyView.SelectionLength += (opCode.LineLength - text.Length);
                     }
                 }
-                DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
             }
+
+            DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
         }
 
         /// <summary>
@@ -439,7 +430,8 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private int GetIndex(string startText)
         {
-            return Enumerable.Range(0, _parser.CodeList.Count).FirstOrDefault(i => _parser.CodeList[i].LineNumber.StartsWith(startText));
+            return Enumerable.Range(0, _parser.CodeList.Count)
+                .FirstOrDefault(i => _parser.CodeList[i].LineNumber.StartsWith(startText));
         }
 
         /// <summary>
@@ -459,7 +451,7 @@ namespace C64BinaryToAssemblyConverter
             using (TextBox txtFind = new TextBox())
             using (Button btnFind = new Button())
             {
-                findForm.Text = "Find";
+                findForm.Text = @"Find";
                 findForm.FormBorderStyle = FormBorderStyle.FixedDialog;
                 findForm.StartPosition = FormStartPosition.CenterParent;
                 findForm.ClientSize = new Size(280, 80);
@@ -469,7 +461,7 @@ namespace C64BinaryToAssemblyConverter
                 txtFind.Location = new Point(10, 10);
                 txtFind.Width = 260;
 
-                btnFind.Text = "Find Next";
+                btnFind.Text = @"Find Next";
                 btnFind.Location = new Point(190, 40);
                 btnFind.DialogResult = DialogResult.OK;
 
@@ -490,11 +482,14 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void FindText(string searchText)
         {
-            if (string.IsNullOrEmpty(searchText)) { return; }
+            if (string.IsNullOrEmpty(searchText))
+            {
+                return;
+            }
 
-            int startIndex = DisAssemblyView.SelectionStart + DisAssemblyView.SelectionLength;
+            var startIndex = DisAssemblyView.SelectionStart + DisAssemblyView.SelectionLength;
 
-            int index = DisAssemblyView.Text.IndexOf(
+            var index = DisAssemblyView.Text.IndexOf(
                 searchText,
                 startIndex,
                 StringComparison.OrdinalIgnoreCase);
@@ -508,7 +503,7 @@ namespace C64BinaryToAssemblyConverter
             }
             else
             {
-                MessageBox.Show("Text not found.", "Find");
+                MessageBox.Show(@"Text not found.", @"Find");
             }
         }
 
@@ -522,6 +517,7 @@ namespace C64BinaryToAssemblyConverter
                 ShowFindDialog();
                 return true;
             }
+
             return base.ProcessCmdKey(ref msg, keyData);
         }
     }
