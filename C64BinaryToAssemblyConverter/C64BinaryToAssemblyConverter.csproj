@@ -56,12 +56,6 @@
     <Compile Include="C64BinaryToAssemblyConverter.Designer.cs">
       <DependentUpon>C64BinaryToAssemblyConverter.cs</DependentUpon>
     </Compile>
-    <Compile Include="ExportMemoryLocationSelector.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ExportMemoryLocationSelector.Designer.cs">
-      <DependentUpon>ExportMemoryLocationSelector.cs</DependentUpon>
-    </Compile>
     <Compile Include="LoadIntoMemoryLocationSelector.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -80,9 +74,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="C64BinaryToAssemblyConverter.resx">
       <DependentUpon>C64BinaryToAssemblyConverter.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ExportMemoryLocationSelector.resx">
-      <DependentUpon>ExportMemoryLocationSelector.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoadIntoMemoryLocationSelector.resx">
       <DependentUpon>LoadIntoMemoryLocationSelector.cs</DependentUpon>
