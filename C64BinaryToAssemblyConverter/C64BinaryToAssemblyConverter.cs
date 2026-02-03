@@ -80,8 +80,8 @@ namespace C64BinaryToAssemblyConverter
         /// Add Labels
         /// </summary>
         private void AddLabels(
-            int start,
-            int end,
+            int startIndex,
+            int endIndex,
             string startMemoryLocation,
             bool replaceIllegalOpcodes,
             Dictionary<string, string[]> replacedWithDataStatements)
@@ -91,9 +91,9 @@ namespace C64BinaryToAssemblyConverter
             AssemblyView.Font = new Font(FontFamily.GenericMonospace, AssemblyView.Font.Size);
             _assemblyCreator.ResetLabelAndBranchCounts();
             _assemblyCreator.Code = DisAssemblyView.Lines;
-            _assemblyCreator.InitialPass(start, end, replaceIllegalOpcodes, replacedWithDataStatements);
+            _assemblyCreator.InitialPass(startIndex, endIndex, replaceIllegalOpcodes, replacedWithDataStatements);
             _assemblyCreator.SecondPass();
-            AssemblyView.Lines = _assemblyCreator.FinalPass(_parser.Code, startMemoryLocation).ToArray();
+            AssemblyView.Lines = _assemblyCreator.FinalPass(_parser.Code, startIndex, startMemoryLocation).ToArray();
             RightWindowMenuItem.Enabled = true;
         }
 
