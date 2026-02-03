@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace C64BinaryToAssemblyConverter
@@ -140,10 +141,10 @@ namespace C64BinaryToAssemblyConverter
         /// <summary>
         /// Final Pass - Method to add the labels to the front of the code
         /// </summary>
-        public List<string> FinalPass(List<string> originalFileContent, string start)
+        public List<string> FinalPass(List<string> originalFileContent, int startIndex, string start)
         {
             PassThree.Add("                *=$" + start);
-            var counter = 0;
+            var counter = startIndex;
             var i = 0;
             try
             {
