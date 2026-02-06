@@ -106,7 +106,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// ConfigureStartAndEndAddresses
+        /// Configure Start And End Addresses
         /// </summary>
         private void ConfigureStartAndEndAddresses()
         {
