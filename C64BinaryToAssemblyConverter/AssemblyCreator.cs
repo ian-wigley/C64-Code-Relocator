@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace C64BinaryToAssemblyConverter
@@ -9,8 +8,8 @@ namespace C64BinaryToAssemblyConverter
     {
         private int _labelCount;
         private int _branchCount;
-        private const string Label = "label";
-        private const string Branch = "branch";
+        private const string LABEL = "label";
+        private const string BRANCH = "branch";
         public string[] Code { get; set; }
         public List<string> PassOne { get; } = new List<string>();
         public List<string> PassTwo { get; } = new List<string>();
@@ -29,6 +28,7 @@ namespace C64BinaryToAssemblyConverter
             Dictionary<string, string[]> replacedWithDataStatements
             )
         {
+            if (Code == null) { return; }
             var count = start;
             var originalFileLength = Code.Length;
             var firstPass = true;
@@ -38,7 +38,7 @@ namespace C64BinaryToAssemblyConverter
                 if (Code[count].Contains("!byte $"))
                 {
                     var byteString = Code[count];
-                    int startLocation = byteString.IndexOf("!byte $");
+                    var startLocation = byteString.IndexOf("!byte $", StringComparison.Ordinal);
                     byteString = byteString.Substring(startLocation, byteString.Length - startLocation);
                     PassOne.Add(byteString);
                 }
@@ -63,7 +63,7 @@ namespace C64BinaryToAssemblyConverter
                             case "4C": // JMP
                                 if (!LabelLocations.Keys.Contains(lineDetails[4] + lineDetails[3]))
                                 {
-                                    LabelLocations.Add(lineDetails[4] + lineDetails[3], Label + _labelCount++.ToString());
+                                    LabelLocations.Add(lineDetails[4] + lineDetails[3], LABEL + _labelCount++.ToString());
                                 }
                                 PassOne.Add(lineDetails[8] + " " + lineDetails[9]);
                                 break;
@@ -77,7 +77,7 @@ namespace C64BinaryToAssemblyConverter
                             case "70": // BVS
                                 if (!BranchLocations.Keys.Contains(lineDetails[11].Replace("$", "")))
                                 {
-                                    BranchLocations.Add(lineDetails[11].Replace("$", ""), Branch + _branchCount++.ToString());
+                                    BranchLocations.Add(lineDetails[11].Replace("$", ""), BRANCH + _branchCount++.ToString());
                                 }
                                 PassOne.Add(lineDetails[10] + " " + lineDetails[11]);
                                 break;
@@ -145,11 +145,10 @@ namespace C64BinaryToAssemblyConverter
         {
             PassThree.Add("                *=$" + start);
             var counter = startIndex;
-            var i = 0;
             try
             {
                 // The length of passOne can be longer if invalid opcodes have been found & converted to bytes 
-                for (i = 0; i < PassOne.Count; i++)
+                for (var i = 0; i < PassOne.Count; i++)
                 {
                     var label = "                ";
                     if (!PassOne[i].Contains("!byte $"))
