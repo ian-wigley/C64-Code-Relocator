@@ -309,7 +309,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// ExportBytesAsBinaryMenuItemClicked
+        /// Export Bytes As Binary Menu Item Clicked
         /// </summary>
         private void ExportBytesAsBinaryMenuItemClicked(object sender, EventArgs e)
         {
