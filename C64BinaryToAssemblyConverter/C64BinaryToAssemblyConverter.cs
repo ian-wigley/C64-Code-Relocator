@@ -42,7 +42,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// OpenToolStripMenuItem_Click
+        /// Open Tool Strip Menu Item Click
         /// </summary>
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -301,7 +301,6 @@ namespace C64BinaryToAssemblyConverter
             {
                 Title = @"Save File",
                 InitialDirectory = @"*.*",
-                //Filter = @"All files (*.*)|*.*|All files (*.a)|*.a",
                 Filter = filter,
                 FilterIndex = 2,
                 RestoreDirectory = true
