@@ -51,6 +51,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestAssemblyCreator.cs" />
+    <Compile Include="TestBytesView.cs" />
+    <Compile Include="TestLoadIntoMemoryLocationSelector.cs" />
+    <Compile Include="TestMemoryLocationsToConvertSelector.cs" />
+    <Compile Include="TestOpcode.cs" />
     <Compile Include="TestParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
