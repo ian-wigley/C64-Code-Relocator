@@ -72,6 +72,8 @@
     <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SettingsCache.cs" />
+    <Compile Include="XmlLoader.cs" />
     <EmbeddedResource Include="C64BinaryToAssemblyConverter.resx">
       <DependentUpon>C64BinaryToAssemblyConverter.cs</DependentUpon>
     </EmbeddedResource>
