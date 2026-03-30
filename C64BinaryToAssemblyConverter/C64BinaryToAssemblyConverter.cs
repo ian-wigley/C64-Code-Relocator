@@ -319,7 +319,7 @@ namespace C64BinaryToAssemblyConverter
             var start = int.Parse(ms.GetSelectedMemStartLocation, NumberStyles.HexNumber) - _userDefinedStartAddress;
             var end = int.Parse(ms.GetSelectedMemEndLocation, NumberStyles.HexNumber) - _userDefinedStartAddress;
             var saveFileDialog = SaveFileDialogue("All files (*.*)|*.*|Binary files (*.bin)|*.bin");
-            if (saveFileDialog.ShowDialog() != DialogResult.OK) { return;  }
+            if (saveFileDialog.ShowDialog() != DialogResult.OK) { return; }
             if (_data.Length <= 0 || end > _data.Length) { return; }
             using (var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
             {
@@ -381,7 +381,64 @@ namespace C64BinaryToAssemblyConverter
         /// <summary>
         /// Method to handle the Convert To Data Bytes Click event
         /// </summary>
-        private void ConvertToDataBytesClick(object sender, EventArgs e)
+        public void ConvertToDataBytesClick(object sender, EventArgs e)
+        {
+            var codeList = _parser.CodeList;
+            var selectedText = DisAssemblyView.SelectedText;
+            if (!CheckStartOfTheSelectionText(selectedText))
+            {
+                return;
+            }
+
+            // Split the text selection up into separate lines
+            char[] delimiters = { '\r', '\n' };
+            var splitSelectedText = selectedText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+
+            // Split the line-up into the separate items
+            var startText = splitSelectedText[0].Split(' ');
+            var dataStatements = new List<string> { "*=$" + startText[0] };
+
+            int numOfBytesPerline = xmlLoader.SettingsCache.NumberOfBytesPerLine;
+
+            int count = 0;
+            string line = "";
+
+            foreach (var text in splitSelectedText)
+            {
+                startText = text.Split(' ');
+                var index = GetIndex(startText[0]);
+                if (CheckStartOfTheSelectionText(text))
+                {
+                    var opCode = codeList[index];
+
+                    if (count == 0)
+                    {
+                        line = "!byte " + opCode.Bytes;
+                    }
+                    if (count > 0 && count < numOfBytesPerline)
+                    {
+                        line += "," + opCode.Bytes;
+                    }
+                    if (count == numOfBytesPerline - 1)
+                    {
+                        dataStatements.Add(line);
+                    }
+                    count = (count + 1) % numOfBytesPerline;
+
+                    //dataStatements.Add("!byte " + opCode.Bytes);
+                    // Does the selected text length need increasing ?
+                    if (opCode.LineLength != text.Length)
+                    {
+                        DisAssemblyView.SelectionLength += (opCode.LineLength - text.Length);
+                    }
+                }
+            }
+            dataStatements.Add(line);
+
+            DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
+        }
+
+        private void oldConvertToDataBytesClick(object sender, EventArgs e)
         {
             var codeList = _parser.CodeList;
             var selectedText = DisAssemblyView.SelectedText;
@@ -416,6 +473,7 @@ namespace C64BinaryToAssemblyConverter
 
             DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
         }
+
 
         /// <summary>
         /// Method to check the Start of the selection text
