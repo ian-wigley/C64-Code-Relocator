@@ -15,7 +15,7 @@ namespace C64BinaryToAssemblyConverter
     {
         private byte[] _data;
         private readonly AssemblyCreator _assemblyCreator;
-        private readonly Parser _parser = new Parser();
+        protected readonly Parser _parser = new Parser();
         private List<string> _lineNumbers = new List<string>();
         private List<string> _illegalOpcodes = new List<string>();
         private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
