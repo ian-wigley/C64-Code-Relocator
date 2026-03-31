@@ -2,9 +2,7 @@
 {
     public class SettingsCache
     {
-        public SettingsCache(
-        int numberOfBytesPerLine
-        )
+        public SettingsCache(int numberOfBytesPerLine)
         {
             NumberOfBytesPerLine = numberOfBytesPerLine;
         }
