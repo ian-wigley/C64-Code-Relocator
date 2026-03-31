@@ -344,7 +344,7 @@ namespace C64BinaryToAssemblyConverter
 
         #endregion
 
-        private System.Windows.Forms.TextBox DisAssemblyView;
+        protected System.Windows.Forms.TextBox DisAssemblyView;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem FileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem OpenMenuItem;
