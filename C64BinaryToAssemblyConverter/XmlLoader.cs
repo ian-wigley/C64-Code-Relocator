@@ -32,6 +32,7 @@ namespace C64BinaryToAssemblyConverter
             {
                 MessageBox.Show(exception.Message, "Error loading the VASM Config.xml file");
                 SettingsLoaded = false;
+                numberOfBytesPerLine = 8;
             }
             finally
             {
