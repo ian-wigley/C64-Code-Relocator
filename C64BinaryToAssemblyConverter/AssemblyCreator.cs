@@ -8,8 +8,8 @@ namespace C64BinaryToAssemblyConverter
     {
         private int _labelCount;
         private int _branchCount;
-        private const string LABEL = "label";
-        private const string BRANCH = "branch";
+        private string LABEL = "label";
+        private string BRANCH = "branch";
         public string[] Code { get; set; }
         public List<string> PassOne { get; } = new List<string>();
         public List<string> PassTwo { get; } = new List<string>();
@@ -17,6 +17,8 @@ namespace C64BinaryToAssemblyConverter
         public List<string> Found { get; } = new List<string>();
         public Dictionary<string, string> LabelLocations { get; } = new Dictionary<string, string>();
         public Dictionary<string, string> BranchLocations { get; } = new Dictionary<string, string>();
+
+        public XmlLoader xmlLoader { get; set; }
 
         /// <summary>
         /// Initial Pass - parses the content looking for branch & jump conditions
@@ -29,6 +31,10 @@ namespace C64BinaryToAssemblyConverter
             )
         {
             if (Code == null) { return; }
+
+            LABEL = xmlLoader.SettingsCache.Label;
+            BRANCH = xmlLoader.SettingsCache.Branch;
+
             var count = start;
             var originalFileLength = Code.Length;
             var firstPass = true;
