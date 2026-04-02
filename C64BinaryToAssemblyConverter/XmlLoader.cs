@@ -17,7 +17,9 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         public void LoadSettings()
         {
-            int numberOfBytesPerLine = 3;
+            int numberOfBytesPerLine = 8;
+            string label = "Label";
+            string branch = "branch";
 
             string settingsXML = Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + "/" + "config.xml";
             XmlTextReader reader = new XmlTextReader(settingsXML);
@@ -26,6 +28,8 @@ namespace C64BinaryToAssemblyConverter
             {
                 reader.MoveToContent();
                 numberOfBytesPerLine = int.Parse(reader.GetAttribute("numberOfBytesPerLine"));
+                label = reader.GetAttribute("labelName");
+                branch = reader.GetAttribute("branchName");
                 SettingsLoaded = true;
             }
             catch (Exception exception)
@@ -37,7 +41,12 @@ namespace C64BinaryToAssemblyConverter
             finally
             {
                 reader.Close();
-                SettingsCache = new SettingsCache(numberOfBytesPerLine);
+                SettingsCache = new SettingsCache
+                {
+                    NumberOfBytesPerLine = numberOfBytesPerLine,
+                    Label = label,
+                    Branch = branch
+                };
             }
         }
 
