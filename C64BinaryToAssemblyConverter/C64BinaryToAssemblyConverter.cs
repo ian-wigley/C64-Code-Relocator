@@ -15,7 +15,9 @@ namespace C64BinaryToAssemblyConverter
     {
         private byte[] _data;
         private readonly AssemblyCreator _assemblyCreator;
+        private readonly XmlLoader xmlLoader = new XmlLoader();
         protected readonly Parser _parser = new Parser();
+
         private List<string> _lineNumbers = new List<string>();
         private List<string> _illegalOpcodes = new List<string>();
         private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
@@ -25,7 +27,7 @@ namespace C64BinaryToAssemblyConverter
         private const string BYTE_DEFINITION = "!byte $";
         private readonly Regex regex =
             new Regex(@"^(?:[0-9A-Fa-f]{4}\s+[0-9A-Fa-f]{2}(?:\s+[0-9A-Fa-f]{2})*\s*(?:[^\r\n]*)\r?\n?)+$");
-        private readonly XmlLoader xmlLoader = new XmlLoader();
+
 
         public C64BinaryToAssemblyConverter()
         {
@@ -40,6 +42,7 @@ namespace C64BinaryToAssemblyConverter
             ExportBytesAsTextMenuItem.Enabled = false;
             PopulateOpCodeList.Init();
             _assemblyCreator = new AssemblyCreator();
+            _assemblyCreator.xmlLoader = xmlLoader;
             xmlLoader.LoadSettings();
         }
 
