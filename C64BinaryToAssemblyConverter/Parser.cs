@@ -8,7 +8,7 @@ namespace C64BinaryToAssemblyConverter
 {
     public class Parser
     {
-        public List<OpCode> CodeList { get;} = new List<OpCode>();
+        public List<OpCode> CodeList { get; } = new List<OpCode>();
         public List<string> Code { get; set; } = new List<string>();
         public List<string> IllegalOpCodes => _illegalOpcodes;
         public Dictionary<string, string[]> DataStatements => _dataStatements;

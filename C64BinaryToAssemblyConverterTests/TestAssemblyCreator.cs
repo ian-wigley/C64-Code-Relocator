@@ -7,7 +7,6 @@ namespace C64BinaryToAssemblyConverterTests
     [TestClass]
     public class TestAssemblyCreator
     {
-
         readonly string branchLocation = "0002";
         readonly string[] linesOfCode = new[] {"0000  A0 00       LDY #$00",
                                         "0002  B9 05 D9    LDA $D905,Y",
@@ -54,7 +53,6 @@ namespace C64BinaryToAssemblyConverterTests
             Assert.IsTrue(branchResult.Keys.Count.Equals(1));
             Assert.IsTrue(branchResult.ContainsKey(branchLocation));
         }
-
 
         [TestMethod]
         public void TestAssemblyCreatorSecondPass()
