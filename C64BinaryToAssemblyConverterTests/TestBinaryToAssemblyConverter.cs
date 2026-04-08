@@ -43,34 +43,30 @@ namespace C64BinaryToAssemblyConverterTests
         [TestMethod]
         public void TestConvertToDataBytesClick()
         {
-            PopulateOpCodeList.Init();
             byte[] bytes = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+            var start = 0x0814;
+            var text = "";
+            string target = "$00";
             var list = new List<string>();
             var textBox = new TextBox();
 
-            var binaryToAssemblyConverter = new TestAssemblyConverter();
-            binaryToAssemblyConverter._parser.ParseFileContent(bytes, textBox, 0, ref list);
-
-            //var text = "0814  00          BRK\r\n0815  00          BRK\r\n0816  00          BRK\r\n0817  00          BRK\r\n0818  00          BRK\r\n0819  00          BRK\r\n081A  00          BRK\r\n081B  00          BRK\r\n081C  00          BRK\r\n081D  00          BRK\r\n081E  00          BRK\r\n081F  00          BRK";
-
-            var start = 0x0814;
-            var text = "";
-            foreach (byte b in bytes) {
+            foreach (byte b in bytes)
+            {
                 text += start.ToString("X4") + "  " + b.ToString("X2") + "          BRK\r\n";
                 start += 1;
             }
 
-
+            PopulateOpCodeList.Init();
+            var binaryToAssemblyConverter = new TestAssemblyConverter();
+            binaryToAssemblyConverter._parser.ParseFileContent(bytes, textBox, 0, ref list);
             binaryToAssemblyConverter.SetSelected(text);
             binaryToAssemblyConverter.ConvertToDataBytesClick(null, null);
             var result = binaryToAssemblyConverter.GetSelected();
 
-            string target = "$00";
             int count = Enumerable.Range(0, result.Length - target.Length + 1)
                 .Count(i => result.Substring(i, target.Length) == target);
 
             Assert.IsNotNull(count == bytes.Length);
         }
-
     }
 }
