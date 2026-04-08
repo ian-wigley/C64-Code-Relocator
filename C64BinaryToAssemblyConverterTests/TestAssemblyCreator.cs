@@ -1,21 +1,25 @@
-﻿using C64BinaryToAssemblyConverter;
+﻿using System.Collections.Generic;
+using C64BinaryToAssemblyConverter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 
 namespace C64BinaryToAssemblyConverterTests
 {
     [TestClass]
     public class TestAssemblyCreator
     {
-        readonly string branchLocation = "0002";
-        readonly string[] linesOfCode = new[] {"0000  A0 00       LDY #$00",
-                                        "0002  B9 05 D9    LDA $D905,Y",
-                                        "0005  99 04 D9    STA $D904,Y",
-                                        "0008  B9 DD D8    LDA $D8DD,Y",
-                                        "000B  99 DC D8    STA $D8DC,Y",
-                                        "000C  C8          INY",
-                                        "000E  C0 11       CPY #$11",
-                                        "0011  D0 EF       BNE $" };
+        private readonly string branchLocation = "0002";
+
+        private readonly string[] linesOfCode =
+        {
+            "0000  A0 00       LDY #$00",
+            "0002  B9 05 D9    LDA $D905,Y",
+            "0005  99 04 D9    STA $D904,Y",
+            "0008  B9 DD D8    LDA $D8DD,Y",
+            "000B  99 DC D8    STA $D8DC,Y",
+            "000C  C8          INY",
+            "000E  C0 11       CPY #$11",
+            "0011  D0 EF       BNE $"
+        };
 
         private AssemblyCreator InstantiatePopulatedAssemblyCreator()
         {
