@@ -10,39 +10,22 @@ namespace C64BinaryToAssemblyConverter
 {
     public class BytesView : TableLayoutPanel
     {
-        private const int DEFAULT_COLUMN_COUNT = 16 /*0x10*/;
-        private const int DEFAULT_ROW_COUNT = 25;
-        private const int COLUMN_COUNT = 16 /*0x10*/;
-        private const int BORDER_GAP = 2;
-        private const int INSET_GAP = 3;
-        private const int CELL_HEIGHT = 21;
-        private const int CELL_WIDTH = 25;
-        private const int CHAR_WIDTH = 8;
-        private const int ADDRESS_WIDTH = 69;
-        private const int HEX_WIDTH = 400;
-        private const int DUMP_WIDTH = 128 /*0x80*/;
-        private int SCROLLBAR_HEIGHT;
-        private int SCROLLBAR_WIDTH;
-        private const int HEX_DUMP_GAP = 5;
-        private const int ADDRESS_START_X = 5;
-        private const int CLIENT_START_Y = 5;
-        private const int LINE_START_Y = 7;
-        private const int HEX_START_X = 74;
-        private const int DUMP_START_X = 479;
-        private const int SCROLLBAR_START_X = 612;
         private static readonly Font ADDRESS_FONT = new Font("Microsoft Sans Serif", 8f);
         private static readonly Font HEXDUMP_FONT = new Font("Courier New", 8f);
-        private VScrollBar scrollBar;
-        private TextBox edit;
-        private int columnCount = 8 ;//16 /*0x10*/;
-        private int rowCount = 25;
+        private readonly int columnCount = 8; //16 /*0x10*/;
         private byte[] dataBuf;
-        private int startLine;
         private int displayLinesCount;
-        private int linesCount;
         private DisplayMode displayMode;
+        private TextBox edit;
+        private int linesCount;
         private DisplayMode realDisplayMode;
-
+        private int rowCount = 25;
+        private VScrollBar scrollBar;
+        private int SCROLLBAR_HEIGHT;
+        private int SCROLLBAR_WIDTH;
+        private int startLine;
+        private int startAddress;
+        
         /// <summary>Initializes a new instance of the <see cref="T:System.ComponentModel.Design.BytesView" /> class.</summary>
         public BytesView()
         {
@@ -62,8 +45,8 @@ namespace C64BinaryToAssemblyConverter
 
         private static int AnalizeByteOrderMark(byte[] buffer, int index)
         {
-            int c1_1 = (int)buffer[index] << 8 | (int)buffer[index + 1];
-            int c1_2 = (int)buffer[index + 2] << 8 | (int)buffer[index + 3];
+            var c1_1 = (buffer[index] << 8) | buffer[index + 1];
+            var c1_2 = (buffer[index + 2] << 8) | buffer[index + 3];
             return new int[13, 13]
             {
                 {
@@ -264,28 +247,32 @@ namespace C64BinaryToAssemblyConverter
             }[GetEncodingIndex(c1_1), GetEncodingIndex(c1_2)];
         }
 
-        private int CellToIndex(int column, int row) => row * columnCount + column;
+        private int CellToIndex(int column, int row)
+        {
+            return row * columnCount + column;
+        }
 
         private byte[] ComposeLineBuffer(int startLine, int line)
         {
-            int num = startLine * columnCount;
-            byte[] numArray = num + (line + 1) * columnCount <= dataBuf.Length
+            var num = startLine * columnCount;
+            var numArray = num + (line + 1) * columnCount <= dataBuf.Length
                 ? new byte[columnCount]
                 : new byte[dataBuf.Length % columnCount];
-            for (int column = 0; column < numArray.Length; ++column)
+            for (var column = 0; column < numArray.Length; ++column)
                 numArray[column] = dataBuf[num + CellToIndex(column, line)];
             return numArray;
         }
 
         private void DrawAddress(Graphics g, int startLine, int line)
         {
-            Font addressFont = ADDRESS_FONT;
-            string s = ((startLine + line) * columnCount).ToString("X8",
-                (IFormatProvider)CultureInfo.InvariantCulture);
-            Brush brush = (Brush)new SolidBrush(ForeColor);
+            var addressFont = ADDRESS_FONT;
+            var s = ((startLine + line) * columnCount).ToString("X4",
+                CultureInfo.InvariantCulture) + " " + 
+                    (startAddress + ((startLine + line) * columnCount)).ToString("X4");
+            Brush brush = new SolidBrush(ForeColor);
             try
             {
-                g.DrawString(s, addressFont, brush, 5f, (float)(7 + line * 21));
+                g.DrawString(s, addressFont, brush, 5f, 7 + line * 21);
             }
             finally
             {
@@ -295,9 +282,12 @@ namespace C64BinaryToAssemblyConverter
 
         private void DrawClient(Graphics g)
         {
-            using (Brush brush = (Brush)new SolidBrush(SystemColors.ControlLightLight))
+            using (Brush brush = new SolidBrush(SystemColors.ControlLightLight))
+            {
                 g.FillRectangle(brush, new Rectangle(74, 5, 538, rowCount * 21));
-            using (Pen pen = new Pen(SystemColors.ControlDark))
+            }
+
+            using (var pen = new Pen(SystemColors.ControlDark))
             {
                 g.DrawRectangle(pen, new Rectangle(74, 5, 537, rowCount * 21 - 1));
                 g.DrawLine(pen, 474, 5, 474, 5 + rowCount * 21 - 1);
@@ -306,8 +296,9 @@ namespace C64BinaryToAssemblyConverter
 
         private static bool CharIsPrintable(char c)
         {
-            UnicodeCategory unicodeCategory = char.GetUnicodeCategory(c);
-            return unicodeCategory != UnicodeCategory.Control || unicodeCategory == UnicodeCategory.Format ||
+            var unicodeCategory = char.GetUnicodeCategory(c);
+            return unicodeCategory != UnicodeCategory.Control || 
+                   unicodeCategory == UnicodeCategory.Format ||
                    unicodeCategory == UnicodeCategory.LineSeparator ||
                    unicodeCategory == UnicodeCategory.ParagraphSeparator ||
                    unicodeCategory == UnicodeCategory.OtherNotAssigned;
@@ -315,21 +306,21 @@ namespace C64BinaryToAssemblyConverter
 
         private void DrawDump(Graphics g, byte[] lineBuffer, int line)
         {
-            StringBuilder stringBuilder = new StringBuilder(lineBuffer.Length);
-            for (int index = 0; index < lineBuffer.Length; ++index)
+            var stringBuilder = new StringBuilder(lineBuffer.Length);
+            for (var index = 0; index < lineBuffer.Length; ++index)
             {
-                char c = Convert.ToChar(lineBuffer[index]);
+                var c = Convert.ToChar(lineBuffer[index]);
                 if (CharIsPrintable(c))
                     stringBuilder.Append(c);
                 else
                     stringBuilder.Append('.');
             }
 
-            Font hexdumpFont = HEXDUMP_FONT;
-            Brush brush = (Brush)new SolidBrush(ForeColor);
+            var hexdumpFont = HEXDUMP_FONT;
+            var brush = (Brush)new SolidBrush(ForeColor);
             try
             {
-                g.DrawString(stringBuilder.ToString(), hexdumpFont, brush, 479f, (float)(7 + line * 21));
+                g.DrawString(stringBuilder.ToString(), hexdumpFont, brush, 479f, 7 + line * 21);
             }
             finally
             {
@@ -339,20 +330,20 @@ namespace C64BinaryToAssemblyConverter
 
         private void DrawHex(Graphics g, byte[] lineBuffer, int line)
         {
-            Font hexdumpFont = HEXDUMP_FONT;
-            StringBuilder stringBuilder = new StringBuilder(lineBuffer.Length * 3 + 1);
-            for (int index = 0; index < lineBuffer.Length; ++index)
+            var hexdumpFont = HEXDUMP_FONT;
+            var stringBuilder = new StringBuilder(lineBuffer.Length * 3 + 1);
+            for (var index = 0; index < lineBuffer.Length; ++index)
             {
-                stringBuilder.Append(lineBuffer[index].ToString("X2", (IFormatProvider)CultureInfo.InvariantCulture));
+                stringBuilder.Append(lineBuffer[index].ToString("X2", CultureInfo.InvariantCulture));
                 stringBuilder.Append(" ");
                 if (index == columnCount / 2 - 1)
                     stringBuilder.Append(" ");
             }
 
-            Brush brush = (Brush)new SolidBrush(ForeColor);
+            Brush brush = new SolidBrush(ForeColor);
             try
             {
-                g.DrawString(stringBuilder.ToString(), hexdumpFont, brush, 76f, (float)(7 + line * 21));
+                g.DrawString(stringBuilder.ToString(), hexdumpFont, brush, 76f, 7 + line * 21);
             }
             finally
             {
@@ -362,9 +353,9 @@ namespace C64BinaryToAssemblyConverter
 
         private void DrawLines(Graphics g, int startLine, int linesCount)
         {
-            for (int line = 0; line < linesCount; ++line)
+            for (var line = 0; line < linesCount; ++line)
             {
-                byte[] lineBuffer = ComposeLineBuffer(startLine, line);
+                var lineBuffer = ComposeLineBuffer(startLine, line);
                 DrawAddress(g, startLine, line);
                 DrawHex(g, lineBuffer, line);
                 DrawDump(g, lineBuffer, line);
@@ -373,9 +364,9 @@ namespace C64BinaryToAssemblyConverter
 
         private DisplayMode GetAutoDisplayMode()
         {
-            int num1 = 0;
-            int num2 = 0;
-            if (dataBuf == null || dataBuf.Length >= 0 && dataBuf.Length < 8)
+            var num1 = 0;
+            var num2 = 0;
+            if (dataBuf == null || (dataBuf.Length >= 0 && dataBuf.Length < 8))
                 return DisplayMode.Hexdump;
             switch (AnalizeByteOrderMark(dataBuf, 0))
             {
@@ -385,34 +376,29 @@ namespace C64BinaryToAssemblyConverter
                     return DisplayMode.Unicode;
                 case 4:
                 case 5:
-                    return DisplayMode.Hexdump;
                 case 6:
                 case 7:
-                    return DisplayMode.Hexdump;
                 case 8:
                 case 9:
-                    return DisplayMode.Hexdump;
                 case 10:
                 case 11:
-                    return DisplayMode.Hexdump;
                 case 12:
                     return DisplayMode.Hexdump;
                 case 13:
-                    return DisplayMode.Ansi;
                 case 14:
                     return DisplayMode.Ansi;
                 default:
-                    int num3 = dataBuf.Length <= 1024 /*0x0400*/ ? dataBuf.Length / 2 : 512 /*0x0200*/;
-                    for (int index = 0; index < num3; ++index)
+                    var num3 = dataBuf.Length <= 1024 /*0x0400*/ ? dataBuf.Length / 2 : 512 /*0x0200*/;
+                    for (var index = 0; index < num3; ++index)
                     {
-                        char c = (char)dataBuf[index];
+                        var c = (char)dataBuf[index];
                         if (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c))
                             ++num1;
                     }
 
-                    for (int byteIndex = 0; byteIndex < num3; byteIndex += 2)
+                    for (var byteIndex = 0; byteIndex < num3; byteIndex += 2)
                     {
-                        char[] chars = new char[1];
+                        var chars = new char[1];
                         Encoding.Unicode.GetChars(dataBuf, byteIndex, 2, chars, 0);
                         if (CharIsPrintable(chars[0]))
                             ++num2;
@@ -426,11 +412,20 @@ namespace C64BinaryToAssemblyConverter
 
         /// <summary>Gets the bytes in the buffer.</summary>
         /// <returns>The unsigned byte array reference.</returns>
-        public virtual byte[] GetBytes() => dataBuf;
+        public virtual byte[] GetBytes()
+        {
+            return dataBuf;
+        }
 
         /// <summary>Gets the display mode for the control.</summary>
-        /// <returns>The display mode that this control uses. The returned value is defined in <see cref="T:System.ComponentModel.Design.DisplayMode" />.</returns>
-        public virtual DisplayMode GetDisplayMode() => displayMode;
+        /// <returns>
+        ///     The display mode that this control uses. The returned value is defined in
+        ///     <see cref="T:System.ComponentModel.Design.DisplayMode" />.
+        /// </returns>
+        public virtual DisplayMode GetDisplayMode()
+        {
+            return displayMode;
+        }
 
         private static int GetEncodingIndex(int c1)
         {
@@ -467,8 +462,8 @@ namespace C64BinaryToAssemblyConverter
 
         private void InitAnsi()
         {
-            int length = dataBuf.Length;
-            char[] lpWideCharStr = new char[length + 1];
+            var length = dataBuf.Length;
+            var lpWideCharStr = new char[length + 1];
 //            int wideChar =
 //                System.Design.NativeMethods.MultiByteToWideChar(0, 0, this.dataBuf, length, lpWideCharStr, length);
 //            lpWideCharStr[wideChar] = char.MinValue;
@@ -483,13 +478,11 @@ namespace C64BinaryToAssemblyConverter
 
         private void InitUnicode()
         {
-            char[] chars = new char[dataBuf.Length / 2 + 1];
+            var chars = new char[dataBuf.Length / 2 + 1];
             Encoding.Unicode.GetChars(dataBuf, 0, dataBuf.Length, chars, 0);
-            for (int index = 0; index < chars.Length; ++index)
-            {
+            for (var index = 0; index < chars.Length; ++index)
                 if (chars[index] == char.MinValue)
                     chars[index] = '\v';
-            }
 
             chars[chars.Length - 1] = char.MinValue;
             edit.Text = new string(chars);
@@ -501,11 +494,11 @@ namespace C64BinaryToAssemblyConverter
             SCROLLBAR_WIDTH = SystemInformation.VerticalScrollBarWidth;
             Size = new Size(612 + SCROLLBAR_WIDTH + 2 + 3, 10 + rowCount * 21);
             scrollBar = new VScrollBar();
-            scrollBar.ValueChanged += new EventHandler(ScrollChanged);
+            scrollBar.ValueChanged += ScrollChanged;
             scrollBar.TabStop = true;
             scrollBar.TabIndex = 0;
             scrollBar.Dock = DockStyle.Right;
-            scrollBar.Visible = true;// false;
+            scrollBar.Visible = true; // false;
             edit = new TextBox();
             // edit.AutoSize = false;
             // edit.BorderStyle = BorderStyle.None;
@@ -551,29 +544,26 @@ namespace C64BinaryToAssemblyConverter
 
         /// <summary>Raises the <see cref="E:System.Windows.Forms.Control.KeyDown" /> event.</summary>
         /// <param name="e">A <see cref="T:System.Windows.Forms.KeyEventArgs" /> that contains the event data.</param>
-        protected override void OnKeyDown(KeyEventArgs e) => scrollBar.Select();
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            scrollBar.Select();
+        }
 
         /// <summary>Raises the <see cref="E:System.Windows.Forms.Control.Paint" /> event.</summary>
         /// <param name="e">A <see cref="T:System.Windows.Forms.PaintEventArgs" /> that contains the event data.</param>
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            Graphics graphics = e.Graphics;
+            var graphics = e.Graphics;
             switch (realDisplayMode)
             {
                 case DisplayMode.Hexdump:
                     SuspendLayout();
-                    edit.Hide();
+                    //edit.Hide();
                     scrollBar.Show();
                     ResumeLayout();
                     DrawClient(graphics);
                     DrawLines(graphics, startLine, displayLinesCount);
-                    break;
-                case DisplayMode.Ansi:
-                    edit.Invalidate();
-                    break;
-                case DisplayMode.Unicode:
-                    edit.Invalidate();
                     break;
             }
         }
@@ -583,7 +573,7 @@ namespace C64BinaryToAssemblyConverter
         protected override void OnLayout(LayoutEventArgs e)
         {
             base.OnLayout(e);
-            int num = (ClientSize.Height - 10) / 21;
+            var num = (ClientSize.Height - 10) / 21;
             if (num < 0 || num == rowCount)
                 return;
             rowCount = num;
@@ -601,7 +591,9 @@ namespace C64BinaryToAssemblyConverter
                     scrollBar.Select();
                 }
                 else
+                {
                     scrollBar.Enabled = false;
+                }
             }
 
             displayLinesCount = startLine + rowCount < linesCount
@@ -609,34 +601,10 @@ namespace C64BinaryToAssemblyConverter
                 : linesCount - startLine;
         }
 
-        /// <summary>Writes the raw data from the data buffer to a file.</summary>
-        /// <param name="path">The file path to save to. </param>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// <paramref name="path" /> is <see langword="null" />. </exception>
-        /// <exception cref="T:System.ArgumentException">
-        /// <paramref name="path" /> is an empty string (""), contains only white space, or contains one or more invalid characters. </exception>
-        /// <exception cref="T:System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive. </exception>
-        /// <exception cref="T:System.IO.IOException">The file write failed. </exception>
-        /// <exception cref="T:System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters. </exception>
-        /// <exception cref="T:System.UnauthorizedAccessException">The access requested is not permitted by the operating system for the specified <paramref name="path" />, such as when access is <see langword="Write" /> or <see langword="ReadWrite" /> and the file or directory is set for read-only access. </exception>
-        public virtual void SaveToFile(string path)
-        {
-            if (dataBuf == null)
-                return;
-            FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-            try
-            {
-                fileStream.Write(dataBuf, 0, dataBuf.Length);
-                fileStream.Close();
-            }
-            catch
-            {
-                fileStream.Close();
-                throw;
-            }
-        }
-
-        /// <summary>Handles the <see cref="E:System.Windows.Forms.ScrollBar.ValueChanged" /> event on the <see cref="T:System.ComponentModel.Design.BytesView" /> control's <see cref="T:System.Windows.Forms.ScrollBar" />.</summary>
+        /// <summary>
+        ///     Handles the <see cref="E:System.Windows.Forms.ScrollBar.ValueChanged" /> event on the
+        ///     <see cref="T:System.ComponentModel.Design.BytesView" /> control's <see cref="T:System.Windows.Forms.ScrollBar" />.
+        /// </summary>
         /// <param name="source">The source of the event. </param>
         /// <param name="e">A <see cref="T:System.EventArgs" /> that contains the event data. </param>
         protected virtual void ScrollChanged(object source, EventArgs e)
@@ -651,9 +619,15 @@ namespace C64BinaryToAssemblyConverter
         public virtual void SetBytes(byte[] bytes)
         {
             if (bytes == null)
+            {
                 throw new ArgumentNullException(nameof(bytes));
+            }
+
             if (dataBuf != null)
-                dataBuf = (byte[])null;
+            {
+                dataBuf = null;
+            }
+
             dataBuf = bytes;
             InitState();
             SetDisplayMode(displayMode);
@@ -661,7 +635,10 @@ namespace C64BinaryToAssemblyConverter
 
         /// <summary>Sets the current display mode.</summary>
         /// <param name="mode">The display mode to set. </param>
-        /// <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">The specified display mode is not from the <see cref="T:System.ComponentModel.Design.DisplayMode" /> enumeration. </exception>
+        /// <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">
+        ///     The specified display mode is not from the
+        ///     <see cref="T:System.ComponentModel.Design.DisplayMode" /> enumeration.
+        /// </exception>
         public virtual void SetDisplayMode(DisplayMode mode)
         {
             //this.displayMode = System.Windows.Forms.ClientUtils.IsEnumValid((Enum)mode, (int)mode, 1, 4)
@@ -713,21 +690,14 @@ namespace C64BinaryToAssemblyConverter
 
         /// <summary>Sets the file to display in the viewer.</summary>
         /// <param name="path">The file path to load from. </param>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// <paramref name="path" /> is <see langword="null" />. </exception>
-        /// <exception cref="T:System.ArgumentException">
-        /// <paramref name="path" /> is an empty string (""), contains only white space, or contains one or more invalid characters. </exception>
-        /// <exception cref="T:System.IO.DirectoryNotFoundException">The specified path is invalid, such as being on an unmapped drive. </exception>
-        /// <exception cref="T:System.IO.IOException">The file load failed. </exception>
-        /// <exception cref="T:System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters. </exception>
-        /// <exception cref="T:System.UnauthorizedAccessException">The access requested is not permitted by the operating system for the specified <paramref name="path" />, such as when access is <see langword="Write" /> or <see langword="ReadWrite" /> and the file or directory is set for read-only access. </exception>
-        public virtual void SetFile(string path)
+        public virtual void SetFile(string path, int startLocation)
         {
-            FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
+            startAddress = startLocation;
+            var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
             try
             {
-                int length = (int)fileStream.Length;
-                byte[] numArray = new byte[length + 1];
+                var length = (int)fileStream.Length;
+                var numArray = new byte[length + 1];
                 fileStream.Read(numArray, 0, length);
                 SetBytes(numArray);
                 fileStream.Close();
@@ -737,16 +707,6 @@ namespace C64BinaryToAssemblyConverter
                 fileStream.Close();
                 throw;
             }
-        }
-
-        /// <summary>Sets the current line for the <see cref="F:System.ComponentModel.Design.DisplayMode.Hexdump" /> view.</summary>
-        /// <param name="line">The current line to display from. </param>
-        public virtual void SetStartLine(int line)
-        {
-            if (line < 0 || line >= linesCount || line > dataBuf.Length / columnCount)
-                startLine = 0;
-            else
-                startLine = line;
         }
     }
 }
