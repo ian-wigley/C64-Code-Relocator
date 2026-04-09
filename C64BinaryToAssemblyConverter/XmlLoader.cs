@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml;
@@ -8,21 +7,22 @@ namespace C64BinaryToAssemblyConverter
 {
     public class XmlLoader
     {
-        public bool Valid { set; get; }
+        public bool Valid { get; set; }
         public SettingsCache SettingsCache { get; private set; }
         public bool SettingsLoaded { get; private set; }
 
         /// <summary>
-        /// Method Loads and Parses the Settings XML file
+        ///     Method Loads and Parses the Settings XML file
         /// </summary>
         public void LoadSettings()
         {
-            int numberOfBytesPerLine = 8;
-            string label = "Label";
-            string branch = "branch";
+            var numberOfBytesPerLine = 8;
+            var label = "Label";
+            var branch = "branch";
 
-            string settingsXML = Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + "/" + "config.xml";
-            XmlTextReader reader = new XmlTextReader(settingsXML);
+            var settingsXML = Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) +
+                              "/" + "config.xml";
+            var reader = new XmlTextReader(settingsXML);
 
             try
             {
@@ -51,17 +51,19 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// Get Data Type
+        ///     Get Data Type
         /// </summary>
         private void GetDataType(string data, out string dataSize)
         {
             if (data.Contains("."))
             {
-                int index = data.IndexOf(".");
+                var index = data.IndexOf(".");
                 dataSize = data.Substring(index + 1);
             }
-            else { dataSize = "?"; }
+            else
+            {
+                dataSize = "?";
+            }
         }
     }
 }
-
