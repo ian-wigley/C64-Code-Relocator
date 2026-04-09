@@ -52,8 +52,8 @@ namespace C64BinaryToAssemblyConverter
             endAddress = int.Parse(GetSelectedMemEndLocation, NumberStyles.HexNumber);
         }
 
-        public string GetSelectedMemStartLocation => comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text;
-        public string GetSelectedMemEndLocation => comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text;
+        public string GetSelectedMemStartLocation => comboBox1.Text.ToUpper() + comboBox2.Text.ToUpper() + comboBox3.Text.ToUpper() + comboBox4.Text.ToUpper();
+        public string GetSelectedMemEndLocation => comboBox5.Text.ToUpper() + comboBox6.Text.ToUpper() + comboBox7.Text.ToUpper() + comboBox8.Text.ToUpper();
         public bool GetConvertIllegalOpCodes => checkBox1.Checked;
 
         /// <summary>
