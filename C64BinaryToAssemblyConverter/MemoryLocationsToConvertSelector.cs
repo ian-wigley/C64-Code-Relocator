@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace C64BinaryToAssemblyConverter
@@ -6,13 +8,10 @@ namespace C64BinaryToAssemblyConverter
     public partial class MemoryLocationsToConvertSelector : Form
     {
         private readonly IList<object> memValues = new List<object>();
-        public string GetSelectedMemStartLocation => comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text;
-        public string GetSelectedMemEndLocation => comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text;
-        public bool GetConvertIllegalOpCodes => checkBox1.Checked;
-        private char[] startAddressValue;
-        private char[] endAddressValue;
-        private int startAddress;
-        private int endAddress;
+        private readonly int endAddress;
+        private readonly char[] endAddressValue;
+        private readonly int startAddress;
+        private readonly char[] startAddressValue;
 
 
         public MemoryLocationsToConvertSelector(char[] startAddressValues, char[] endAddressValues)
@@ -21,15 +20,12 @@ namespace C64BinaryToAssemblyConverter
 
             startAddressValue = startAddressValues;
             endAddressValue = endAddressValues;
-            
+
             MaximizeBox = false;
             MinimizeBox = false;
             FormBorderStyle = FormBorderStyle.FixedSingle;
 
-            for (int i = 0; i < 16; i++)
-            {
-                memValues.Add(new { Text = i.ToString("X1"), Value = i });
-            }
+            for (var i = 0; i < 16; i++) memValues.Add(new { Text = i.ToString("X1"), Value = i });
 
             InitialiseComboBoxes(comboBox1);
             InitialiseComboBoxes(comboBox2);
@@ -46,18 +42,21 @@ namespace C64BinaryToAssemblyConverter
             comboBox3.Text = startAddressValues[2].ToString();
             comboBox4.Text = startAddressValues[3].ToString();
 
-            startAddress = int.Parse(GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber);
+            startAddress = int.Parse(GetSelectedMemStartLocation, NumberStyles.HexNumber);
 
             comboBox5.Text = endAddressValues[0].ToString();
             comboBox6.Text = endAddressValues[1].ToString();
             comboBox7.Text = endAddressValues[2].ToString();
             comboBox8.Text = endAddressValues[3].ToString();
 
-            endAddress = int.Parse(GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber);
+            endAddress = int.Parse(GetSelectedMemEndLocation, NumberStyles.HexNumber);
         }
 
+        public string GetSelectedMemStartLocation => comboBox1.Text + comboBox2.Text + comboBox3.Text + comboBox4.Text;
+        public string GetSelectedMemEndLocation => comboBox5.Text + comboBox6.Text + comboBox7.Text + comboBox8.Text;
+        public bool GetConvertIllegalOpCodes => checkBox1.Checked;
+
         /// <summary>
-        ///
         /// </summary>
         private void InitialiseComboBoxes(ComboBox comboBox)
         {
@@ -68,85 +67,79 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// Button Click event handler
+        ///     Button Click event handler
         /// </summary>
-        private void ButtonClick(object sender, System.EventArgs e)
+        private void ButtonClick(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
             Close();
         }
 
         /// <summary>
-        /// Selected Start address Index Change event handler
+        ///     Selected Start address Index Change event handler
         /// </summary>
-        private void SelectedStartIndexChangedOne(object sender, System.EventArgs e)
+        private void SelectedStartIndexChangedOne(object sender, EventArgs e)
         {
-            int.TryParse(comboBox1.Text, System.Globalization.NumberStyles.HexNumber, null, out var one);
+            int.TryParse(comboBox1.Text, NumberStyles.HexNumber, null, out var one);
             InvalidStartAddress(one, comboBox1, startAddressValue[0].ToString());
         }
 
-        private void SelectedStartIndexChangedTwo(object sender, System.EventArgs e)
+        private void SelectedStartIndexChangedTwo(object sender, EventArgs e)
         {
-            int.TryParse(comboBox2.Text, System.Globalization.NumberStyles.HexNumber, null, out var one);
+            int.TryParse(comboBox2.Text, NumberStyles.HexNumber, null, out var one);
             InvalidStartAddress(one, comboBox2, startAddressValue[1].ToString());
         }
 
-        private void SelectedStartIndexChangedThree(object sender, System.EventArgs e)
+        private void SelectedStartIndexChangedThree(object sender, EventArgs e)
         {
-            int.TryParse(comboBox3.Text, System.Globalization.NumberStyles.HexNumber, null, out var one);
+            int.TryParse(comboBox3.Text, NumberStyles.HexNumber, null, out var one);
             InvalidStartAddress(one, comboBox3, startAddressValue[2].ToString());
         }
 
-        private void SelectedStartIndexChangedFour(object sender, System.EventArgs e)
+        private void SelectedStartIndexChangedFour(object sender, EventArgs e)
         {
-            int.TryParse(comboBox4.Text, System.Globalization.NumberStyles.HexNumber, null, out var one);
+            int.TryParse(comboBox4.Text, NumberStyles.HexNumber, null, out var one);
             InvalidStartAddress(one, comboBox4, startAddressValue[3].ToString());
         }
 
         private void InvalidStartAddress(int value, ComboBox comboBox, string startAddresses)
         {
-            if (int.Parse(GetSelectedMemStartLocation, System.Globalization.NumberStyles.HexNumber) < startAddress)
-            {
+            if (int.Parse(GetSelectedMemStartLocation, NumberStyles.HexNumber) < startAddress)
                 comboBox.Text = startAddresses;
-            }
         }
 
         /// <summary>
-        /// Selected End address Index Change event handler
+        ///     Selected End address Index Change event handler
         /// </summary>
-        private void SelectedEndIndexChangedOne(object sender, System.EventArgs e)
+        private void SelectedEndIndexChangedOne(object sender, EventArgs e)
         {
-            int.TryParse(comboBox5.Text, System.Globalization.NumberStyles.HexNumber, null, out var one);
+            int.TryParse(comboBox5.Text, NumberStyles.HexNumber, null, out var one);
             InvalidEndAddress(one, comboBox5, endAddressValue[0].ToString());
         }
 
-        private void SelectedEndIndexChangedTwo(object sender, System.EventArgs e)
+        private void SelectedEndIndexChangedTwo(object sender, EventArgs e)
         {
-            int.TryParse(comboBox6.Text, System.Globalization.NumberStyles.HexNumber, null, out var two);
+            int.TryParse(comboBox6.Text, NumberStyles.HexNumber, null, out var two);
             InvalidEndAddress(two, comboBox6, endAddressValue[1].ToString());
         }
 
-        private void SelectedEndIndexChangedThree(object sender, System.EventArgs e)
+        private void SelectedEndIndexChangedThree(object sender, EventArgs e)
         {
-            int.TryParse(comboBox7.Text, System.Globalization.NumberStyles.HexNumber, null, out var three);
+            int.TryParse(comboBox7.Text, NumberStyles.HexNumber, null, out var three);
             InvalidEndAddress(three, comboBox7, endAddressValue[2].ToString());
         }
 
-        private void SelectedEndIndexChangedFour(object sender, System.EventArgs e)
+        private void SelectedEndIndexChangedFour(object sender, EventArgs e)
         {
-            int.TryParse(comboBox8.Text, System.Globalization.NumberStyles.HexNumber, null, out var four);
+            int.TryParse(comboBox8.Text, NumberStyles.HexNumber, null, out var four);
             InvalidEndAddress(four, comboBox8, endAddressValue[3].ToString());
         }
 
         private void InvalidEndAddress(int value, ComboBox comboBox, string endAddresses)
         {
-            if (int.Parse(GetSelectedMemEndLocation, System.Globalization.NumberStyles.HexNumber) > endAddress)
-            //if (value > int.Parse(endAddresses, System.Globalization.NumberStyles.HexNumber))
-            {
+            if (int.Parse(GetSelectedMemEndLocation, NumberStyles.HexNumber) > endAddress)
+                //if (value > int.Parse(endAddresses, System.Globalization.NumberStyles.HexNumber))
                 comboBox.Text = endAddresses;
-            }
         }
-
-
     }
 }
