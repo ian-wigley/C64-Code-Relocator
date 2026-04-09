@@ -8,15 +8,15 @@ namespace C64BinaryToAssemblyConverter
 {
     public class Parser
     {
+        private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
+        private List<string> _illegalOpcodes = new List<string>();
         public List<OpCode> CodeList { get; } = new List<OpCode>();
         public List<string> Code { get; set; } = new List<string>();
         public List<string> IllegalOpCodes => _illegalOpcodes;
         public Dictionary<string, string[]> DataStatements => _dataStatements;
-        private List<string> _illegalOpcodes = new List<string>();
-        private Dictionary<string, string[]> _dataStatements = new Dictionary<string, string[]>();
 
         /// <summary>
-        /// Load Binary Data
+        ///     Load Binary Data
         /// </summary>
         public byte[] LoadBinaryData(string fileName)
         {
@@ -32,20 +32,20 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// Parse File Content
+        ///     Parse File Content
         /// </summary>
         public string[] ParseFileContent(
             byte[] data,
             TextBox textBox,
             int startAddress,
             ref List<string> lineNumbers
-            )
+        )
         {
             textBox.Clear();
             var filePosition = 0;
             var opCodes = PopulateOpCodeList.GetOpCodes;
-            if (opCodes.Count.Equals(0)) { return Array.Empty<string>();} 
-            
+            if (opCodes.Count.Equals(0)) return Array.Empty<string>();
+
             while (filePosition < data.Length)
             {
                 int opCode = data[filePosition];
@@ -57,12 +57,15 @@ namespace C64BinaryToAssemblyConverter
                 foreach (var oc in opCodes.Where(oc => oc.Code == opCode.ToString("X2")))
                 {
                     var opCodeCopy = new OpCode(oc);
-                    opCodeCopy.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref _dataStatements, ref _illegalOpcodes);
+                    opCodeCopy.GetCode(ref line, ref filePosition, data, lineNumber, pc, ref _dataStatements,
+                        ref _illegalOpcodes);
                     CodeList.Add(opCodeCopy);
                     break;
                 }
+
                 Code.Add(line);
             }
+
             return Code.ToArray();
         }
     }
