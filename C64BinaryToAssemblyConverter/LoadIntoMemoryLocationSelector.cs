@@ -1,13 +1,12 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
-using System;
+using System.Windows.Forms;
 
 namespace C64BinaryToAssemblyConverter
 {
     public partial class LoadIntoMemoryLocationSelector : Form
     {
-        public string GetMemStartLocation => StartAddressSelector.Text;
-
         public LoadIntoMemoryLocationSelector()
         {
             InitializeComponent();
@@ -19,7 +18,8 @@ namespace C64BinaryToAssemblyConverter
             StartAddressSelector.DisplayMember = "Text";
             StartAddressSelector.ValueMember = "Value";
 
-            var items = new[] {
+            var items = new[]
+            {
                 new { Text = "0400", Value = 1024 },
                 new { Text = "0801", Value = 2049 },
                 new { Text = "0900", Value = 2304 },
@@ -49,17 +49,18 @@ namespace C64BinaryToAssemblyConverter
             StartAddressSelector.SelectedIndex = 1;
         }
 
+        public string GetMemStartLocation => StartAddressSelector.Text;
+
         /// <summary>
-        ///
         /// </summary>
-        private void Button1_Click(object sender, System.EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
             Close();
         }
 
         /// <summary>
-        /// Validate the users Key Input
+        ///     Validate the users Key Input
         /// </summary>
         private void ValidateKeyInput(object sender, KeyPressEventArgs e)
         {
@@ -68,20 +69,25 @@ namespace C64BinaryToAssemblyConverter
                 DialogResult = DialogResult.OK;
                 Close();
             }
-            else if (char.IsControl(e.KeyChar)) { return; }
-            char c = char.ToUpper(e.KeyChar);
+            else if (char.IsControl(e.KeyChar))
+            {
+                return;
+            }
+
+            var c = char.ToUpper(e.KeyChar);
             if (!Uri.IsHexDigit(c))
             {
                 e.Handled = true;
                 return;
             }
+
             e.KeyChar = c;
         }
 
         /// <summary>
-        /// Validate Input when the user clicks OK
+        ///     Validate Input when the user clicks OK
         /// </summary>
-        private void ValidateInput(object sender, System.ComponentModel.CancelEventArgs e)
+        private void ValidateInput(object sender, CancelEventArgs e)
         {
             if (!Regex.IsMatch(StartAddressSelector.Text, @"\A[0-9A-F]{1,4}\z"))
             {
