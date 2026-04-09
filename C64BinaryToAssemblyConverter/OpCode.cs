@@ -4,19 +4,14 @@ namespace C64BinaryToAssemblyConverter
 {
     public class OpCode
     {
-        public string Code { get; private set; }
-        private bool Illegal { get; set; }
-        public int LineLength { get; private set; }
-        public string LineNumber { get; private set; }
-        public string Bytes { get; private set; }
-
-        private readonly int _numberOfBytes = 0;
         private readonly string _name;
+
+        private readonly int _numberOfBytes;
         private readonly string _prefix;
         private readonly string _suffix;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public OpCode(
             string code,
@@ -35,7 +30,7 @@ namespace C64BinaryToAssemblyConverter
         }
 
         /// <summary>
-        /// Copy constructor
+        ///     Copy constructor
         /// </summary>
         public OpCode(OpCode other)
         {
@@ -47,8 +42,14 @@ namespace C64BinaryToAssemblyConverter
             Illegal = other.Illegal;
         }
 
+        public string Code { get; }
+        private bool Illegal { get; }
+        public int LineLength { get; private set; }
+        public string LineNumber { get; private set; }
+        public string Bytes { get; private set; }
+
         /// <summary>
-        /// Get Code
+        ///     Get Code
         /// </summary>
         public void GetCode(
             ref string line,
@@ -58,17 +59,15 @@ namespace C64BinaryToAssemblyConverter
             int pc,
             ref Dictionary<string, string[]> dataStatements,
             ref List<string> illegalOpCodes
-            )
+        )
         {
             LineNumber = lineNumber.ToString("X4");
             string[] temp;
             if (_numberOfBytes == 1)
             {
                 if (Illegal)
-                {
                     //Add the programme counter location to the list of illegal opcodes found
                     illegalOpCodes.Add(pc.ToString("X4"));
-                }
                 Bytes = "$" + Code;
                 temp = new string[1];
                 temp[0] = "!byte $" + Code;
@@ -76,15 +75,12 @@ namespace C64BinaryToAssemblyConverter
                 line += "          " + _name;
                 filePosition += 1;
             }
+
             if (_numberOfBytes == 2)
             {
                 if (filePosition + 1 < bytes.Length)
                 {
-
-                    if (Illegal)
-                    {
-                        illegalOpCodes.Add(pc.ToString("X4"));
-                    }
+                    if (Illegal) illegalOpCodes.Add(pc.ToString("X4"));
                     Bytes = "$" + Code + ", $" + bytes[filePosition + 1].ToString("X2");
                     temp = new string[2];
                     temp[0] = "!byte $" + Code;
@@ -97,7 +93,7 @@ namespace C64BinaryToAssemblyConverter
                         _name.Contains("BNE") || _name.Contains("BPL") ||
                         _name.Contains("BVC") || _name.Contains("BVS"))
                     {
-                        sbyte s = unchecked((sbyte)bytes[filePosition + 1]);
+                        var s = unchecked((sbyte)bytes[filePosition + 1]);
                         s += 2;
                         line += "       " + _name + " " + _prefix + (pc + s).ToString("X4");
                     }
@@ -106,16 +102,16 @@ namespace C64BinaryToAssemblyConverter
                         line += "       " + _name + " " + _prefix + bytes[filePosition + 1].ToString("X2") + _suffix;
                     }
                 }
+
                 filePosition += 2;
             }
-            else if (_numberOfBytes == 3) {
+            else if (_numberOfBytes == 3)
+            {
                 if (filePosition + 2 < bytes.Length)
                 {
-                    if (Illegal)
-                    {
-                        illegalOpCodes.Add(pc.ToString("X4"));
-                    }
-                    Bytes = "$" + Code + ", $" + bytes[filePosition + 1].ToString("X2") + ", $" + bytes[filePosition + 2].ToString("X2");
+                    if (Illegal) illegalOpCodes.Add(pc.ToString("X4"));
+                    Bytes = "$" + Code + ", $" + bytes[filePosition + 1].ToString("X2") + ", $" +
+                            bytes[filePosition + 2].ToString("X2");
                     temp = new string[3];
                     temp[0] = "!byte $" + Code;
                     temp[1] = "!byte $" + bytes[filePosition + 1].ToString("X2");
@@ -123,16 +119,19 @@ namespace C64BinaryToAssemblyConverter
                     dataStatements.Add(pc.ToString("X4"), temp);
 
                     line += " " + bytes[filePosition + 1].ToString("X2") + " " + bytes[filePosition + 2].ToString("X2");
-                    line += "    " + _name + " " + _prefix + bytes[filePosition + 2].ToString("X2") + bytes[filePosition + 1].ToString("X2") + _suffix;
+                    line += "    " + _name + " " + _prefix + bytes[filePosition + 2].ToString("X2") +
+                            bytes[filePosition + 1].ToString("X2") + _suffix;
                 }
+
                 filePosition += 3;
             }
+
             LineLength = line.Length;
         }
     }
 
     /// <summary>
-    /// Populate OpCode List
+    ///     Populate OpCode List
     /// </summary>
     public static class PopulateOpCodeList
     {
