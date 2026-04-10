@@ -75,8 +75,8 @@ namespace C64BinaryToAssemblyConverter
             ExportBytesAsBinaryMenuItem.Enabled = true;
             ExportBytesAsTextMenuItem.Enabled = true;
 
-            // TODO Update the Byte Viewer to include the memory locations
-            byteviewer.SetFile(openFileDialog.FileName, startAddress);
+            byteviewer.SetBytes(_data, startAddress);
+            
             FileLoaded.Text = openFileDialog.SafeFileName;
             FileLoaded.Left = Width / 2 - FileLoaded.Size.Width / 2 - 10;
 
