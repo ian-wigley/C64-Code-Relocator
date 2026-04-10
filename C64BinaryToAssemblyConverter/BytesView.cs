@@ -26,7 +26,7 @@ namespace C64BinaryToAssemblyConverter
         private int startLine;
         private int startAddress;
         
-        /// <summary>Initializes a new instance of the <see cref="T:System.ComponentModel.Design.BytesView" /> class.</summary>
+        /// <summary>Initializes a new instance of the class.</summary>
         public BytesView()
         {
             SuspendLayout();
@@ -41,210 +41,6 @@ namespace C64BinaryToAssemblyConverter
             realDisplayMode = DisplayMode.Hexdump;
             DoubleBuffered = true;
             SetStyle(ControlStyles.ResizeRedraw, true);
-        }
-
-        private static int AnalizeByteOrderMark(byte[] buffer, int index)
-        {
-            var c1_1 = (buffer[index] << 8) | buffer[index + 1];
-            var c1_2 = (buffer[index + 2] << 8) | buffer[index + 3];
-            return new int[13, 13]
-            {
-                {
-                    1,
-                    5,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1
-                },
-                {
-                    1,
-                    1,
-                    1,
-                    11,
-                    1,
-                    10,
-                    4,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1
-                },
-                {
-                    2,
-                    9,
-                    5,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2
-                },
-                {
-                    3,
-                    7,
-                    3,
-                    7,
-                    3,
-                    3,
-                    3,
-                    3,
-                    3,
-                    3,
-                    3,
-                    3,
-                    3
-                },
-                {
-                    14,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1
-                },
-                {
-                    1,
-                    6,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    3,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1
-                },
-                {
-                    1,
-                    8,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    2,
-                    1,
-                    1,
-                    1,
-                    1
-                },
-                {
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1
-                },
-                {
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1
-                },
-                {
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    13,
-                    1,
-                    1
-                },
-                {
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1
-                },
-                {
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    12
-                },
-                {
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1
-                }
-            }[GetEncodingIndex(c1_1), GetEncodingIndex(c1_2)];
         }
 
         private int CellToIndex(int column, int row)
@@ -317,7 +113,7 @@ namespace C64BinaryToAssemblyConverter
             }
 
             var hexdumpFont = HEXDUMP_FONT;
-            var brush = (Brush)new SolidBrush(ForeColor);
+            var brush = new SolidBrush(ForeColor);
             try
             {
                 g.DrawString(stringBuilder.ToString(), hexdumpFont, brush, 479f, 7 + line * 21);
@@ -364,128 +160,7 @@ namespace C64BinaryToAssemblyConverter
 
         private DisplayMode GetAutoDisplayMode()
         {
-            var num1 = 0;
-            var num2 = 0;
-            if (dataBuf == null || (dataBuf.Length >= 0 && dataBuf.Length < 8))
-                return DisplayMode.Hexdump;
-            switch (AnalizeByteOrderMark(dataBuf, 0))
-            {
-                case 2:
-                    return DisplayMode.Hexdump;
-                case 3:
-                    return DisplayMode.Unicode;
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                    return DisplayMode.Hexdump;
-                case 13:
-                case 14:
-                    return DisplayMode.Ansi;
-                default:
-                    var num3 = dataBuf.Length <= 1024 /*0x0400*/ ? dataBuf.Length / 2 : 512 /*0x0200*/;
-                    for (var index = 0; index < num3; ++index)
-                    {
-                        var c = (char)dataBuf[index];
-                        if (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c))
-                            ++num1;
-                    }
-
-                    for (var byteIndex = 0; byteIndex < num3; byteIndex += 2)
-                    {
-                        var chars = new char[1];
-                        Encoding.Unicode.GetChars(dataBuf, byteIndex, 2, chars, 0);
-                        if (CharIsPrintable(chars[0]))
-                            ++num2;
-                    }
-
-                    if (num2 * 100 / (num3 / 2) > 80 /*0x50*/)
-                        return DisplayMode.Unicode;
-                    return num1 * 100 / num3 > 80 /*0x50*/ ? DisplayMode.Ansi : DisplayMode.Hexdump;
-            }
-        }
-
-        /// <summary>Gets the bytes in the buffer.</summary>
-        /// <returns>The unsigned byte array reference.</returns>
-        public virtual byte[] GetBytes()
-        {
-            return dataBuf;
-        }
-
-        /// <summary>Gets the display mode for the control.</summary>
-        /// <returns>
-        ///     The display mode that this control uses. The returned value is defined in
-        ///     <see cref="T:System.ComponentModel.Design.DisplayMode" />.
-        /// </returns>
-        public virtual DisplayMode GetDisplayMode()
-        {
-            return displayMode;
-        }
-
-        private static int GetEncodingIndex(int c1)
-        {
-            switch (c1)
-            {
-                case 0:
-                    return 1;
-                case 60:
-                    return 6;
-                case 63 /*0x3F*/:
-                    return 8;
-                case 15360:
-                    return 5;
-                case 15423:
-                    return 9;
-                case 16128:
-                    return 7;
-                case 19567:
-                    return 11;
-                case 30829:
-                    return 10;
-                case 42900:
-                    return 12;
-                case 61371:
-                    return 4;
-                case 65279:
-                    return 2;
-                case 65534:
-                    return 3;
-                default:
-                    return 0;
-            }
-        }
-
-        private void InitAnsi()
-        {
-            var length = dataBuf.Length;
-            var lpWideCharStr = new char[length + 1];
-//            int wideChar =
-//                System.Design.NativeMethods.MultiByteToWideChar(0, 0, this.dataBuf, length, lpWideCharStr, length);
-//            lpWideCharStr[wideChar] = char.MinValue;
-//            for (int index = 0; index < wideChar; ++index)
-            // {
-            //     if (lpWideCharStr[index] == char.MinValue)
-            //         lpWideCharStr[index] = '\v';
-            // }
-            //
-            // this.edit.Text = new string(lpWideCharStr);
-        }
-
-        private void InitUnicode()
-        {
-            var chars = new char[dataBuf.Length / 2 + 1];
-            Encoding.Unicode.GetChars(dataBuf, 0, dataBuf.Length, chars, 0);
-            for (var index = 0; index < chars.Length; ++index)
-                if (chars[index] == char.MinValue)
-                    chars[index] = '\v';
-
-            chars[chars.Length - 1] = char.MinValue;
-            edit.Text = new string(chars);
+            return DisplayMode.Hexdump;
         }
 
         private void InitUI()
@@ -616,8 +291,9 @@ namespace C64BinaryToAssemblyConverter
         /// <summary>Sets the byte array to display in the viewer.</summary>
         /// <param name="bytes">The byte array to display. </param>
         /// <exception cref="T:System.ArgumentNullException">The specified byte array is <see langword="null" />. </exception>
-        public virtual void SetBytes(byte[] bytes)
+        public void SetBytes(byte[] bytes, int startingAddress)
         {
+            startAddress = startingAddress;
             if (bytes == null)
             {
                 throw new ArgumentNullException(nameof(bytes));
@@ -635,18 +311,10 @@ namespace C64BinaryToAssemblyConverter
 
         /// <summary>Sets the current display mode.</summary>
         /// <param name="mode">The display mode to set. </param>
-        /// <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">
-        ///     The specified display mode is not from the
-        ///     <see cref="T:System.ComponentModel.Design.DisplayMode" /> enumeration.
-        /// </exception>
         public virtual void SetDisplayMode(DisplayMode mode)
         {
-            //this.displayMode = System.Windows.Forms.ClientUtils.IsEnumValid((Enum)mode, (int)mode, 1, 4)
-            //    ? mode
-            //     : throw new InvalidEnumArgumentException(nameof(mode), (int)mode, typeof(DisplayMode));
-
             displayMode = mode;
-            realDisplayMode = mode == DisplayMode.Auto ? GetAutoDisplayMode() : mode;
+            realDisplayMode = mode == DisplayMode.Auto ? DisplayMode.Hexdump : mode;
             switch (realDisplayMode)
             {
                 case DisplayMode.Hexdump:
@@ -669,43 +337,6 @@ namespace C64BinaryToAssemblyConverter
 
                     ResumeLayout();
                     break;
-                case DisplayMode.Ansi:
-                    InitAnsi();
-                    SuspendLayout();
-                    edit.Show();
-                    scrollBar.Hide();
-                    ResumeLayout();
-                    Invalidate();
-                    break;
-                case DisplayMode.Unicode:
-                    InitUnicode();
-                    SuspendLayout();
-                    edit.Show();
-                    scrollBar.Hide();
-                    ResumeLayout();
-                    Invalidate();
-                    break;
-            }
-        }
-
-        /// <summary>Sets the file to display in the viewer.</summary>
-        /// <param name="path">The file path to load from. </param>
-        public virtual void SetFile(string path, int startLocation)
-        {
-            startAddress = startLocation;
-            var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
-            try
-            {
-                var length = (int)fileStream.Length;
-                var numArray = new byte[length + 1];
-                fileStream.Read(numArray, 0, length);
-                SetBytes(numArray);
-                fileStream.Close();
-            }
-            catch
-            {
-                fileStream.Close();
-                throw;
             }
         }
     }
