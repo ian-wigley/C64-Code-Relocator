@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.Design;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
@@ -25,16 +25,10 @@ namespace C64BinaryToAssemblyConverter
         private int SCROLLBAR_WIDTH;
         private int startLine;
         private int startAddress;
-        
-        /// <summary>Initializes a new instance of the class.</summary>
+
         public BytesView()
         {
             SuspendLayout();
-            CellBorderStyle = TableLayoutPanelCellBorderStyle.Inset;
-            ColumnCount = 1;
-            ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
-            RowCount = 1;
-            RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
             InitUI();
             ResumeLayout();
             displayMode = DisplayMode.Hexdump;
@@ -63,7 +57,7 @@ namespace C64BinaryToAssemblyConverter
         {
             var addressFont = ADDRESS_FONT;
             var s = ((startLine + line) * columnCount).ToString("X4",
-                CultureInfo.InvariantCulture) + " " + 
+                CultureInfo.InvariantCulture) + " " +
                     (startAddress + ((startLine + line) * columnCount)).ToString("X4");
             Brush brush = new SolidBrush(ForeColor);
             try
@@ -93,7 +87,7 @@ namespace C64BinaryToAssemblyConverter
         private static bool CharIsPrintable(char c)
         {
             var unicodeCategory = char.GetUnicodeCategory(c);
-            return unicodeCategory != UnicodeCategory.Control || 
+            return unicodeCategory != UnicodeCategory.Control ||
                    unicodeCategory == UnicodeCategory.Format ||
                    unicodeCategory == UnicodeCategory.LineSeparator ||
                    unicodeCategory == UnicodeCategory.ParagraphSeparator ||
@@ -116,7 +110,18 @@ namespace C64BinaryToAssemblyConverter
             var brush = new SolidBrush(ForeColor);
             try
             {
-                g.DrawString(stringBuilder.ToString(), hexdumpFont, brush, 479f, 7 + line * 21);
+                g.DrawString(stringBuilder.ToString(), hexdumpFont, brush, 479f - 100, 7 + line * 21);
+
+                byte[] bitmapData =
+                {
+                    lineBuffer[0],lineBuffer[1],lineBuffer[2],lineBuffer[3],lineBuffer[4],lineBuffer[5],lineBuffer[6],lineBuffer[7],
+                    lineBuffer[0],lineBuffer[1],lineBuffer[2],lineBuffer[3],lineBuffer[4],lineBuffer[5],lineBuffer[6],lineBuffer[7]
+                    // 0x30, 0x48, 0x48, 0xFC, 0xC4, 0xC4, 0xC4, 0x00,
+                    // 0x30, 0x48, 0x48, 0xFC, 0xC4, 0xC4, 0xC4, 0x00
+                };
+                Bitmap bmp = CreateBitmapFromBytes(bitmapData, 8, 8);
+                // Bitmap bmp = CreateBitmapFromBytes(lineBuffer, 8, 16);
+                g.DrawImage(bmp, 479f, 7 + line * 21);
             }
             finally
             {
@@ -158,10 +163,10 @@ namespace C64BinaryToAssemblyConverter
             }
         }
 
-        private DisplayMode GetAutoDisplayMode()
-        {
-            return DisplayMode.Hexdump;
-        }
+        //private DisplayMode GetAutoDisplayMode()
+        //{
+        //    return DisplayMode.Hexdump;
+        //}
 
         private void InitUI()
         {
@@ -294,17 +299,8 @@ namespace C64BinaryToAssemblyConverter
         public void SetBytes(byte[] bytes, int startingAddress)
         {
             startAddress = startingAddress;
-            if (bytes == null)
-            {
-                throw new ArgumentNullException(nameof(bytes));
-            }
-
-            if (dataBuf != null)
-            {
-                dataBuf = null;
-            }
-
-            dataBuf = bytes;
+            dataBuf = null;
+            dataBuf = bytes ?? throw new ArgumentNullException(nameof(bytes));
             InitState();
             SetDisplayMode(displayMode);
         }
@@ -338,6 +334,36 @@ namespace C64BinaryToAssemblyConverter
                     ResumeLayout();
                     break;
             }
+        }
+
+        private Bitmap CreateBitmapFromBytes(byte[] data, int width, int height)
+        {
+            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format1bppIndexed);
+
+            // Lock the bitmap's bits
+            BitmapData bmpData = bmp.LockBits(
+                new Rectangle(0, 0, width, height),
+                ImageLockMode.WriteOnly,
+                PixelFormat.Format1bppIndexed);
+
+            int stride = bmpData.Stride;
+            IntPtr ptr = bmpData.Scan0;
+
+            byte[] paddedData = new byte[stride * height];
+
+            for (int y = 0; y < height; y++)
+            {
+                if (y * stride <= data.Length)
+                {
+                    paddedData[y * stride] = data[y];
+                }
+            }
+
+            System.Runtime.InteropServices.Marshal.Copy(paddedData, 0, ptr, paddedData.Length);
+
+            bmp.UnlockBits(bmpData);
+
+            return bmp;
         }
     }
 }
