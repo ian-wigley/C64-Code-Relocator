@@ -30,7 +30,6 @@ namespace C64BinaryToAssemblyConverter
         private char[] _startAddress;
         private int _userDefinedStartAddress;
 
-
         public C64BinaryToAssemblyConverter()
         {
             InitializeComponent();
@@ -43,8 +42,10 @@ namespace C64BinaryToAssemblyConverter
             ExportBytesAsBinaryMenuItem.Enabled = false;
             ExportBytesAsTextMenuItem.Enabled = false;
             PopulateOpCodeList.Init();
-            _assemblyCreator = new AssemblyCreator();
-            _assemblyCreator.xmlLoader = xmlLoader;
+            _assemblyCreator = new AssemblyCreator
+            {
+                xmlLoader = xmlLoader
+            };
             xmlLoader.LoadSettings();
         }
 
@@ -387,13 +388,13 @@ namespace C64BinaryToAssemblyConverter
                 if (CheckStartOfTheSelectionText(text))
                 {
                     var opCode = codeList[index];
+                    var opCodeBytes = string.Concat(opCode.Bytes.Where(c => !char.IsWhiteSpace(c)));
 
-                    if (count == 0) line = "!byte " + opCode.Bytes;
-                    if (count > 0 && count < numOfBytesPerline) line += "," + opCode.Bytes;
+                    if (count == 0) line = "!byte " + opCodeBytes;
+                    if (count > 0 && count < numOfBytesPerline) line += "," + opCodeBytes;
                     if (count == numOfBytesPerline - 1) dataStatements.Add(line);
                     count = (count + 1) % numOfBytesPerline;
 
-                    //dataStatements.Add("!byte " + opCode.Bytes);
                     // Does the selected text length need increasing ?
                     if (opCode.LineLength != text.Length)
                         DisAssemblyView.SelectionLength += opCode.LineLength - text.Length;
