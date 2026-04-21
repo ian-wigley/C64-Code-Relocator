@@ -21,7 +21,7 @@ The resulting code can then be saved to disk & load and compiled with your favou
 If Illegal opcodes are found during the add labels processing, you will be prompted if you would like them automatically converting to data statements an appending into the code.
 
 
-The reason for creating this tool... some 40 something years after learning to write 6502 & a few C64 demo's i wanted to view the code.
+The reason for creating this tool... some 40 something years after learning to write a few C64 assembly demo's/intros I wanted to view the code.
 
 After trying to save Commodore 64 dis-assembled code & manually adding labels by hand, i quickly became bored !
 So this seemed like a much better idea than adding labels by hand !!
