@@ -3,6 +3,7 @@ using System.ComponentModel.Design;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
@@ -12,7 +13,7 @@ namespace C64BinaryToAssemblyConverter
     {
         private static readonly Font ADDRESS_FONT = new Font("Microsoft Sans Serif", 8f);
         private static readonly Font HEXDUMP_FONT = new Font("Courier New", 8f);
-        private readonly int columnCount = 8; //16 /*0x10*/;
+        private readonly int columnCount = 8;
         private byte[] dataBuf;
         private int displayLinesCount;
         private DisplayMode displayMode;
@@ -42,9 +43,9 @@ namespace C64BinaryToAssemblyConverter
             return row * columnCount + column;
         }
 
-        private byte[] ComposeLineBuffer(int startLine, int line)
+        private byte[] ComposeLineBuffer(int startingLine, int line)
         {
-            var num = startLine * columnCount;
+            var num = startingLine * columnCount;
             var numArray = num + (line + 1) * columnCount <= dataBuf.Length
                 ? new byte[columnCount]
                 : new byte[dataBuf.Length % columnCount];
@@ -53,12 +54,12 @@ namespace C64BinaryToAssemblyConverter
             return numArray;
         }
 
-        private void DrawAddress(Graphics g, int startLine, int line)
+        private void DrawAddress(Graphics g, int startingLine, int line)
         {
             var addressFont = ADDRESS_FONT;
-            var s = ((startLine + line) * columnCount).ToString("X4",
+            var s = ((startingLine + line) * columnCount).ToString("X4",
                 CultureInfo.InvariantCulture) + " " +
-                    (startAddress + ((startLine + line) * columnCount)).ToString("X4");
+                    (startAddress + ((startingLine + line) * columnCount)).ToString("X4");
             Brush brush = new SolidBrush(ForeColor);
             try
             {
@@ -74,7 +75,7 @@ namespace C64BinaryToAssemblyConverter
         {
             using (Brush brush = new SolidBrush(SystemColors.ControlLightLight))
             {
-                g.FillRectangle(brush, new Rectangle(74, 5, 538, rowCount * 21));
+                //g.FillRectangle(brush, new Rectangle(74, 5, 538, rowCount * 21));
             }
 
             using (var pen = new Pen(SystemColors.ControlDark))
@@ -97,13 +98,10 @@ namespace C64BinaryToAssemblyConverter
         private void DrawDump(Graphics g, byte[] lineBuffer, int line)
         {
             var stringBuilder = new StringBuilder(lineBuffer.Length);
-            for (var index = 0; index < lineBuffer.Length; ++index)
+            foreach (var t in lineBuffer)
             {
-                var c = Convert.ToChar(lineBuffer[index]);
-                if (CharIsPrintable(c))
-                    stringBuilder.Append(c);
-                else
-                    stringBuilder.Append('.');
+                var c = Convert.ToChar(t);
+                stringBuilder.Append(CharIsPrintable(c) ? c : '.');
             }
 
             var hexdumpFont = HEXDUMP_FONT;
@@ -111,17 +109,6 @@ namespace C64BinaryToAssemblyConverter
             try
             {
                 g.DrawString(stringBuilder.ToString(), hexdumpFont, brush, 479f - 100, 7 + line * 21);
-
-                byte[] bitmapData =
-                {
-                    lineBuffer[0],lineBuffer[1],lineBuffer[2],lineBuffer[3],lineBuffer[4],lineBuffer[5],lineBuffer[6],lineBuffer[7],
-                    lineBuffer[0],lineBuffer[1],lineBuffer[2],lineBuffer[3],lineBuffer[4],lineBuffer[5],lineBuffer[6],lineBuffer[7]
-                    // 0x30, 0x48, 0x48, 0xFC, 0xC4, 0xC4, 0xC4, 0x00,
-                    // 0x30, 0x48, 0x48, 0xFC, 0xC4, 0xC4, 0xC4, 0x00
-                };
-                Bitmap bmp = CreateBitmapFromBytes(bitmapData, 8, 8);
-                // Bitmap bmp = CreateBitmapFromBytes(lineBuffer, 8, 16);
-                g.DrawImage(bmp, 479f, 7 + line * 21);
             }
             finally
             {
@@ -152,21 +139,28 @@ namespace C64BinaryToAssemblyConverter
             }
         }
 
-        private void DrawLines(Graphics g, int startLine, int linesCount)
+        private void DrawLines(Graphics g, int startingLine, int linesCount)
         {
             for (var line = 0; line < linesCount; ++line)
             {
-                var lineBuffer = ComposeLineBuffer(startLine, line);
-                DrawAddress(g, startLine, line);
+                var lineBuffer = ComposeLineBuffer(startingLine, line);
+                DrawAddress(g, startingLine, line);
                 DrawHex(g, lineBuffer, line);
                 DrawDump(g, lineBuffer, line);
+                DrawChar(g, lineBuffer, line);
             }
         }
 
-        //private DisplayMode GetAutoDisplayMode()
-        //{
-        //    return DisplayMode.Hexdump;
-        //}
+        private void DrawChar(Graphics g, byte[] lineBuffers, int line)
+        {
+            if (lineBuffers.Length != 8) return;
+            var bmp = CreateBitmapFromBytes(lineBuffers, 8, 8);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            const int scale = 2;
+            g.DrawImage(bmp, new Rectangle(500, 7 + line * 21, 8 * scale, 8 * scale));
+        }
 
         private void InitUI()
         {
@@ -193,6 +187,7 @@ namespace C64BinaryToAssemblyConverter
             // edit.Visible = false;
             Controls.Add(scrollBar, 0, 0);
             // Controls.Add((Control)edit, 0, 0);
+            MouseWheel += MouseWheelEvent;
         }
 
         private void InitState()
@@ -281,6 +276,12 @@ namespace C64BinaryToAssemblyConverter
                 : linesCount - startLine;
         }
 
+        private void MouseWheelEvent(object sender, MouseEventArgs e)
+        {
+            if (dataBuf == null) return;
+            scrollBar.Select();
+        }   
+        
         /// <summary>
         ///     Handles the <see cref="E:System.Windows.Forms.ScrollBar.ValueChanged" /> event on the
         ///     <see cref="T:System.ComponentModel.Design.BytesView" /> control's <see cref="T:System.Windows.Forms.ScrollBar" />.
@@ -336,33 +337,25 @@ namespace C64BinaryToAssemblyConverter
             }
         }
 
-        private Bitmap CreateBitmapFromBytes(byte[] data, int width, int height)
+        private static Bitmap CreateBitmapFromBytes(byte[] data, int width, int height)
         {
-            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format1bppIndexed);
+            var bmp = new Bitmap(width, height, PixelFormat.Format1bppIndexed);
 
             // Lock the bitmap's bits
-            BitmapData bmpData = bmp.LockBits(
+            var bmpData = bmp.LockBits(
                 new Rectangle(0, 0, width, height),
                 ImageLockMode.WriteOnly,
                 PixelFormat.Format1bppIndexed);
 
-            int stride = bmpData.Stride;
-            IntPtr ptr = bmpData.Scan0;
+            var stride = bmpData.Stride;
+            var ptr = bmpData.Scan0;
 
-            byte[] paddedData = new byte[stride * height];
+            var paddedData = new byte[stride * height];
 
-            for (int y = 0; y < height; y++)
-            {
-                if (y * stride <= data.Length)
-                {
-                    paddedData[y * stride] = data[y];
-                }
-            }
+            for (var y = 0; y < height; y++) paddedData[y * stride] = data[y];
 
-            System.Runtime.InteropServices.Marshal.Copy(paddedData, 0, ptr, paddedData.Length);
-
+            Marshal.Copy(paddedData, 0, ptr, paddedData.Length);
             bmp.UnlockBits(bmpData);
-
             return bmp;
         }
     }
