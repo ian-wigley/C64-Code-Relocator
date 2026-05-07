@@ -29,6 +29,7 @@ namespace C64BinaryToAssemblyConverter
         private List<string> _lineNumbers = new List<string>();
         private char[] _startAddress;
         private int _userDefinedStartAddress;
+        private string _userFindValue = "";
 
         public C64BinaryToAssemblyConverter()
         {
@@ -300,8 +301,10 @@ namespace C64BinaryToAssemblyConverter
         {
             var ms = new MemoryLocationsToConvertSelector(_startAddress, _endAddress);
             if (ms.ShowDialog() != DialogResult.OK) return;
+            // Int.tryparse
             var start = int.Parse(ms.GetSelectedMemStartLocation, NumberStyles.HexNumber) - _userDefinedStartAddress;
             var end = int.Parse(ms.GetSelectedMemEndLocation, NumberStyles.HexNumber) - _userDefinedStartAddress;
+
             var saveFileDialog = SaveFileDialogue("All files (*.*)|*.*|Binary files (*.bin)|*.bin");
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
             if (_data.Length <= 0 || end > _data.Length) return;
@@ -492,7 +495,10 @@ namespace C64BinaryToAssemblyConverter
                 findForm.Controls.Add(txtFind);
                 findForm.Controls.Add(btnFind);
 
-                if (findForm.ShowDialog(this) == DialogResult.OK) FindText(txtFind.Text);
+                if (findForm.ShowDialog(this) == DialogResult.OK) {
+                    _userFindValue = txtFind.Text;
+                    FindText(txtFind.Text); 
+                }
             }
         }
 
@@ -520,6 +526,7 @@ namespace C64BinaryToAssemblyConverter
             else
             {
                 MessageBox.Show(@"Text not found.", @"Find");
+                _userFindValue = "";
             }
         }
 
@@ -531,6 +538,11 @@ namespace C64BinaryToAssemblyConverter
             if (keyData == (Keys.Control | Keys.F))
             {
                 ShowFindDialog();
+                return true;
+            }
+            if (keyData == (Keys.F3) && _userFindValue != "")
+            {
+                FindText(_userFindValue);
                 return true;
             }
 
