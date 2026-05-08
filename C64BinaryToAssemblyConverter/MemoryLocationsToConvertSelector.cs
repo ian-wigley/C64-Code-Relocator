@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace C64BinaryToAssemblyConverter
@@ -12,7 +13,7 @@ namespace C64BinaryToAssemblyConverter
         private readonly char[] endAddressValue;
         private readonly int startAddress;
         private readonly char[] startAddressValue;
-
+        private readonly Regex regex = new Regex(@"[0-9A-Fa-f]{1}");
 
         public MemoryLocationsToConvertSelector(char[] startAddressValues, char[] endAddressValues)
         {
@@ -101,13 +102,7 @@ namespace C64BinaryToAssemblyConverter
             int.TryParse(comboBox4.Text, NumberStyles.HexNumber, null, out var one);
             InvalidStartAddress(one, comboBox4, startAddressValue[3].ToString());
         }
-
-        private void InvalidStartAddress(int value, ComboBox comboBox, string startAddresses)
-        {
-            if (int.Parse(GetSelectedMemStartLocation, NumberStyles.HexNumber) < startAddress)
-                comboBox.Text = startAddresses;
-        }
-
+        
         /// <summary>
         ///     Selected End address Index Change event handler
         /// </summary>
@@ -135,11 +130,29 @@ namespace C64BinaryToAssemblyConverter
             InvalidEndAddress(four, comboBox8, endAddressValue[3].ToString());
         }
 
+        private void InvalidStartAddress(int value, ComboBox comboBox, string startAddresses)
+        {
+            if (int.Parse(GetSelectedMemStartLocation, NumberStyles.HexNumber) < startAddress || 
+                int.Parse(GetSelectedMemStartLocation, NumberStyles.HexNumber) > endAddress)
+                comboBox.Text = startAddresses;
+        }
+
         private void InvalidEndAddress(int value, ComboBox comboBox, string endAddresses)
         {
-            if (int.Parse(GetSelectedMemEndLocation, NumberStyles.HexNumber) > endAddress)
-                //if (value > int.Parse(endAddresses, System.Globalization.NumberStyles.HexNumber))
+            if (int.Parse(GetSelectedMemEndLocation, NumberStyles.HexNumber) > endAddress ||
+                int.Parse(GetSelectedMemEndLocation, NumberStyles.HexNumber) < startAddress)
                 comboBox.Text = endAddresses;
+        }
+        
+        private void SelectedStartValueValidatingKeyPress(object sender, KeyPressEventArgs e)
+        {
+            var combo = sender as ComboBox;
+            if (combo == null) return;
+            if (regex.IsMatch(e.KeyChar.ToString())) {
+                //comboBox1.Text = e.KeyChar.ToString().ToUpper();
+                combo.Text = e.KeyChar.ToString().ToUpper();
+            }
+            e.Handled = true;
         }
     }
 }
