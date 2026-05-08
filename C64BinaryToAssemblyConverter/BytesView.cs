@@ -11,55 +11,55 @@ namespace C64BinaryToAssemblyConverter
 {
     public class BytesView : TableLayoutPanel
     {
-        private static readonly Font ADDRESS_FONT = new Font("Microsoft Sans Serif", 8f);
-        private static readonly Font HEXDUMP_FONT = new Font("Courier New", 8f);
-        private readonly int columnCount = 8;
-        private byte[] dataBuf;
-        private int displayLinesCount;
-        private DisplayMode displayMode;
-        private TextBox edit;
-        private int linesCount;
-        private DisplayMode realDisplayMode;
-        private int rowCount = 25;
-        private VScrollBar scrollBar;
-        private int SCROLLBAR_HEIGHT;
-        private int SCROLLBAR_WIDTH;
-        private int startLine;
-        private int startAddress;
+        private static readonly Font AddressFont = new Font("Microsoft Sans Serif", 8f);
+        private static readonly Font HexdumpFont = new Font("Courier New", 8f);
+        private readonly int _columnCount = 8;
+        private byte[] _dataBuf;
+        private int _displayLinesCount;
+        private DisplayMode _displayMode;
+        private TextBox _edit;
+        private int _linesCount;
+        private DisplayMode _realDisplayMode;
+        private int _rowCount = 25;
+        private VScrollBar _scrollBar;
+        private int _scrollbarHeight;
+        private int _scrollbarWidth;
+        private int _startLine;
+        private int _startAddress;
 
         public BytesView()
         {
             SuspendLayout();
             InitUI();
             ResumeLayout();
-            displayMode = DisplayMode.Hexdump;
-            realDisplayMode = DisplayMode.Hexdump;
+            _displayMode = DisplayMode.Hexdump;
+            _realDisplayMode = DisplayMode.Hexdump;
             DoubleBuffered = true;
             SetStyle(ControlStyles.ResizeRedraw, true);
         }
 
         private int CellToIndex(int column, int row)
         {
-            return row * columnCount + column;
+            return row * _columnCount + column;
         }
 
         private byte[] ComposeLineBuffer(int startingLine, int line)
         {
-            var num = startingLine * columnCount;
-            var numArray = num + (line + 1) * columnCount <= dataBuf.Length
-                ? new byte[columnCount]
-                : new byte[dataBuf.Length % columnCount];
+            var num = startingLine * _columnCount;
+            var numArray = num + (line + 1) * _columnCount <= _dataBuf.Length
+                ? new byte[_columnCount]
+                : new byte[_dataBuf.Length % _columnCount];
             for (var column = 0; column < numArray.Length; ++column)
-                numArray[column] = dataBuf[num + CellToIndex(column, line)];
+                numArray[column] = _dataBuf[num + CellToIndex(column, line)];
             return numArray;
         }
 
         private void DrawAddress(Graphics g, int startingLine, int line)
         {
-            var addressFont = ADDRESS_FONT;
-            var s = ((startingLine + line) * columnCount).ToString("X4",
+            var addressFont = AddressFont;
+            var s = ((startingLine + line) * _columnCount).ToString("X4",
                 CultureInfo.InvariantCulture) + " " +
-                    (startAddress + ((startingLine + line) * columnCount)).ToString("X4");
+                    (_startAddress + ((startingLine + line) * _columnCount)).ToString("X4");
             Brush brush = new SolidBrush(ForeColor);
             try
             {
@@ -73,26 +73,22 @@ namespace C64BinaryToAssemblyConverter
 
         private void DrawClient(Graphics g)
         {
-            using (Brush brush = new SolidBrush(SystemColors.ControlLightLight))
-            {
-                //g.FillRectangle(brush, new Rectangle(74, 5, 538, rowCount * 21));
-            }
+            // using (Brush brush = new SolidBrush(SystemColors.ControlLightLight))
+            // {
+            //     //g.FillRectangle(brush, new Rectangle(74, 5, 538, rowCount * 21));
+            // }
 
             using (var pen = new Pen(SystemColors.ControlDark))
             {
-                g.DrawRectangle(pen, new Rectangle(74, 5, 537, rowCount * 21 - 1));
-                g.DrawLine(pen, 474, 5, 474, 5 + rowCount * 21 - 1);
+                g.DrawRectangle(pen, new Rectangle(74, 5, 537, _rowCount * 21 - 1));
+                g.DrawLine(pen, 474, 5, 474, 5 + _rowCount * 21 - 1);
             }
         }
 
         private static bool CharIsPrintable(char c)
         {
             var unicodeCategory = char.GetUnicodeCategory(c);
-            return unicodeCategory != UnicodeCategory.Control ||
-                   unicodeCategory == UnicodeCategory.Format ||
-                   unicodeCategory == UnicodeCategory.LineSeparator ||
-                   unicodeCategory == UnicodeCategory.ParagraphSeparator ||
-                   unicodeCategory == UnicodeCategory.OtherNotAssigned;
+            return unicodeCategory != UnicodeCategory.Control;
         }
 
         private void DrawDump(Graphics g, byte[] lineBuffer, int line)
@@ -104,7 +100,7 @@ namespace C64BinaryToAssemblyConverter
                 stringBuilder.Append(CharIsPrintable(c) ? c : '.');
             }
 
-            var hexdumpFont = HEXDUMP_FONT;
+            var hexdumpFont = HexdumpFont;
             var brush = new SolidBrush(ForeColor);
             try
             {
@@ -118,13 +114,13 @@ namespace C64BinaryToAssemblyConverter
 
         private void DrawHex(Graphics g, byte[] lineBuffer, int line)
         {
-            var hexdumpFont = HEXDUMP_FONT;
+            var hexdumpFont = HexdumpFont;
             var stringBuilder = new StringBuilder(lineBuffer.Length * 3 + 1);
             for (var index = 0; index < lineBuffer.Length; ++index)
             {
                 stringBuilder.Append(lineBuffer[index].ToString("X2", CultureInfo.InvariantCulture));
                 stringBuilder.Append(" ");
-                if (index == columnCount / 2 - 1)
+                if (index == _columnCount / 2 - 1)
                     stringBuilder.Append(" ");
             }
 
@@ -164,16 +160,16 @@ namespace C64BinaryToAssemblyConverter
 
         private void InitUI()
         {
-            SCROLLBAR_HEIGHT = SystemInformation.HorizontalScrollBarHeight;
-            SCROLLBAR_WIDTH = SystemInformation.VerticalScrollBarWidth;
-            Size = new Size(612 + SCROLLBAR_WIDTH + 2 + 3, 10 + rowCount * 21);
-            scrollBar = new VScrollBar();
-            scrollBar.ValueChanged += ScrollChanged;
-            scrollBar.TabStop = true;
-            scrollBar.TabIndex = 0;
-            scrollBar.Dock = DockStyle.Right;
-            scrollBar.Visible = true; // false;
-            edit = new TextBox();
+            _scrollbarHeight = SystemInformation.HorizontalScrollBarHeight;
+            _scrollbarWidth = SystemInformation.VerticalScrollBarWidth;
+            Size = new Size(612 + _scrollbarWidth + 2 + 3, 10 + _rowCount * 21);
+            _scrollBar = new VScrollBar();
+            _scrollBar.ValueChanged += ScrollChanged;
+            _scrollBar.TabStop = true;
+            _scrollBar.TabIndex = 0;
+            _scrollBar.Dock = DockStyle.Right;
+            _scrollBar.Visible = true; // false;
+            _edit = new TextBox();
             // edit.AutoSize = false;
             // edit.BorderStyle = BorderStyle.None;
             // edit.Multiline = true;
@@ -185,35 +181,35 @@ namespace C64BinaryToAssemblyConverter
             // edit.Margin = Padding.Empty;
             // edit.WordWrap = false;
             // edit.Visible = false;
-            Controls.Add(scrollBar, 0, 0);
+            Controls.Add(_scrollBar, 0, 0);
             // Controls.Add((Control)edit, 0, 0);
             MouseWheel += MouseWheelEvent;
         }
 
         private void InitState()
         {
-            linesCount = (dataBuf.Length + columnCount - 1) / columnCount;
-            startLine = 0;
-            if (linesCount > rowCount)
+            _linesCount = (_dataBuf.Length + _columnCount - 1) / _columnCount;
+            _startLine = 0;
+            if (_linesCount > _rowCount)
             {
-                displayLinesCount = rowCount;
-                scrollBar.Hide();
-                scrollBar.Maximum = linesCount - 1;
-                scrollBar.LargeChange = rowCount;
-                scrollBar.Show();
-                scrollBar.Enabled = true;
+                _displayLinesCount = _rowCount;
+                _scrollBar.Hide();
+                _scrollBar.Maximum = _linesCount - 1;
+                _scrollBar.LargeChange = _rowCount;
+                _scrollBar.Show();
+                _scrollBar.Enabled = true;
             }
             else
             {
-                displayLinesCount = linesCount;
-                scrollBar.Hide();
-                scrollBar.Maximum = rowCount;
-                scrollBar.LargeChange = rowCount;
-                scrollBar.Show();
-                scrollBar.Enabled = false;
+                _displayLinesCount = _linesCount;
+                _scrollBar.Hide();
+                _scrollBar.Maximum = _rowCount;
+                _scrollBar.LargeChange = _rowCount;
+                _scrollBar.Show();
+                _scrollBar.Enabled = false;
             }
 
-            scrollBar.Select();
+            _scrollBar.Select();
             Invalidate();
         }
 
@@ -221,7 +217,7 @@ namespace C64BinaryToAssemblyConverter
         /// <param name="e">A <see cref="T:System.Windows.Forms.KeyEventArgs" /> that contains the event data.</param>
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            scrollBar.Select();
+            _scrollBar.Select();
         }
 
         /// <summary>Raises the <see cref="E:System.Windows.Forms.Control.Paint" /> event.</summary>
@@ -230,15 +226,15 @@ namespace C64BinaryToAssemblyConverter
         {
             base.OnPaint(e);
             var graphics = e.Graphics;
-            switch (realDisplayMode)
+            switch (_realDisplayMode)
             {
                 case DisplayMode.Hexdump:
                     SuspendLayout();
                     //edit.Hide();
-                    scrollBar.Show();
+                    _scrollBar.Show();
                     ResumeLayout();
                     DrawClient(graphics);
-                    DrawLines(graphics, startLine, displayLinesCount);
+                    DrawLines(graphics, _startLine, _displayLinesCount);
                     break;
             }
         }
@@ -249,37 +245,37 @@ namespace C64BinaryToAssemblyConverter
         {
             base.OnLayout(e);
             var num = (ClientSize.Height - 10) / 21;
-            if (num < 0 || num == rowCount)
+            if (num < 0 || num == _rowCount)
                 return;
-            rowCount = num;
+            _rowCount = num;
             if (Dock == DockStyle.None)
-                Size = new Size(612 + SCROLLBAR_WIDTH + 2 + 3, 10 + rowCount * 21);
-            if (scrollBar != null)
+                Size = new Size(612 + _scrollbarWidth + 2 + 3, 10 + _rowCount * 21);
+            if (_scrollBar != null)
             {
-                if (linesCount > rowCount)
+                if (_linesCount > _rowCount)
                 {
-                    scrollBar.Hide();
-                    scrollBar.Maximum = linesCount - 1;
-                    scrollBar.LargeChange = rowCount;
-                    scrollBar.Show();
-                    scrollBar.Enabled = true;
-                    scrollBar.Select();
+                    _scrollBar.Hide();
+                    _scrollBar.Maximum = _linesCount - 1;
+                    _scrollBar.LargeChange = _rowCount;
+                    _scrollBar.Show();
+                    _scrollBar.Enabled = true;
+                    _scrollBar.Select();
                 }
                 else
                 {
-                    scrollBar.Enabled = false;
+                    _scrollBar.Enabled = false;
                 }
             }
 
-            displayLinesCount = startLine + rowCount < linesCount
-                ? rowCount
-                : linesCount - startLine;
+            _displayLinesCount = _startLine + _rowCount < _linesCount
+                ? _rowCount
+                : _linesCount - _startLine;
         }
 
         private void MouseWheelEvent(object sender, MouseEventArgs e)
         {
-            if (dataBuf == null) return;
-            scrollBar.Select();
+            if (_dataBuf == null) return;
+            _scrollBar.Select();
         }   
         
         /// <summary>
@@ -290,7 +286,7 @@ namespace C64BinaryToAssemblyConverter
         /// <param name="e">A <see cref="T:System.EventArgs" /> that contains the event data. </param>
         protected virtual void ScrollChanged(object source, EventArgs e)
         {
-            startLine = scrollBar.Value;
+            _startLine = _scrollBar.Value;
             Invalidate();
         }
 
@@ -299,32 +295,32 @@ namespace C64BinaryToAssemblyConverter
         /// <exception cref="T:System.ArgumentNullException">The specified byte array is <see langword="null" />. </exception>
         public void SetBytes(byte[] bytes, int startingAddress)
         {
-            startAddress = startingAddress;
-            dataBuf = null;
-            dataBuf = bytes ?? throw new ArgumentNullException(nameof(bytes));
+            _startAddress = startingAddress;
+            _dataBuf = null;
+            _dataBuf = bytes ?? throw new ArgumentNullException(nameof(bytes));
             InitState();
-            SetDisplayMode(displayMode);
+            SetDisplayMode(_displayMode);
         }
 
         /// <summary>Sets the current display mode.</summary>
         /// <param name="mode">The display mode to set. </param>
         public virtual void SetDisplayMode(DisplayMode mode)
         {
-            displayMode = mode;
-            realDisplayMode = mode == DisplayMode.Auto ? DisplayMode.Hexdump : mode;
-            switch (realDisplayMode)
+            _displayMode = mode;
+            _realDisplayMode = mode == DisplayMode.Auto ? DisplayMode.Hexdump : mode;
+            switch (_realDisplayMode)
             {
                 case DisplayMode.Hexdump:
                     SuspendLayout();
-                    edit.Hide();
-                    if (linesCount > rowCount)
+                    _edit.Hide();
+                    if (_linesCount > _rowCount)
                     {
-                        if (!scrollBar.Visible)
+                        if (!_scrollBar.Visible)
                         {
-                            scrollBar.Show();
+                            _scrollBar.Show();
                             ResumeLayout();
-                            scrollBar.Invalidate();
-                            scrollBar.Select();
+                            _scrollBar.Invalidate();
+                            _scrollBar.Select();
                             break;
                         }
 
