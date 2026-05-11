@@ -81,26 +81,9 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void SelectedStartIndexChangedOne(object sender, EventArgs e)
         {
-            int.TryParse(comboBox1.Text, NumberStyles.HexNumber, null, out var one);
-            InvalidStartAddress(one, comboBox1, startAddressValue[0].ToString());
-        }
-
-        private void SelectedStartIndexChangedTwo(object sender, EventArgs e)
-        {
-            int.TryParse(comboBox2.Text, NumberStyles.HexNumber, null, out var one);
-            InvalidStartAddress(one, comboBox2, startAddressValue[1].ToString());
-        }
-
-        private void SelectedStartIndexChangedThree(object sender, EventArgs e)
-        {
-            int.TryParse(comboBox3.Text, NumberStyles.HexNumber, null, out var one);
-            InvalidStartAddress(one, comboBox3, startAddressValue[2].ToString());
-        }
-
-        private void SelectedStartIndexChangedFour(object sender, EventArgs e)
-        {
-            int.TryParse(comboBox4.Text, NumberStyles.HexNumber, null, out var one);
-            InvalidStartAddress(one, comboBox4, startAddressValue[3].ToString());
+            if (!(sender is ComboBox combo)) return;
+            int.TryParse(combo.Tag.ToString(), out int index);
+            InvalidStartAddress(combo, startAddressValue[index].ToString());
         }
         
         /// <summary>
@@ -108,36 +91,19 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void SelectedEndIndexChangedOne(object sender, EventArgs e)
         {
-            int.TryParse(comboBox5.Text, NumberStyles.HexNumber, null, out var one);
-            InvalidEndAddress(one, comboBox5, endAddressValue[0].ToString());
+            if (!(sender is ComboBox combo)) return;
+            int.TryParse(combo.Tag.ToString(), out int index);
+            InvalidEndAddress(combo, endAddressValue[index].ToString());
         }
 
-        private void SelectedEndIndexChangedTwo(object sender, EventArgs e)
-        {
-            int.TryParse(comboBox6.Text, NumberStyles.HexNumber, null, out var two);
-            InvalidEndAddress(two, comboBox6, endAddressValue[1].ToString());
-        }
-
-        private void SelectedEndIndexChangedThree(object sender, EventArgs e)
-        {
-            int.TryParse(comboBox7.Text, NumberStyles.HexNumber, null, out var three);
-            InvalidEndAddress(three, comboBox7, endAddressValue[2].ToString());
-        }
-
-        private void SelectedEndIndexChangedFour(object sender, EventArgs e)
-        {
-            int.TryParse(comboBox8.Text, NumberStyles.HexNumber, null, out var four);
-            InvalidEndAddress(four, comboBox8, endAddressValue[3].ToString());
-        }
-
-        private void InvalidStartAddress(int value, ComboBox comboBox, string startAddresses)
+        private void InvalidStartAddress(ComboBox comboBox, string startAddresses)
         {
             if (int.Parse(GetSelectedMemStartLocation, NumberStyles.HexNumber) < startAddress || 
                 int.Parse(GetSelectedMemStartLocation, NumberStyles.HexNumber) > endAddress)
                 comboBox.Text = startAddresses;
         }
 
-        private void InvalidEndAddress(int value, ComboBox comboBox, string endAddresses)
+        private void InvalidEndAddress(ComboBox comboBox, string endAddresses)
         {
             if (int.Parse(GetSelectedMemEndLocation, NumberStyles.HexNumber) > endAddress ||
                 int.Parse(GetSelectedMemEndLocation, NumberStyles.HexNumber) < startAddress)
@@ -146,10 +112,8 @@ namespace C64BinaryToAssemblyConverter
         
         private void SelectedStartValueValidatingKeyPress(object sender, KeyPressEventArgs e)
         {
-            var combo = sender as ComboBox;
-            if (combo == null) return;
+            if (!(sender is ComboBox combo)) return;
             if (regex.IsMatch(e.KeyChar.ToString())) {
-                //comboBox1.Text = e.KeyChar.ToString().ToUpper();
                 combo.Text = e.KeyChar.ToString().ToUpper();
             }
             e.Handled = true;
