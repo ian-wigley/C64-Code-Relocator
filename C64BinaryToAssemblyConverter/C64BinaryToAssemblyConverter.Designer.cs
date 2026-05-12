@@ -47,11 +47,11 @@ namespace C64BinaryToAssemblyConverter
             this.ExportBytesAsTextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GenerateLabels = new System.Windows.Forms.Button();
             this.AssemblyView = new System.Windows.Forms.TextBox();
             this.byteviewer = new BytesView();
             this.FileLoaded = new System.Windows.Forms.Label();
-            this.configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenu.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -182,6 +182,13 @@ namespace C64BinaryToAssemblyConverter
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Settings";
             // 
+            // configureToolStripMenuItem
+            // 
+            this.configureToolStripMenuItem.Name = "configureToolStripMenuItem";
+            this.configureToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.configureToolStripMenuItem.Text = "Configure";
+            this.configureToolStripMenuItem.Click += new System.EventHandler(this.Configure_Click);
+            // 
             // GenerateLabels
             // 
             this.GenerateLabels.Location = new System.Drawing.Point(319, 584);
@@ -206,7 +213,9 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+
             this.byteviewer.BackColor = System.Drawing.Color.Transparent;
+//            this.byteviewer.AutoScroll = true;
             this.byteviewer.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Inset;
             this.byteviewer.ColumnCount = 1;
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -254,6 +263,8 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.Location = new System.Drawing.Point(70, 620);
+            this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.byteviewer.Location = new System.Drawing.Point(10, 620);
             this.byteviewer.Name = "byteviewer";
             this.byteviewer.RowCount = 1;
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -301,6 +312,10 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.Size = new System.Drawing.Size(634, 199);
+            this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.byteviewer.Size = new System.Drawing.Size(764, 199);
+            this.byteviewer.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.byteviewer.MouseWheelEvent);
+            this.byteviewer.AutoScroll = true;
             this.byteviewer.TabIndex = 6;
             // 
             // FileLoaded
@@ -311,12 +326,6 @@ namespace C64BinaryToAssemblyConverter
             this.FileLoaded.Name = "FileLoaded";
             this.FileLoaded.Size = new System.Drawing.Size(0, 13);
             this.FileLoaded.TabIndex = 9;
-            // 
-            // configureToolStripMenuItem
-            // 
-            this.configureToolStripMenuItem.Name = "configureToolStripMenuItem";
-            this.configureToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.configureToolStripMenuItem.Text = "Configure";
             // 
             // C64BinaryToAssemblyConverter
             // 
@@ -341,6 +350,8 @@ namespace C64BinaryToAssemblyConverter
             this.PerformLayout();
 
         }
+
+
 
         #endregion
 
