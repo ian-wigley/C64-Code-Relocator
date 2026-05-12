@@ -440,7 +440,6 @@ namespace C64BinaryToAssemblyConverter
             DisAssemblyView.SelectedText = string.Join("\r\n", dataStatements) + "\r\n";
         }
 
-
         /// <summary>
         ///     Method to check the Start of the selection text
         ///     matches the expected format
@@ -547,6 +546,15 @@ namespace C64BinaryToAssemblyConverter
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void Configure_Click(object sender, EventArgs e)
+        {
+            ConfigureSettings cs = new ConfigureSettings();
+            if (cs.ShowDialog() == DialogResult.OK)
+            {
+                // TODO
+            }
         }
     }
 }
