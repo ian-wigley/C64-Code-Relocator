@@ -127,7 +127,6 @@
             this.comboBox8.Size = new System.Drawing.Size(40, 21);
             this.comboBox8.TabIndex = 8;
             this.comboBox8.Tag = "3";
-            //this.comboBox8.SelectedValueChanged += new System.EventHandler(this.SelectedEndIndexChangedFour);
             this.comboBox8.SelectedIndexChanged += new System.EventHandler(this.SelectedEndIndexChangedOne);
             this.comboBox8.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SelectedStartValueValidatingKeyPress);
             // 
@@ -139,7 +138,6 @@
             this.comboBox7.Size = new System.Drawing.Size(40, 21);
             this.comboBox7.TabIndex = 7;
             this.comboBox7.Tag = "2";
-            // this.comboBox7.SelectedIndexChanged += new System.EventHandler(this.SelectedEndIndexChangedThree);
             this.comboBox7.SelectedIndexChanged += new System.EventHandler(this.SelectedEndIndexChangedOne);
             this.comboBox7.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SelectedStartValueValidatingKeyPress);
             // 
@@ -151,7 +149,6 @@
             this.comboBox6.Size = new System.Drawing.Size(40, 21);
             this.comboBox6.TabIndex = 6;
             this.comboBox6.Tag = "1";
-            // this.comboBox6.SelectedIndexChanged += new System.EventHandler(this.SelectedEndIndexChangedTwo);
             this.comboBox6.SelectedIndexChanged += new System.EventHandler(this.SelectedEndIndexChangedOne);
             this.comboBox6.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SelectedStartValueValidatingKeyPress);
             // 
