@@ -50,7 +50,11 @@ namespace C64BinaryToAssemblyConverter
                 ? new byte[_columnCount]
                 : new byte[_dataBuf.Length % _columnCount];
             for (var column = 0; column < numArray.Length; ++column)
-                numArray[column] = _dataBuf[num + CellToIndex(column, line)];
+            {
+                var index = CellToIndex(column, line);
+                if (num + index < _dataBuf.Length)
+                    numArray[column] = _dataBuf[num + index];// CellToIndex(column, line)];
+            }
             return numArray;
         }
 
@@ -183,7 +187,7 @@ namespace C64BinaryToAssemblyConverter
             // edit.Visible = false;
             Controls.Add(_scrollBar, 0, 0);
             // Controls.Add((Control)edit, 0, 0);
-            MouseWheel += MouseWheelEvent;
+            //MouseWheel += MouseWheelEvent;
         }
 
         private void InitState()
@@ -226,17 +230,11 @@ namespace C64BinaryToAssemblyConverter
         {
             base.OnPaint(e);
             var graphics = e.Graphics;
-            switch (_realDisplayMode)
-            {
-                case DisplayMode.Hexdump:
-                    SuspendLayout();
-                    //edit.Hide();
-                    _scrollBar.Show();
-                    ResumeLayout();
-                    DrawClient(graphics);
-                    DrawLines(graphics, _startLine, _displayLinesCount);
-                    break;
-            }
+            SuspendLayout();
+            _scrollBar.Show();
+            ResumeLayout();
+            DrawClient(graphics);
+            DrawLines(graphics, _startLine, _displayLinesCount);
         }
 
         /// <summary>Raises the <see cref="E:System.Windows.Forms.Control.Layout" /> event.</summary>
@@ -272,10 +270,15 @@ namespace C64BinaryToAssemblyConverter
                 : _linesCount - _startLine;
         }
 
-        private void MouseWheelEvent(object sender, MouseEventArgs e)
+        public void MouseWheelEvent(object sender, MouseEventArgs e)
         {
             if (_dataBuf == null) return;
-            _scrollBar.Select();
+            int step = SystemInformation.MouseWheelScrollLines * 15;
+            int newValue = _scrollBar.Value - Math.Sign(e.Delta) * step;
+            newValue = Math.Max(_scrollBar.Minimum, newValue);
+            newValue = Math.Min(_scrollBar.Maximum - 8, newValue);
+            _scrollBar.Value = newValue;
+            PerformLayout();
         }   
         
         /// <summary>
