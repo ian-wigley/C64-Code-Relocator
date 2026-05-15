@@ -550,10 +550,11 @@ namespace C64BinaryToAssemblyConverter
 
         private void Configure_Click(object sender, EventArgs e)
         {
-            ConfigureSettings cs = new ConfigureSettings();
+            ConfigureSettings cs = new ConfigureSettings(xmlLoader.SettingsCache);
             if (cs.ShowDialog() == DialogResult.OK)
             {
                 // TODO
+                var done = true;
             }
         }
     }
