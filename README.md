@@ -26,4 +26,4 @@ The reason for creating this tool... some 40 something years after learning to w
 After trying to save Commodore 64 dis-assembled code & manually adding labels by hand, i quickly became bored !
 So this seemed like a much better idea than adding labels by hand !!
 
-**This has only been tested on one small intro, it worked ok after re-building the generated Assembly file with C64 Studio.**
+**I have used this app to reverse engineer most of our old C64 demos/intros and also a game.**
