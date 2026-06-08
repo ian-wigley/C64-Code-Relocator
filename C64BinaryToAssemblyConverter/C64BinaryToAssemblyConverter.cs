@@ -35,6 +35,9 @@ namespace C64BinaryToAssemblyConverter
         {
             InitializeComponent();
             byteviewer.SetDisplayMode(DisplayMode.Hexdump);
+
+            c64Bitmap.Size = new Size(320, 200);
+
             MaximizeBox = false;
             MinimizeBox = false;
             GenerateLabels.Enabled = false;
