@@ -35,9 +35,6 @@ namespace C64BinaryToAssemblyConverter
         {
             InitializeComponent();
             byteviewer.SetDisplayMode(DisplayMode.Hexdump);
-
-            c64Bitmap.Size = new Size(320, 200);
-
             MaximizeBox = false;
             MinimizeBox = false;
             GenerateLabels.Enabled = false;
@@ -51,6 +48,28 @@ namespace C64BinaryToAssemblyConverter
                 xmlLoader = xmlLoader
             };
             xmlLoader.LoadSettings();
+
+
+
+
+
+            c64Bitmap.Size = new Size(320, 200);
+            c64Bitmap.GotFocus += C64Bitmap_GotFocus;
+
+            byte[] bitmap = File.ReadAllBytes("bitmap.bin");
+            byte[] screen = File.ReadAllBytes("screen.bin");
+            byte[] color = File.ReadAllBytes("color.bin");
+
+            BitmapViewer bv = new BitmapViewer();
+
+            Bitmap bmp = bv.ConvertMulticolorToBitmap(
+                bitmap,
+                screen,
+                color,
+                9 // background color
+            );
+
+            c64Bitmap.Image = bmp;
         }
 
         /// <summary>
@@ -560,5 +579,12 @@ namespace C64BinaryToAssemblyConverter
                 var done = true;
             }
         }
+        
+        private void C64Bitmap_GotFocus(object sender, EventArgs e)
+        {
+            ((RichTextBox)sender).Parent.Focus();
+        }
+        
+        
     }
 }
