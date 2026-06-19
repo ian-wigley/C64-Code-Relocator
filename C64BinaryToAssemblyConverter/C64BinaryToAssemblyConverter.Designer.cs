@@ -56,12 +56,20 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer = new BytesView();
             this.bitmapViewer = new System.Windows.Forms.TabPage();
             this.c64Bitmap = new System.Windows.Forms.PictureBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.contextMenu.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.memoryView.SuspendLayout();
             this.bitmapViewer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.c64Bitmap)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // DisAssemblyView
@@ -353,6 +361,7 @@ namespace C64BinaryToAssemblyConverter
             // 
             // bitmapViewer
             // 
+            this.bitmapViewer.Controls.Add(this.groupBox1);
             this.bitmapViewer.Controls.Add(this.c64Bitmap);
             this.bitmapViewer.Location = new System.Drawing.Point(4, 22);
             this.bitmapViewer.Name = "bitmapViewer";
@@ -365,11 +374,74 @@ namespace C64BinaryToAssemblyConverter
             // c64Bitmap
             // 
             this.c64Bitmap.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.c64Bitmap.Location = new System.Drawing.Point(3, 6);
+            this.c64Bitmap.Location = new System.Drawing.Point(3, 3);
             this.c64Bitmap.Name = "c64Bitmap";
-            this.c64Bitmap.Size = new System.Drawing.Size(746, 215);
+            this.c64Bitmap.Size = new System.Drawing.Size(746, 218);
             this.c64Bitmap.TabIndex = 0;
             this.c64Bitmap.TabStop = false;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.textBox3);
+            this.groupBox1.Controls.Add(this.textBox2);
+            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Location = new System.Drawing.Point(487, 32);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(200, 140);
+            this.groupBox1.TabIndex = 7;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "groupBox1";
+            // 
+            // textBox3
+            // 
+            this.textBox3.Location = new System.Drawing.Point(91, 91);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(100, 20);
+            this.textBox3.TabIndex = 12;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(93, 64);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(100, 20);
+            this.textBox2.TabIndex = 11;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(93, 33);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 20);
+            this.textBox1.TabIndex = 10;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(7, 92);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(77, 13);
+            this.label3.TabIndex = 9;
+            this.label3.Text = "Colour location";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(7, 64);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(81, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Screen location";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 33);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(79, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Bitmap location";
             // 
             // C64BinaryToAssemblyConverter
             // 
@@ -394,6 +466,8 @@ namespace C64BinaryToAssemblyConverter
             this.memoryView.ResumeLayout(false);
             this.bitmapViewer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.c64Bitmap)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -427,5 +501,12 @@ namespace C64BinaryToAssemblyConverter
         private BytesView byteviewer;
         private TabPage bitmapViewer;
         private PictureBox c64Bitmap;
+        private GroupBox groupBox1;
+        private TextBox textBox3;
+        private TextBox textBox2;
+        private TextBox textBox1;
+        private Label label3;
+        private Label label2;
+        private Label label1;
     }
 }
