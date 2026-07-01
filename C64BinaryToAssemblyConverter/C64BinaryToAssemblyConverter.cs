@@ -48,28 +48,6 @@ namespace C64BinaryToAssemblyConverter
                 xmlLoader = xmlLoader
             };
             xmlLoader.LoadSettings();
-
-
-
-
-
-            c64Bitmap.Size = new Size(320, 200);
-            c64Bitmap.GotFocus += C64Bitmap_GotFocus;
-
-            byte[] bitmap = File.ReadAllBytes("bitmap.bin");
-            byte[] screen = File.ReadAllBytes("screen.bin");
-            byte[] color = File.ReadAllBytes("color.bin");
-
-            BitmapViewer bv = new BitmapViewer();
-
-            Bitmap bmp = bv.ConvertMulticolorToBitmap(
-                bitmap,
-                screen,
-                color,
-                9 // background color
-            );
-
-            c64Bitmap.Image = bmp;
         }
 
         /// <summary>
@@ -105,6 +83,7 @@ namespace C64BinaryToAssemblyConverter
             FileLoaded.Left = Width / 2 - FileLoaded.Size.Width / 2 - 10;
 
             ConfigureStartAndEndAddresses();
+            PopulateMemoryLocations();
         }
 
         /// <summary>
@@ -580,11 +559,72 @@ namespace C64BinaryToAssemblyConverter
             }
         }
         
-        private void C64Bitmap_GotFocus(object sender, EventArgs e)
+        private void DrawBitmapClick(object sender, EventArgs e)
         {
-            ((RichTextBox)sender).Parent.Focus();
+            byte[] bitmap = GetBitmapData((int)(BitmapCombo.SelectedValue) - _userDefinedStartAddress, (int)(BitmapCombo.SelectedValue) - _userDefinedStartAddress + 0x2000);
+            byte[] screen = GetBitmapData(0x3F40 - _userDefinedStartAddress, 0x3F40 - _userDefinedStartAddress + 0x1000);
+            byte[] color = GetBitmapData(0x4328 - _userDefinedStartAddress, 0x4328 - _userDefinedStartAddress + 0x1000);
+
+            BitmapViewer bv = new BitmapViewer();
+
+            Bitmap bmp = bv.ConvertMulticolorToBitmap(
+                bitmap,
+                screen,
+                color,
+                9 // background color
+            );
+            C64Bitmap.Image = bmp;
         }
-        
-        
+
+        private byte[] GetBitmapData(int startAddress, int endAdress)
+        {
+            var values = new byte[endAdress - startAddress];
+            int index = 0;
+            for (int i = startAddress; i < endAdress; i++)
+            {
+                values[index++] = _data[i];
+            }
+            return values;
+        }
+
+        private void PopulateMemoryLocations()
+        {
+            var items = Enumerable.Range(0, _data.Length)
+                .Select(i => new
+                {
+                    Text = (_userDefinedStartAddress + i).ToString("X4"),
+                    Value = 2048 + i
+                })
+                .ToArray();
+
+            BitmapCombo.DisplayMember = "Text";
+            BitmapCombo.ValueMember = "Value";
+            BitmapCombo.DataSource = items;
+            BitmapCombo.SelectedIndex = 0;
+        }
+
+        /// <summary>
+        ///     Validate the users Key Input
+        /// </summary>
+        private void ValidateKeyInput(object sender, KeyPressEventArgs e)
+        {
+            //if (e.KeyChar == '\r')
+            //{
+            //    DialogResult = DialogResult.OK;
+            //    Close();
+            //}
+            //else if (char.IsControl(e.KeyChar))
+            //{
+            //    return;
+            //}
+
+            var c = char.ToUpper(e.KeyChar);
+            if (!Uri.IsHexDigit(c) || !Regex.IsMatch(BitmapCombo.Text, @"\A[0-9A-F]{1,3}\z"))
+            {
+                e.Handled = true;
+                return;
+            }
+            e.KeyChar = c;
+        }
     }
 }
