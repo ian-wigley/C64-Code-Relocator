@@ -62,7 +62,7 @@
             this.StartAddressSelector.Name = "StartAddressSelector";
             this.StartAddressSelector.Size = new System.Drawing.Size(75, 21);
             this.StartAddressSelector.TabIndex = 3;
-            this.StartAddressSelector.Text = "0801";
+            this.StartAddressSelector.Text = "0800";
             this.StartAddressSelector.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateKeyInput);
             this.StartAddressSelector.Validating += new System.ComponentModel.CancelEventHandler(this.ValidateInput);
             // 
