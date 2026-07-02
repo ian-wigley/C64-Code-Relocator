@@ -397,7 +397,7 @@ namespace C64BinaryToAssemblyConverter
             this.ColourCombo.Name = "ColourCombo";
             this.ColourCombo.Size = new System.Drawing.Size(102, 21);
             this.ColourCombo.TabIndex = 17;
-            this.ColourCombo.Text = "0x4328";
+            this.ColourCombo.Text = "4328";
             // 
             // ScreenCombo
             // 
@@ -406,7 +406,7 @@ namespace C64BinaryToAssemblyConverter
             this.ScreenCombo.Name = "ScreenCombo";
             this.ScreenCombo.Size = new System.Drawing.Size(100, 21);
             this.ScreenCombo.TabIndex = 16;
-            this.ScreenCombo.Text = "0x3F40";
+            this.ScreenCombo.Text = "3F40";
             // 
             // BitmapCombo
             // 
@@ -415,7 +415,7 @@ namespace C64BinaryToAssemblyConverter
             this.BitmapCombo.Name = "BitmapCombo";
             this.BitmapCombo.Size = new System.Drawing.Size(100, 21);
             this.BitmapCombo.TabIndex = 15;
-            this.BitmapCombo.Text = "0x2000";
+            this.BitmapCombo.Text = "2000";
             this.BitmapCombo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateKeyInput);
             // 
             // ExportBitmap
@@ -426,6 +426,7 @@ namespace C64BinaryToAssemblyConverter
             this.ExportBitmap.TabIndex = 14;
             this.ExportBitmap.Text = "Export";
             this.ExportBitmap.UseVisualStyleBackColor = true;
+            this.ExportBitmap.Click += new System.EventHandler(this.ExportBitmap_Click);
             // 
             // DrawBitmap
             // 
