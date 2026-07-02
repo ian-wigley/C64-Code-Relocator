@@ -23,7 +23,7 @@ namespace C64BinaryToAssemblyConverter
                 new { Text = "0400", Value = 1024 },
                 new { Text = "0800", Value = 2048 },
                 new { Text = "0900", Value = 2304 },
-                new { Text = "0A00", Value = 2566 },
+                new { Text = "0A00", Value = 2560 },
                 new { Text = "0C00", Value = 3072 },
                 new { Text = "0D00", Value = 3328 },
                 new { Text = "0E00", Value = 3584 },
