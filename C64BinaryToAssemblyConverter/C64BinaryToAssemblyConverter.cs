@@ -309,10 +309,8 @@ namespace C64BinaryToAssemblyConverter
             var saveFileDialog = SaveFileDialogue("All files (*.*)|*.*|Binary files (*.bin)|*.bin");
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
             if (_data.Length <= 0 || end > _data.Length) return;
-            using (var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
-            {
-                for (var i = start; i <= end; i++) fileStream.WriteByte(_data[i]);
-            }
+            using var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create);
+            for (var i = start; i <= end; i++) fileStream.WriteByte(_data[i]);
         }
 
         /// <summary>
@@ -625,6 +623,13 @@ namespace C64BinaryToAssemblyConverter
                 return;
             }
             e.KeyChar = c;
+        }
+
+        private void ExportBitmap_Click(object sender, EventArgs e)
+        {
+            var saveFileDialog = SaveFileDialogue("All files (*.*)|*.*|PNG files (*.png)|*.png");
+            if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+            C64Bitmap.Image.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
         }
     }
 }
