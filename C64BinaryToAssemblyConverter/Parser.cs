@@ -37,19 +37,19 @@ namespace C64BinaryToAssemblyConverter
         public string[] ParseFileContent(
             byte[] data,
             TextBox textBox,
-            int startAddress,
+            uint startAddress,
             ref List<string> lineNumbers
         )
         {
             textBox.Clear();
-            var filePosition = 0;
+            uint filePosition = 0;
             var opCodes = PopulateOpCodeList.GetOpCodes;
             if (opCodes.Count.Equals(0)) return Array.Empty<string>();
 
             while (filePosition < data.Length)
             {
                 int opCode = data[filePosition];
-                var lineNumber = startAddress + filePosition;
+                uint lineNumber = startAddress + filePosition;
                 lineNumbers.Add(lineNumber.ToString("X4"));
                 var line = (startAddress + filePosition).ToString("X4");
                 line += "  " + opCode.ToString("X2");
