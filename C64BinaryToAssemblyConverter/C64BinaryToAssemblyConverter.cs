@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -28,7 +29,7 @@ namespace C64BinaryToAssemblyConverter
 
         private List<string> _lineNumbers = new List<string>();
         private char[] _startAddress;
-        private int _userDefinedStartAddress;
+        private uint _userDefinedStartAddress;
         private string _userFindValue = "";
 
         public C64BinaryToAssemblyConverter()
@@ -55,6 +56,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            BitmapCombo.Visible = false; 
             var openFileDialog = OpenFileDialogue();
             if (openFileDialog.ShowDialog() != DialogResult.OK) return;
             ClearCollections();
@@ -63,9 +65,10 @@ namespace C64BinaryToAssemblyConverter
 
             // Use a monospaced font
             DisAssemblyView.Font = new Font(FontFamily.GenericMonospace, DisAssemblyView.Font.Size);
-            if (!int.TryParse(ml.GetMemStartLocation, NumberStyles.HexNumber, null, out var startAddress)) return;
+            if (!uint.TryParse(ml.GetMemStartLocation, NumberStyles.HexNumber, null, out uint startAddress)) return;
             _userDefinedStartAddress = startAddress;
             _data = _parser.LoadBinaryData(openFileDialog.FileName);
+            PopulateMemoryLocations();
 
             DisAssemblyView.Lines = _parser.ParseFileContent(_data, DisAssemblyView, startAddress, ref _lineNumbers);
 
@@ -83,7 +86,7 @@ namespace C64BinaryToAssemblyConverter
             FileLoaded.Left = Width / 2 - FileLoaded.Size.Width / 2 - 10;
 
             ConfigureStartAndEndAddresses();
-            PopulateMemoryLocations();
+            BitmapCombo.Visible = true;
         }
 
         /// <summary>
@@ -559,7 +562,7 @@ namespace C64BinaryToAssemblyConverter
         
         private void DrawBitmapClick(object sender, EventArgs e)
         {
-            byte[] bitmap = GetBitmapData((int)(BitmapCombo.SelectedValue) - _userDefinedStartAddress, (int)(BitmapCombo.SelectedValue) - _userDefinedStartAddress + 0x2000);
+            byte[] bitmap = GetBitmapData(uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x2000);
             byte[] screen = GetBitmapData(0x3F40 - _userDefinedStartAddress, 0x3F40 - _userDefinedStartAddress + 0x1000);
             byte[] color = GetBitmapData(0x4328 - _userDefinedStartAddress, 0x4328 - _userDefinedStartAddress + 0x1000);
 
@@ -574,11 +577,11 @@ namespace C64BinaryToAssemblyConverter
             C64Bitmap.Image = bmp;
         }
 
-        private byte[] GetBitmapData(int startAddress, int endAdress)
+        private byte[] GetBitmapData(uint startAddress, uint endAdress)
         {
             var values = new byte[endAdress - startAddress];
-            int index = 0;
-            for (int i = startAddress; i < endAdress; i++)
+            uint index = 0;
+            for (uint i = startAddress; i < endAdress; i++)
             {
                 values[index++] = _data[i];
             }
@@ -587,13 +590,15 @@ namespace C64BinaryToAssemblyConverter
 
         private void PopulateMemoryLocations()
         {
-            var items = Enumerable.Range(0, _data.Length)
+            var items = Enumerable.Range(0, _data.Length / 0x100)
                 .Select(i => new
                 {
-                    Text = (_userDefinedStartAddress + i).ToString("X4"),
-                    Value = 2048 + i
+                    Text = (_userDefinedStartAddress + i * 0x100).ToString("X4"),
+                    Value = 2048 + i * 0x100
                 })
-                .ToArray();
+                .ToList();
+
+            if (items.Count == 0) { items.Add(new { Text = _userDefinedStartAddress.ToString("X4"), Value = (int)(_userDefinedStartAddress) }); }
 
             BitmapCombo.DisplayMember = "Text";
             BitmapCombo.ValueMember = "Value";
