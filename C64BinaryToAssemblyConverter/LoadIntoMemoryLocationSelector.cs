@@ -40,9 +40,7 @@ namespace C64BinaryToAssemblyConverter
                 new { Text = "A000", Value = 40960 },
                 new { Text = "B000", Value = 45056 },
                 new { Text = "C000", Value = 49152 },
-                new { Text = "D000", Value = 53248 },
-                new { Text = "E000", Value = 57344 },
-                new { Text = "F000", Value = 61440 }
+                new { Text = "D000", Value = 53248 }
             };
 
             StartAddressSelector.DataSource = items;
