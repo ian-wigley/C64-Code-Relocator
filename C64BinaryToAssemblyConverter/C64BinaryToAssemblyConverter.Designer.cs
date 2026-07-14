@@ -393,9 +393,9 @@ namespace C64BinaryToAssemblyConverter
             // ColourCombo
             // 
             this.ColourCombo.FormattingEnabled = true;
-            this.ColourCombo.Location = new System.Drawing.Point(91, 71);
+            this.ColourCombo.Location = new System.Drawing.Point(93, 71);
             this.ColourCombo.Name = "ColourCombo";
-            this.ColourCombo.Size = new System.Drawing.Size(102, 21);
+            this.ColourCombo.Size = new System.Drawing.Size(100, 21);
             this.ColourCombo.TabIndex = 17;
             this.ColourCombo.Text = "4328";
             // 
@@ -416,7 +416,7 @@ namespace C64BinaryToAssemblyConverter
             this.BitmapCombo.Size = new System.Drawing.Size(100, 21);
             this.BitmapCombo.TabIndex = 15;
             this.BitmapCombo.Text = "2000";
-            this.BitmapCombo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateKeyInput);
+            //this.BitmapCombo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateKeyInput);
             // 
             // ExportBitmap
             // 
