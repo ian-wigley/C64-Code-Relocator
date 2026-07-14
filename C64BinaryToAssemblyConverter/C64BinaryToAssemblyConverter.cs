@@ -68,7 +68,7 @@ namespace C64BinaryToAssemblyConverter
             if (!uint.TryParse(ml.GetMemStartLocation, NumberStyles.HexNumber, null, out uint startAddress)) return;
             _userDefinedStartAddress = startAddress;
             _data = _parser.LoadBinaryData(openFileDialog.FileName);
-            PopulateMemoryLocations();
+            PopulateBitMapTabMemoryLocations();
 
             DisAssemblyView.Lines = _parser.ParseFileContent(_data, DisAssemblyView, startAddress, ref _lineNumbers);
 
@@ -562,19 +562,25 @@ namespace C64BinaryToAssemblyConverter
         
         private void DrawBitmapClick(object sender, EventArgs e)
         {
-            byte[] bitmap = GetBitmapData(uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x2000);
-            byte[] screen = GetBitmapData(0x3F40 - _userDefinedStartAddress, 0x3F40 - _userDefinedStartAddress + 0x1000);
-            byte[] color = GetBitmapData(0x4328 - _userDefinedStartAddress, 0x4328 - _userDefinedStartAddress + 0x1000);
+            if (BitmapCombo.Items.Count > 0 && ScreenCombo.Items.Count > 0 && ColourCombo.Items.Count > 0)
+            {
+                // 0x2000
+                byte[] bitmap = GetBitmapData(uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x2000);
+                // 0x3F40
+                byte[] screen = GetBitmapData(uint.Parse(ScreenCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(ScreenCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x1000);
+                // 0x4328
+                byte[] color = GetBitmapData(uint.Parse(ColourCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(ColourCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x1000);
 
-            BitmapViewer bv = new BitmapViewer();
+                BitmapViewer bv = new BitmapViewer();
 
-            Bitmap bmp = bv.ConvertMulticolorToBitmap(
-                bitmap,
-                screen,
-                color,
-                9 // background color
-            );
-            C64Bitmap.Image = bmp;
+                Bitmap bmp = bv.ConvertMulticolorToBitmap(
+                    bitmap,
+                    screen,
+                    color,
+                    9 // background color
+                );
+                C64Bitmap.Image = bmp;
+            }
         }
 
         private byte[] GetBitmapData(uint startAddress, uint endAdress)
@@ -588,22 +594,36 @@ namespace C64BinaryToAssemblyConverter
             return values;
         }
 
-        private void PopulateMemoryLocations()
+        private void PopulateBitMapTabMemoryLocations()
         {
-            var items = Enumerable.Range(0, _data.Length / 0x100)
-                .Select(i => new
-                {
-                    Text = (_userDefinedStartAddress + i * 0x100).ToString("X4"),
-                    Value = 2048 + i * 0x100
-                })
-                .ToList();
+            // Ensure there is enough loaded data to display
+            if (_data.Length > 0x4000)
+            {
+                var items = Enumerable.Range(0, _data.Length / 0x100)
+                    .Select(i => new
+                    {
+                        Text = (_userDefinedStartAddress + i * 0x100).ToString("X4"),
+                        Value = 2048 + i * 0x100
+                    })
+                    .ToList();
 
-            if (items.Count == 0) { items.Add(new { Text = _userDefinedStartAddress.ToString("X4"), Value = (int)(_userDefinedStartAddress) }); }
+                if (items.Count == 0) { items.Add(new { Text = _userDefinedStartAddress.ToString("X4"), Value = (int)(_userDefinedStartAddress) }); }
 
-            BitmapCombo.DisplayMember = "Text";
-            BitmapCombo.ValueMember = "Value";
-            BitmapCombo.DataSource = items;
-            BitmapCombo.SelectedIndex = 0;
+                BitmapCombo.DisplayMember = "Text";
+                BitmapCombo.ValueMember = "Value";
+                BitmapCombo.DataSource = items.ToList();
+                BitmapCombo.SelectedIndex = 0;
+
+                ScreenCombo.DisplayMember = "Text";
+                ScreenCombo.ValueMember = "Value";
+                ScreenCombo.DataSource = items.ToList();
+                ScreenCombo.SelectedIndex = 0;
+
+                ColourCombo.DisplayMember = "Text";
+                ColourCombo.ValueMember = "Value";
+                ColourCombo.DataSource = items.ToList();
+                ColourCombo.SelectedIndex = 0;
+            }
         }
 
         /// <summary>
