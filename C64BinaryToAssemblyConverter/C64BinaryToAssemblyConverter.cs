@@ -550,6 +550,9 @@ namespace C64BinaryToAssemblyConverter
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        /// <summary>
+        ///     Configure_Click
+        /// </summary>
         private void Configure_Click(object sender, EventArgs e)
         {
             ConfigureSettings cs = new ConfigureSettings(xmlLoader.SettingsCache);
@@ -559,7 +562,10 @@ namespace C64BinaryToAssemblyConverter
                 var done = true;
             }
         }
-        
+
+        /// <summary>
+        ///     DrawBitmapClick
+        /// </summary>
         private void DrawBitmapClick(object sender, EventArgs e)
         {
             if (BitmapCombo.Items.Count > 0 && ScreenCombo.Items.Count > 0 && ColourCombo.Items.Count > 0)
@@ -583,6 +589,9 @@ namespace C64BinaryToAssemblyConverter
             }
         }
 
+        /// <summary>
+        ///     GetBitmapData
+        /// </summary>
         private byte[] GetBitmapData(uint startAddress, uint endAdress)
         {
             var values = new byte[endAdress - startAddress];
@@ -594,9 +603,12 @@ namespace C64BinaryToAssemblyConverter
             return values;
         }
 
+        /// <summary>
+        ///     PopulateBitMapTabMemoryLocations
+        /// </summary>
         private void PopulateBitMapTabMemoryLocations()
         {
-            // Ensure there is enough loaded data to display
+            // Ensure there is enough data loaded
             if (_data.Length > 0x4000)
             {
                 var items = Enumerable.Range(0, _data.Length / 0x100)
@@ -650,11 +662,17 @@ namespace C64BinaryToAssemblyConverter
             e.KeyChar = c;
         }
 
+        /// <summary>
+        ///     ExportBitmap_Click
+        /// </summary>
         private void ExportBitmap_Click(object sender, EventArgs e)
         {
-            var saveFileDialog = SaveFileDialogue("All files (*.*)|*.*|PNG files (*.png)|*.png");
-            if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
-            C64Bitmap.Image.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
+            if (C64Bitmap.Image != null)
+            {
+                var saveFileDialog = SaveFileDialogue("All files (*.*)|*.*|PNG files (*.png)|*.png");
+                if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+                C64Bitmap.Image.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
+            }
         }
     }
 }
