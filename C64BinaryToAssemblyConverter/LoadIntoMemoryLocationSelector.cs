@@ -21,9 +21,9 @@ namespace C64BinaryToAssemblyConverter
             var items = new[]
             {
                 new { Text = "0400", Value = 1024 },
-                new { Text = "0801", Value = 2049 },
+                new { Text = "0800", Value = 2048 },
                 new { Text = "0900", Value = 2304 },
-                new { Text = "0A00", Value = 2566 },
+                new { Text = "0A00", Value = 2560 },
                 new { Text = "0C00", Value = 3072 },
                 new { Text = "0D00", Value = 3328 },
                 new { Text = "0E00", Value = 3584 },
@@ -40,9 +40,7 @@ namespace C64BinaryToAssemblyConverter
                 new { Text = "A000", Value = 40960 },
                 new { Text = "B000", Value = 45056 },
                 new { Text = "C000", Value = 49152 },
-                new { Text = "D000", Value = 53248 },
-                new { Text = "E000", Value = 57344 },
-                new { Text = "F000", Value = 61440 }
+                new { Text = "D000", Value = 53248 }
             };
 
             StartAddressSelector.DataSource = items;

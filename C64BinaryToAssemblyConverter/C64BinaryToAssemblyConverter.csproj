@@ -11,6 +11,7 @@
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyCreator.cs" />
+    <Compile Include="BitmapViewer.cs" />
     <Compile Include="BytesView.cs">
       <SubType>Component</SubType>
     </Compile>

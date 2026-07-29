@@ -25,7 +25,7 @@ namespace C64BinaryToAssemblyConverter
         private int _scrollbarHeight;
         private int _scrollbarWidth;
         private int _startLine;
-        private int _startAddress;
+        private uint _startAddress;
 
         public BytesView()
         {
@@ -296,7 +296,7 @@ namespace C64BinaryToAssemblyConverter
         /// <summary>Sets the byte array to display in the viewer.</summary>
         /// <param name="bytes">The byte array to display. </param>
         /// <exception cref="T:System.ArgumentNullException">The specified byte array is <see langword="null" />. </exception>
-        public void SetBytes(byte[] bytes, int startingAddress)
+        public void SetBytes(byte[] bytes, uint startingAddress)
         {
             _startAddress = startingAddress;
             _dataBuf = null;

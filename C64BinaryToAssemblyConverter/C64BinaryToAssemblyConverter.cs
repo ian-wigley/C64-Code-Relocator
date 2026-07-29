@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -28,7 +29,7 @@ namespace C64BinaryToAssemblyConverter
 
         private List<string> _lineNumbers = new List<string>();
         private char[] _startAddress;
-        private int _userDefinedStartAddress;
+        private uint _userDefinedStartAddress;
         private string _userFindValue = "";
 
         public C64BinaryToAssemblyConverter()
@@ -55,6 +56,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            BitmapCombo.Visible = false; 
             var openFileDialog = OpenFileDialogue();
             if (openFileDialog.ShowDialog() != DialogResult.OK) return;
             ClearCollections();
@@ -63,9 +65,10 @@ namespace C64BinaryToAssemblyConverter
 
             // Use a monospaced font
             DisAssemblyView.Font = new Font(FontFamily.GenericMonospace, DisAssemblyView.Font.Size);
-            if (!int.TryParse(ml.GetMemStartLocation, NumberStyles.HexNumber, null, out var startAddress)) return;
+            if (!uint.TryParse(ml.GetMemStartLocation, NumberStyles.HexNumber, null, out uint startAddress)) return;
             _userDefinedStartAddress = startAddress;
             _data = _parser.LoadBinaryData(openFileDialog.FileName);
+            PopulateBitMapTabMemoryLocations();
 
             DisAssemblyView.Lines = _parser.ParseFileContent(_data, DisAssemblyView, startAddress, ref _lineNumbers);
 
@@ -83,6 +86,7 @@ namespace C64BinaryToAssemblyConverter
             FileLoaded.Left = Width / 2 - FileLoaded.Size.Width / 2 - 10;
 
             ConfigureStartAndEndAddresses();
+            BitmapCombo.Visible = true;
         }
 
         /// <summary>
@@ -308,10 +312,8 @@ namespace C64BinaryToAssemblyConverter
             var saveFileDialog = SaveFileDialogue("All files (*.*)|*.*|Binary files (*.bin)|*.bin");
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
             if (_data.Length <= 0 || end > _data.Length) return;
-            using (var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
-            {
-                for (var i = start; i <= end; i++) fileStream.WriteByte(_data[i]);
-            }
+            using var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create);
+            for (var i = start; i <= end; i++) fileStream.WriteByte(_data[i]);
         }
 
         /// <summary>
@@ -548,6 +550,9 @@ namespace C64BinaryToAssemblyConverter
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        /// <summary>
+        ///     Configure_Click
+        /// </summary>
         private void Configure_Click(object sender, EventArgs e)
         {
             ConfigureSettings cs = new ConfigureSettings(xmlLoader.SettingsCache);
@@ -555,6 +560,118 @@ namespace C64BinaryToAssemblyConverter
             {
                 // TODO
                 var done = true;
+            }
+        }
+
+        /// <summary>
+        ///     DrawBitmapClick
+        /// </summary>
+        private void DrawBitmapClick(object sender, EventArgs e)
+        {
+            if (BitmapCombo.Items.Count > 0 && ScreenCombo.Items.Count > 0 && ColourCombo.Items.Count > 0)
+            {
+                // 0x2000
+                byte[] bitmap = GetBitmapData(uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x2000);
+                // 0x3F40
+                byte[] screen = GetBitmapData(uint.Parse(ScreenCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(ScreenCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x1000);
+                // 0x4328
+                byte[] color = GetBitmapData(uint.Parse(ColourCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(ColourCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x1000);
+
+                BitmapViewer bv = new BitmapViewer();
+
+                Bitmap bmp = bv.ConvertMulticolorToBitmap(
+                    bitmap,
+                    screen,
+                    color,
+                    9 // background color
+                );
+                C64Bitmap.Image = bmp;
+            }
+        }
+
+        /// <summary>
+        ///     GetBitmapData
+        /// </summary>
+        private byte[] GetBitmapData(uint startAddress, uint endAdress)
+        {
+            var values = new byte[endAdress - startAddress];
+            uint index = 0;
+            for (uint i = startAddress; i < endAdress; i++)
+            {
+                values[index++] = _data[i];
+            }
+            return values;
+        }
+
+        /// <summary>
+        ///     PopulateBitMapTabMemoryLocations
+        /// </summary>
+        private void PopulateBitMapTabMemoryLocations()
+        {
+            // Ensure there is enough data loaded
+            if (_data.Length > 0x4000)
+            {
+                var items = Enumerable.Range(0, _data.Length / 0x100)
+                    .Select(i => new
+                    {
+                        Text = (_userDefinedStartAddress + i * 0x100).ToString("X4"),
+                        Value = 2048 + i * 0x100
+                    })
+                    .ToList();
+
+                if (items.Count == 0) { items.Add(new { Text = _userDefinedStartAddress.ToString("X4"), Value = (int)(_userDefinedStartAddress) }); }
+
+                BitmapCombo.DisplayMember = "Text";
+                BitmapCombo.ValueMember = "Value";
+                BitmapCombo.DataSource = items.ToList();
+                BitmapCombo.SelectedIndex = 0;
+
+                ScreenCombo.DisplayMember = "Text";
+                ScreenCombo.ValueMember = "Value";
+                ScreenCombo.DataSource = items.ToList();
+                ScreenCombo.SelectedIndex = 0;
+
+                ColourCombo.DisplayMember = "Text";
+                ColourCombo.ValueMember = "Value";
+                ColourCombo.DataSource = items.ToList();
+                ColourCombo.SelectedIndex = 0;
+            }
+        }
+
+        /// <summary>
+        ///     Validate the users Key Input
+        /// </summary>
+        private void ValidateKeyInput(object sender, KeyPressEventArgs e)
+        {
+            //if (e.KeyChar == '\r')
+            //{
+            //    DialogResult = DialogResult.OK;
+            //    Close();
+            //}
+            //else if (char.IsControl(e.KeyChar))
+            //{
+            //    return;
+            //}
+
+            var c = char.ToUpper(e.KeyChar);
+            if (!Uri.IsHexDigit(c) || !Regex.IsMatch(BitmapCombo.Text, @"\A[0-9A-F]{1,3}\z"))
+            {
+                e.Handled = true;
+                return;
+            }
+            e.KeyChar = c;
+        }
+
+        /// <summary>
+        ///     ExportBitmap_Click
+        /// </summary>
+        private void ExportBitmap_Click(object sender, EventArgs e)
+        {
+            if (C64Bitmap.Image != null)
+            {
+                var saveFileDialog = SaveFileDialogue("All files (*.*)|*.*|PNG files (*.png)|*.png");
+                if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+                C64Bitmap.Image.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
             }
         }
     }

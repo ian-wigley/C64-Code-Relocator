@@ -50,10 +50,28 @@ namespace C64BinaryToAssemblyConverter
             this.configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GenerateLabels = new System.Windows.Forms.Button();
             this.AssemblyView = new System.Windows.Forms.TextBox();
-            this.byteviewer = new BytesView();
             this.FileLoaded = new System.Windows.Forms.Label();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.memoryView = new System.Windows.Forms.TabPage();
+            this.byteviewer = new BytesView();
+            this.bitmapViewer = new System.Windows.Forms.TabPage();
+            this.BitmapLocator = new System.Windows.Forms.GroupBox();
+            this.ColourCombo = new System.Windows.Forms.ComboBox();
+            this.ScreenCombo = new System.Windows.Forms.ComboBox();
+            this.BitmapCombo = new System.Windows.Forms.ComboBox();
+            this.ExportBitmap = new System.Windows.Forms.Button();
+            this.DrawBitmap = new System.Windows.Forms.Button();
+            this.ColourLocationLabel = new System.Windows.Forms.Label();
+            this.ScreenLocationLabel = new System.Windows.Forms.Label();
+            this.BitmapLocationLabel = new System.Windows.Forms.Label();
+            this.C64Bitmap = new System.Windows.Forms.PictureBox();
             this.contextMenu.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.tabControl.SuspendLayout();
+            this.memoryView.SuspendLayout();
+            this.bitmapViewer.SuspendLayout();
+            this.BitmapLocator.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.C64Bitmap)).BeginInit();
             this.SuspendLayout();
             // 
             // DisAssemblyView
@@ -185,13 +203,13 @@ namespace C64BinaryToAssemblyConverter
             // configureToolStripMenuItem
             // 
             this.configureToolStripMenuItem.Name = "configureToolStripMenuItem";
-            this.configureToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.configureToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.configureToolStripMenuItem.Text = "Configure";
             this.configureToolStripMenuItem.Click += new System.EventHandler(this.Configure_Click);
             // 
             // GenerateLabels
             // 
-            this.GenerateLabels.Location = new System.Drawing.Point(319, 584);
+            this.GenerateLabels.Location = new System.Drawing.Point(319, 575);
             this.GenerateLabels.Name = "GenerateLabels";
             this.GenerateLabels.Size = new System.Drawing.Size(145, 23);
             this.GenerateLabels.TabIndex = 2;
@@ -208,14 +226,43 @@ namespace C64BinaryToAssemblyConverter
             this.AssemblyView.Size = new System.Drawing.Size(390, 529);
             this.AssemblyView.TabIndex = 3;
             // 
+            // FileLoaded
+            // 
+            this.FileLoaded.AutoSize = true;
+            this.FileLoaded.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.FileLoaded.Location = new System.Drawing.Point(300, 5);
+            this.FileLoaded.Name = "FileLoaded";
+            this.FileLoaded.Size = new System.Drawing.Size(0, 13);
+            this.FileLoaded.TabIndex = 9;
+            // 
+            // tabControl
+            // 
+            this.tabControl.Controls.Add(this.memoryView);
+            this.tabControl.Controls.Add(this.bitmapViewer);
+            this.tabControl.Location = new System.Drawing.Point(12, 600);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(760, 250);
+            this.tabControl.TabIndex = 10;
+            // 
+            // memoryView
+            // 
+            this.memoryView.Controls.Add(this.byteviewer);
+            this.memoryView.Location = new System.Drawing.Point(4, 22);
+            this.memoryView.Name = "memoryView";
+            this.memoryView.Padding = new System.Windows.Forms.Padding(3);
+            this.memoryView.Size = new System.Drawing.Size(752, 224);
+            this.memoryView.TabIndex = 0;
+            this.memoryView.Text = "Memory View";
+            this.memoryView.UseVisualStyleBackColor = true;
+            // 
             // byteviewer
             // 
             this.byteviewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-
+            this.byteviewer.AutoScroll = true;
             this.byteviewer.BackColor = System.Drawing.Color.Transparent;
-//            this.byteviewer.AutoScroll = true;
             this.byteviewer.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Inset;
             this.byteviewer.ColumnCount = 1;
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -262,9 +309,8 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.byteviewer.Location = new System.Drawing.Point(70, 620);
             this.byteviewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.byteviewer.Location = new System.Drawing.Point(10, 620);
+            this.byteviewer.Location = new System.Drawing.Point(60, 10);
             this.byteviewer.Name = "byteviewer";
             this.byteviewer.RowCount = 1;
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -311,33 +357,133 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.byteviewer.Size = new System.Drawing.Size(634, 199);
-            this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.byteviewer.Size = new System.Drawing.Size(764, 199);
-            this.byteviewer.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.byteviewer.MouseWheelEvent);
-            this.byteviewer.AutoScroll = true;
-            this.byteviewer.TabIndex = 6;
+            this.byteviewer.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 176F));
+            this.byteviewer.Size = new System.Drawing.Size(634, 178);
+            this.byteviewer.TabIndex = 7;
             // 
-            // FileLoaded
+            // bitmapViewer
             // 
-            this.FileLoaded.AutoSize = true;
-            this.FileLoaded.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.FileLoaded.Location = new System.Drawing.Point(300, 5);
-            this.FileLoaded.Name = "FileLoaded";
-            this.FileLoaded.Size = new System.Drawing.Size(0, 13);
-            this.FileLoaded.TabIndex = 9;
+            this.bitmapViewer.Controls.Add(this.BitmapLocator);
+            this.bitmapViewer.Controls.Add(this.C64Bitmap);
+            this.bitmapViewer.Location = new System.Drawing.Point(4, 22);
+            this.bitmapViewer.Name = "bitmapViewer";
+            this.bitmapViewer.Padding = new System.Windows.Forms.Padding(3);
+            this.bitmapViewer.Size = new System.Drawing.Size(752, 224);
+            this.bitmapViewer.TabIndex = 1;
+            this.bitmapViewer.Text = "Bitmap Viewer";
+            this.bitmapViewer.UseVisualStyleBackColor = true;
+            // 
+            // BitmapLocator
+            // 
+            this.BitmapLocator.Controls.Add(this.ColourCombo);
+            this.BitmapLocator.Controls.Add(this.ScreenCombo);
+            this.BitmapLocator.Controls.Add(this.BitmapCombo);
+            this.BitmapLocator.Controls.Add(this.ExportBitmap);
+            this.BitmapLocator.Controls.Add(this.DrawBitmap);
+            this.BitmapLocator.Controls.Add(this.ColourLocationLabel);
+            this.BitmapLocator.Controls.Add(this.ScreenLocationLabel);
+            this.BitmapLocator.Controls.Add(this.BitmapLocationLabel);
+            this.BitmapLocator.Location = new System.Drawing.Point(10, 20);
+            this.BitmapLocator.Name = "BitmapLocator";
+            this.BitmapLocator.Size = new System.Drawing.Size(200, 160);
+            this.BitmapLocator.TabIndex = 7;
+            this.BitmapLocator.TabStop = false;
+            this.BitmapLocator.Text = "Bitmap locator";
+            // 
+            // ColourCombo
+            // 
+            this.ColourCombo.FormattingEnabled = true;
+            this.ColourCombo.Location = new System.Drawing.Point(93, 71);
+            this.ColourCombo.Name = "ColourCombo";
+            this.ColourCombo.Size = new System.Drawing.Size(100, 21);
+            this.ColourCombo.TabIndex = 17;
+            this.ColourCombo.Text = "4328";
+            // 
+            // ScreenCombo
+            // 
+            this.ScreenCombo.FormattingEnabled = true;
+            this.ScreenCombo.Location = new System.Drawing.Point(93, 45);
+            this.ScreenCombo.Name = "ScreenCombo";
+            this.ScreenCombo.Size = new System.Drawing.Size(100, 21);
+            this.ScreenCombo.TabIndex = 16;
+            this.ScreenCombo.Text = "3F40";
+            // 
+            // BitmapCombo
+            // 
+            this.BitmapCombo.FormattingEnabled = true;
+            this.BitmapCombo.Location = new System.Drawing.Point(93, 19);
+            this.BitmapCombo.Name = "BitmapCombo";
+            this.BitmapCombo.Size = new System.Drawing.Size(100, 21);
+            this.BitmapCombo.TabIndex = 15;
+            this.BitmapCombo.Text = "2000";
+            //this.BitmapCombo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateKeyInput);
+            // 
+            // ExportBitmap
+            // 
+            this.ExportBitmap.Location = new System.Drawing.Point(63, 129);
+            this.ExportBitmap.Name = "ExportBitmap";
+            this.ExportBitmap.Size = new System.Drawing.Size(75, 23);
+            this.ExportBitmap.TabIndex = 14;
+            this.ExportBitmap.Text = "Export";
+            this.ExportBitmap.UseVisualStyleBackColor = true;
+            this.ExportBitmap.Click += new System.EventHandler(this.ExportBitmap_Click);
+            // 
+            // DrawBitmap
+            // 
+            this.DrawBitmap.Location = new System.Drawing.Point(65, 98);
+            this.DrawBitmap.Name = "DrawBitmap";
+            this.DrawBitmap.Size = new System.Drawing.Size(75, 23);
+            this.DrawBitmap.TabIndex = 13;
+            this.DrawBitmap.Text = "Draw";
+            this.DrawBitmap.UseVisualStyleBackColor = true;
+            this.DrawBitmap.Click += new System.EventHandler(this.DrawBitmapClick);
+            // 
+            // ColourLocationLabel
+            // 
+            this.ColourLocationLabel.AutoSize = true;
+            this.ColourLocationLabel.Location = new System.Drawing.Point(7, 75);
+            this.ColourLocationLabel.Name = "ColourLocationLabel";
+            this.ColourLocationLabel.Size = new System.Drawing.Size(77, 13);
+            this.ColourLocationLabel.TabIndex = 9;
+            this.ColourLocationLabel.Text = "Colour location";
+            // 
+            // ScreenLocationLabel
+            // 
+            this.ScreenLocationLabel.AutoSize = true;
+            this.ScreenLocationLabel.Location = new System.Drawing.Point(7, 48);
+            this.ScreenLocationLabel.Name = "ScreenLocationLabel";
+            this.ScreenLocationLabel.Size = new System.Drawing.Size(81, 13);
+            this.ScreenLocationLabel.TabIndex = 8;
+            this.ScreenLocationLabel.Text = "Screen location";
+            // 
+            // BitmapLocationLabel
+            // 
+            this.BitmapLocationLabel.AutoSize = true;
+            this.BitmapLocationLabel.Location = new System.Drawing.Point(7, 24);
+            this.BitmapLocationLabel.Name = "BitmapLocationLabel";
+            this.BitmapLocationLabel.Size = new System.Drawing.Size(79, 13);
+            this.BitmapLocationLabel.TabIndex = 7;
+            this.BitmapLocationLabel.Text = "Bitmap location";
+            // 
+            // C64Bitmap
+            // 
+            this.C64Bitmap.Location = new System.Drawing.Point(240, 10);
+            this.C64Bitmap.Name = "C64Bitmap";
+            this.C64Bitmap.Size = new System.Drawing.Size(320, 220);
+            this.C64Bitmap.TabIndex = 0;
+            this.C64Bitmap.TabStop = false;
             // 
             // C64BinaryToAssemblyConverter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 853);
+            this.Controls.Add(this.tabControl);
             this.Controls.Add(this.FileLoaded);
             this.Controls.Add(this.GenerateLabels);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.AssemblyView);
             this.Controls.Add(this.DisAssemblyView);
-            this.Controls.Add(this.byteviewer);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
@@ -346,6 +492,12 @@ namespace C64BinaryToAssemblyConverter
             this.contextMenu.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.tabControl.ResumeLayout(false);
+            this.memoryView.ResumeLayout(false);
+            this.bitmapViewer.ResumeLayout(false);
+            this.BitmapLocator.ResumeLayout(false);
+            this.BitmapLocator.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.C64Bitmap)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -365,7 +517,6 @@ namespace C64BinaryToAssemblyConverter
         private System.Windows.Forms.TextBox AssemblyView;
         private System.Windows.Forms.ToolStripMenuItem LeftWindowMenuItem;
         private System.Windows.Forms.ToolStripMenuItem RightWindowMenuItem;
-        private BytesView byteviewer;
         private Label FileLoaded;
         private ToolStripMenuItem ExportBytesMenuItem;
         private ToolStripMenuItem ExportBytesAsBinaryMenuItem;
@@ -375,5 +526,19 @@ namespace C64BinaryToAssemblyConverter
         private ToolStripMenuItem findText;
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem configureToolStripMenuItem;
+        private TabControl tabControl;
+        private TabPage memoryView;
+        private BytesView byteviewer;
+        private TabPage bitmapViewer;
+        private PictureBox C64Bitmap;
+        private GroupBox BitmapLocator;
+        private Label ColourLocationLabel;
+        private Label ScreenLocationLabel;
+        private Label BitmapLocationLabel;
+        private Button DrawBitmap;
+        private Button ExportBitmap;
+        private ComboBox ColourCombo;
+        private ComboBox ScreenCombo;
+        private ComboBox BitmapCombo;
     }
 }

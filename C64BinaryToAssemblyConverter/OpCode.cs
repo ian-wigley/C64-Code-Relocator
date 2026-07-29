@@ -19,7 +19,8 @@ namespace C64BinaryToAssemblyConverter
             int numberOfBytes,
             string prefix,
             string suffix,
-            bool illegal)
+            bool illegal
+            )
         {
             Code = code;
             _name = name;
@@ -53,10 +54,10 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         public void GetCode(
             ref string line,
-            ref int filePosition,
+            ref uint filePosition,
             byte[] bytes,
-            int lineNumber,
-            int pc,
+            uint lineNumber,
+            uint pc,
             ref Dictionary<string, string[]> dataStatements,
             ref List<string> illegalOpCodes
         )
