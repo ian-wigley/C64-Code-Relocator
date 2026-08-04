@@ -56,6 +56,8 @@ namespace C64BinaryToAssemblyConverter
             this.byteviewer = new BytesView();
             this.bitmapViewer = new System.Windows.Forms.TabPage();
             this.BitmapLocator = new System.Windows.Forms.GroupBox();
+            this.BitmapColour = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.ColourCombo = new System.Windows.Forms.ComboBox();
             this.ScreenCombo = new System.Windows.Forms.ComboBox();
             this.BitmapCombo = new System.Windows.Forms.ComboBox();
@@ -65,6 +67,7 @@ namespace C64BinaryToAssemblyConverter
             this.ScreenLocationLabel = new System.Windows.Forms.Label();
             this.BitmapLocationLabel = new System.Windows.Forms.Label();
             this.C64Bitmap = new System.Windows.Forms.PictureBox();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.contextMenu.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -375,6 +378,8 @@ namespace C64BinaryToAssemblyConverter
             // 
             // BitmapLocator
             // 
+            this.BitmapLocator.Controls.Add(this.BitmapColour);
+            this.BitmapLocator.Controls.Add(this.label1);
             this.BitmapLocator.Controls.Add(this.ColourCombo);
             this.BitmapLocator.Controls.Add(this.ScreenCombo);
             this.BitmapLocator.Controls.Add(this.BitmapCombo);
@@ -390,10 +395,28 @@ namespace C64BinaryToAssemblyConverter
             this.BitmapLocator.TabStop = false;
             this.BitmapLocator.Text = "Bitmap locator";
             // 
+            // BitmapColour
+            // 
+            this.BitmapColour.FormattingEnabled = true;
+            this.BitmapColour.Location = new System.Drawing.Point(111, 25);
+            this.BitmapColour.Name = "BitmapColour";
+            this.BitmapColour.Size = new System.Drawing.Size(82, 21);
+            this.BitmapColour.TabIndex = 19;
+            this.BitmapColour.Text = "White";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 29);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(98, 13);
+            this.label1.TabIndex = 18;
+            this.label1.Text = "Background Colour";
+            // 
             // ColourCombo
             // 
             this.ColourCombo.FormattingEnabled = true;
-            this.ColourCombo.Location = new System.Drawing.Point(93, 71);
+            this.ColourCombo.Location = new System.Drawing.Point(93, 102);
             this.ColourCombo.Name = "ColourCombo";
             this.ColourCombo.Size = new System.Drawing.Size(100, 21);
             this.ColourCombo.TabIndex = 17;
@@ -402,7 +425,7 @@ namespace C64BinaryToAssemblyConverter
             // ScreenCombo
             // 
             this.ScreenCombo.FormattingEnabled = true;
-            this.ScreenCombo.Location = new System.Drawing.Point(93, 45);
+            this.ScreenCombo.Location = new System.Drawing.Point(93, 76);
             this.ScreenCombo.Name = "ScreenCombo";
             this.ScreenCombo.Size = new System.Drawing.Size(100, 21);
             this.ScreenCombo.TabIndex = 16;
@@ -411,16 +434,15 @@ namespace C64BinaryToAssemblyConverter
             // BitmapCombo
             // 
             this.BitmapCombo.FormattingEnabled = true;
-            this.BitmapCombo.Location = new System.Drawing.Point(93, 19);
+            this.BitmapCombo.Location = new System.Drawing.Point(93, 50);
             this.BitmapCombo.Name = "BitmapCombo";
             this.BitmapCombo.Size = new System.Drawing.Size(100, 21);
             this.BitmapCombo.TabIndex = 15;
             this.BitmapCombo.Text = "2000";
-            //this.BitmapCombo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValidateKeyInput);
             // 
             // ExportBitmap
             // 
-            this.ExportBitmap.Location = new System.Drawing.Point(63, 129);
+            this.ExportBitmap.Location = new System.Drawing.Point(102, 129);
             this.ExportBitmap.Name = "ExportBitmap";
             this.ExportBitmap.Size = new System.Drawing.Size(75, 23);
             this.ExportBitmap.TabIndex = 14;
@@ -430,7 +452,7 @@ namespace C64BinaryToAssemblyConverter
             // 
             // DrawBitmap
             // 
-            this.DrawBitmap.Location = new System.Drawing.Point(65, 98);
+            this.DrawBitmap.Location = new System.Drawing.Point(21, 129);
             this.DrawBitmap.Name = "DrawBitmap";
             this.DrawBitmap.Size = new System.Drawing.Size(75, 23);
             this.DrawBitmap.TabIndex = 13;
@@ -441,7 +463,7 @@ namespace C64BinaryToAssemblyConverter
             // ColourLocationLabel
             // 
             this.ColourLocationLabel.AutoSize = true;
-            this.ColourLocationLabel.Location = new System.Drawing.Point(7, 75);
+            this.ColourLocationLabel.Location = new System.Drawing.Point(7, 106);
             this.ColourLocationLabel.Name = "ColourLocationLabel";
             this.ColourLocationLabel.Size = new System.Drawing.Size(77, 13);
             this.ColourLocationLabel.TabIndex = 9;
@@ -450,7 +472,7 @@ namespace C64BinaryToAssemblyConverter
             // ScreenLocationLabel
             // 
             this.ScreenLocationLabel.AutoSize = true;
-            this.ScreenLocationLabel.Location = new System.Drawing.Point(7, 48);
+            this.ScreenLocationLabel.Location = new System.Drawing.Point(7, 79);
             this.ScreenLocationLabel.Name = "ScreenLocationLabel";
             this.ScreenLocationLabel.Size = new System.Drawing.Size(81, 13);
             this.ScreenLocationLabel.TabIndex = 8;
@@ -459,7 +481,7 @@ namespace C64BinaryToAssemblyConverter
             // BitmapLocationLabel
             // 
             this.BitmapLocationLabel.AutoSize = true;
-            this.BitmapLocationLabel.Location = new System.Drawing.Point(7, 24);
+            this.BitmapLocationLabel.Location = new System.Drawing.Point(7, 55);
             this.BitmapLocationLabel.Name = "BitmapLocationLabel";
             this.BitmapLocationLabel.Size = new System.Drawing.Size(79, 13);
             this.BitmapLocationLabel.TabIndex = 7;
@@ -540,5 +562,8 @@ namespace C64BinaryToAssemblyConverter
         private ComboBox ColourCombo;
         private ComboBox ScreenCombo;
         private ComboBox BitmapCombo;
+        private ComboBox BitmapColour;
+        private Label label1;
+        private ToolTip toolTip;
     }
 }
