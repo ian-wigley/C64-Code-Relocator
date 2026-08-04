@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -16,6 +15,7 @@ namespace C64BinaryToAssemblyConverter
     {
         private const string BYTE_DEFINITION = "!byte $";
         private readonly AssemblyCreator _assemblyCreator;
+        private readonly BitmapViewer bv = new BitmapViewer();
         protected readonly Parser _parser = new Parser();
 
         private readonly Regex regex =
@@ -32,9 +32,13 @@ namespace C64BinaryToAssemblyConverter
         private uint _userDefinedStartAddress;
         private string _userFindValue = "";
 
+
+
         public C64BinaryToAssemblyConverter()
         {
             InitializeComponent();
+            toolTip.SetToolTip(ColourLocationLabel, "Search for STA $D800,X in code");
+            toolTip.SetToolTip(ScreenLocationLabel, "Search for STA $0400,X in code");
             byteviewer.SetDisplayMode(DisplayMode.Hexdump);
             MaximizeBox = false;
             MinimizeBox = false;
@@ -56,7 +60,7 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BitmapCombo.Visible = false; 
+            BitmapCombo.Visible = false;
             var openFileDialog = OpenFileDialogue();
             if (openFileDialog.ShowDialog() != DialogResult.OK) return;
             ClearCollections();
@@ -81,7 +85,7 @@ namespace C64BinaryToAssemblyConverter
             ExportBytesAsTextMenuItem.Enabled = true;
 
             byteviewer.SetBytes(_data, startAddress);
-            
+
             FileLoaded.Text = openFileDialog.SafeFileName;
             FileLoaded.Left = Width / 2 - FileLoaded.Size.Width / 2 - 10;
 
@@ -473,33 +477,32 @@ namespace C64BinaryToAssemblyConverter
         /// </summary>
         private void ShowFindDialog()
         {
-            using (var findForm = new Form())
-            using (var txtFind = new TextBox())
-            using (var btnFind = new Button())
+            using var findForm = new Form();
+            using var txtFind = new TextBox();
+            using var btnFind = new Button();
+            findForm.Text = @"Find";
+            findForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+            findForm.StartPosition = FormStartPosition.CenterParent;
+            findForm.ClientSize = new Size(280, 80);
+            findForm.MaximizeBox = false;
+            findForm.MinimizeBox = false;
+
+            txtFind.Location = new Point(10, 10);
+            txtFind.Width = 260;
+
+            btnFind.Text = @"Find Next";
+            btnFind.Location = new Point(190, 40);
+            btnFind.DialogResult = DialogResult.OK;
+
+            findForm.AcceptButton = btnFind;
+
+            findForm.Controls.Add(txtFind);
+            findForm.Controls.Add(btnFind);
+
+            if (findForm.ShowDialog(this) == DialogResult.OK)
             {
-                findForm.Text = @"Find";
-                findForm.FormBorderStyle = FormBorderStyle.FixedDialog;
-                findForm.StartPosition = FormStartPosition.CenterParent;
-                findForm.ClientSize = new Size(280, 80);
-                findForm.MaximizeBox = false;
-                findForm.MinimizeBox = false;
-
-                txtFind.Location = new Point(10, 10);
-                txtFind.Width = 260;
-
-                btnFind.Text = @"Find Next";
-                btnFind.Location = new Point(190, 40);
-                btnFind.DialogResult = DialogResult.OK;
-
-                findForm.AcceptButton = btnFind;
-
-                findForm.Controls.Add(txtFind);
-                findForm.Controls.Add(btnFind);
-
-                if (findForm.ShowDialog(this) == DialogResult.OK) {
-                    _userFindValue = txtFind.Text;
-                    FindText(txtFind.Text); 
-                }
+                _userFindValue = txtFind.Text;
+                FindText(txtFind.Text);
             }
         }
 
@@ -570,6 +573,7 @@ namespace C64BinaryToAssemblyConverter
         {
             if (BitmapCombo.Items.Count > 0 && ScreenCombo.Items.Count > 0 && ColourCombo.Items.Count > 0)
             {
+                byte backgroundColour = (byte)(BitmapColour.SelectedIndex);
                 // 0x2000
                 byte[] bitmap = GetBitmapData(uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(BitmapCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x2000);
                 // 0x3F40
@@ -577,13 +581,11 @@ namespace C64BinaryToAssemblyConverter
                 // 0x4328
                 byte[] color = GetBitmapData(uint.Parse(ColourCombo.SelectedValue.ToString()) - _userDefinedStartAddress, uint.Parse(ColourCombo.SelectedValue.ToString()) - _userDefinedStartAddress + 0x1000);
 
-                BitmapViewer bv = new BitmapViewer();
-
                 Bitmap bmp = bv.ConvertMulticolorToBitmap(
                     bitmap,
                     screen,
                     color,
-                    9 // background color
+                    backgroundColour
                 );
                 C64Bitmap.Image = bmp;
             }
@@ -611,6 +613,38 @@ namespace C64BinaryToAssemblyConverter
             // Ensure there is enough data loaded
             if (_data.Length > 0x4000)
             {
+                string[] names =
+                {
+                    "Black",
+                    "White",
+                    "Red",
+                    "Cyan",
+                    "Purple",
+                    "Green",
+                    "Blue",
+                    "Yellow",
+                    "Orange",
+                    "Brown",
+                    "Light Red",
+                    "Dark Grey",
+                    "Grey",
+                    "Light Green",
+                    "Light Blue",
+                    "Light Grey"
+                };
+
+                var colours = names
+                    .Select((name, i) => new
+                    {
+                        Text = name,
+                        Value = bv.C64Colours[i]
+                    })
+                    .ToList();
+
+                BitmapColour.DisplayMember = "Text";
+                BitmapColour.ValueMember = "Value";
+                BitmapColour.DataSource = colours;
+
                 var items = Enumerable.Range(0, _data.Length / 0x100)
                     .Select(i => new
                     {
