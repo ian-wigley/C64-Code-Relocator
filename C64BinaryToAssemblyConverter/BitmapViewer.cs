@@ -5,7 +5,7 @@ namespace C64BinaryToAssemblyConverter
 {
     public class BitmapViewer
     {
-        private readonly Color[] _c64Palette =
+        private readonly Color[] c64Palette =
         {
             Color.Black,
             Color.White,
@@ -25,6 +25,7 @@ namespace C64BinaryToAssemblyConverter
             Color.FromArgb(187, 187, 187)
         };
 
+        public Color[] C64Colours { get { return c64Palette; } }
 
         public Bitmap ConvertMulticolorToBitmap(byte[] bitmapData, byte[] screenData, byte[] colorData,
             byte backgroundColorCode)
@@ -38,10 +39,10 @@ namespace C64BinaryToAssemblyConverter
                     int cellIndex = charY * 40 + charX;
 
                     // Extract the 4 possible colors for this specific 8x8 block
-                    Color col00 = _c64Palette[backgroundColorCode & 0x0F];
-                    Color col01 = _c64Palette[(screenData[cellIndex] >> 4) & 0x0F];
-                    Color col10 = _c64Palette[screenData[cellIndex] & 0x0F];
-                    Color col11 = _c64Palette[colorData[cellIndex] & 0x0F];
+                    Color col00 = c64Palette[backgroundColorCode & 0x0F];
+                    Color col01 = c64Palette[(screenData[cellIndex] >> 4) & 0x0F];
+                    Color col10 = c64Palette[screenData[cellIndex] & 0x0F];
+                    Color col11 = c64Palette[colorData[cellIndex] & 0x0F];
 
                     // Process the 8 rows of the character block
                     for (int row = 0; row < 8; row++)
