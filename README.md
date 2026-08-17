@@ -16,7 +16,7 @@ Either windows output can be saved, as long as it's populated.
 The resulting code can then be saved to disk & load and compiled with your favourite IDE.
 <br>I have successfully compiled and executed the reverse engineered code with both C64 Studio & the VSCode VS64 extension.
 
-![](Application.jpg)
+![](Application.png)
 
 If Illegal opcodes are found during the add labels processing, you will be prompted if you would like them automatically converting to data statements an appending into the code.
 
@@ -26,4 +26,7 @@ The reason for creating this tool... some 40 something years after learning to w
 After trying to save Commodore 64 dis-assembled code & manually adding labels by hand, i quickly became bored !
 So this seemed like a much better idea than adding labels by hand !!
 
-**I have used this app to reverse engineer most of our old C64 demos/intros and also a game.**
+**I have used this app to reverse engineer our old C64 demos/intros and also a game.**
+
+
+![](BitmapLocator.png)
