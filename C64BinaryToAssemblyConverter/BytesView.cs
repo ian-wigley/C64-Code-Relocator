@@ -279,8 +279,8 @@ namespace C64BinaryToAssemblyConverter
             newValue = Math.Min(_scrollBar.Maximum - 8, newValue);
             _scrollBar.Value = newValue;
             PerformLayout();
-        }   
-        
+        }
+
         /// <summary>
         ///     Handles the <see cref="E:System.Windows.Forms.ScrollBar.ValueChanged" /> event on the
         ///     <see cref="T:System.ComponentModel.Design.BytesView" /> control's <see cref="T:System.Windows.Forms.ScrollBar" />.
